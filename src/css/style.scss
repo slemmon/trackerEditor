@@ -1,0 +1,254 @@
+body {
+    width: 30%;
+    margin: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+.track-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: auto;
+    max-height: 150px;
+    border: 1px solid #4e999c;
+    .track-list-item {
+        height: 23px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #bfe4e4;
+        &.track-list-item-last {
+            border-bottom: none;
+        }
+        > span {
+            flex: 1;
+        }
+        .track-list-item-tickbar {
+            display: flex;
+            height: 15px;
+            .track-list-item-tickbar-bar {
+                border-radius: 2px;
+
+                // background-size: 3px 3px;
+                // background-image: linear-gradient(45deg, #fff 25%, transparent 25%, transparent),
+                                          // linear-gradient(-45deg, #fff 25%, transparent 25%, transparent),
+                                          // linear-gradient(45deg, transparent 75%, #fff 75%),
+                                          // linear-gradient(-45deg, transparent 75%, #fff 75%)
+
+            }
+        }
+        .track-list-item-buttons {
+            flex: 0 0 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .track-list-item-buttons-color-button {
+                width: 15px;
+                height: 15px;
+                border-radius: 3px;
+            }
+        }
+    }
+}
+
+.editor-container {
+    display: flex;
+    .editor-table {
+        display: flex;
+        flex-flow: column;
+        .editor-table-row {
+            display: flex;
+            &.editor-table-row-last .editor-table-block {
+                border-bottom: 1px solid #00969c;
+            }
+            .editor-table-block {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 10px;
+                height: 10px;
+                border-top: 1px solid #00969c;
+                border-left: 1px solid #00969c;
+                &.editor-table-block-last {
+                    border-right: 1px solid #00969c;
+                }
+                .editor-table-block-note {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 2px;
+                    background-color: #584d4c;
+                    &.editor-table-block-note-first {
+                        height: 10px;
+                        position: relative;
+                        top: 1px;
+                        border-bottom-left-radius: 0;
+                        border-bottom-right-radius: 0;
+                        align-self: flex-end;
+                    }
+                    &.editor-table-block-note-middle {
+                        height: 12px;
+                        border-radius: 0;
+                    }
+                    &.editor-table-block-note-last {
+                        height: 10px;
+                        position: relative;
+                        top: -1px;
+                        border-top-left-radius: 0;
+                        border-top-right-radius: 0;
+                        align-self: flex-start;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.sheet-note-container {
+    margin-top: 10px;
+    width: 694px;
+}
+
+.sheet-note-row {
+    > :last-child {
+        border-right: 1px solid;
+    }
+    display: flex;
+    font-size: 6pt;
+    position: relative;
+}
+
+.sheet-note {
+    flex: 1;
+    height: 16px;
+    border: 1px solid;
+    border-right: none;
+    display: flex;
+}
+
+.sheet-note-low {
+    align-items: flex-end;
+}
+
+.sheet-note-high {
+    align-items: flex-start;
+}
+
+.sheet-note-key-row {
+    > :last-child {
+        border-right: 1px solid;
+    }
+    display: flex;
+}
+
+.sheet-note-key {
+    height: 30px;
+    border-left: 1px solid;
+    border-bottom: 1px solid;
+    border-bottom-right-radius: 2.5px;
+    border-bottom-left-radius: 2.5px;
+    &.key-1 {
+        flex: 17;
+    }
+    &.key-2 {
+        flex: 19.5;
+    }
+    &.key-3 {
+        flex: 17;
+    }
+    &.key-4 {
+        flex: 17;
+    }
+    &.key-5 {
+        flex: 19.5;
+    }
+    &.key-6 {
+        flex: 19.5;
+    }
+    &.key-7 {
+        flex: 17;
+    }
+}
+
+.sheet-note-key-black {
+    position: absolute;
+    background-color: #584d4c;
+    border-bottom-left-radius: 2.5px;
+    border-bottom-right-radius: 2.5px;
+    width: 12px;
+    height: 15px;
+    top: 18px;
+    transform: translateX(-1px);
+}
+
+.editor-drum-container {
+    display: flex;
+    .editor-drum-row {
+        display: flex;
+        .editor-drum-block {
+            &:last-child {
+                border-right: 1px solid #00969c;
+            }
+            border: 1px solid #00969c;
+            border-right: none;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .editor-drum-block-note {
+                &.editor-drum-block-note-snare {
+                    width: 14px;
+                    border-radius: 2px;
+                }
+                &.editor-drum-block-note-middle {
+                    width: 100%;
+                }
+                &.editor-drum-block-note-start {
+                    border-top-left-radius: 2px;
+                    border-bottom-left-radius: 2px;
+                    width: 16px;
+                    position: relative;
+                    right: -1px;
+                }
+                &.editor-drum-block-note-end {
+                    border-top-right-radius: 2px;
+                    border-bottom-right-radius: 2px;
+                    width: 16px;
+                    position: relative;
+                    left: -1px;
+                }
+                height: 14px;
+                background-color: #584d4c;
+            }
+        }
+    }
+}
+
+.drum-selector-container {
+    display: flex;
+    flex-flow: column;
+    .drum-selector {
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        .effect-text {
+            flex: 0 0 5%;
+        }
+        .effect-preview {
+            border-radius: 2px;
+            height: 14px;
+            background-color: #584d4c;
+            &.snare {
+                width: 14px;
+            }
+            &.snake {
+                width: 28px;
+            }
+            &.crash {
+                width: 56px;
+            }
+        }
+    }
+}

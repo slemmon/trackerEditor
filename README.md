@@ -1,7 +1,8 @@
-# trackerEditor
+# ATM track editor
 Create 8-bit tracker music
 
-```
-npm install
-npm run dev
-```
+### setup
+`yarn` or `npm i`
+
+### dev script
+`yarn run dev` or `npm run dev`
