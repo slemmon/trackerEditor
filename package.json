@@ -1,18 +1,34 @@
 {
-  "name": "midi",
+  "name": "tracker-editor",
   "version": "1.0.0",
+  "description": "an 8-bit tracker music editor",
   "main": "index.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TEAMarg/trackerEditor.git"
+  },
+  "homepage": "https://github.com/TEAMarg/trackerEditor#readme",
+  "bugs": {
+    "url": "https://github.com/TEAMarg/trackerEditor/issues"
+  },
+  "keywords": [
+    "music",
+    "tracker-music",
+    "8-bit",
+    "arduino",
+    "editor"
+  ],
+  "scripts": {
+    "dev": "bash .bin/dev.sh",
+    "deploy": "bash .bin/deploy.sh"
+  },
   "dependencies": {
     "babel-preset-react": "^6.22.0",
     "lodash.isequal": "^4.5.0",
     "lodash.uniq": "^4.5.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2"
-  },
-  "scripts": {
-    "dev": "bash .bin/dev.sh",
-    "deploy": "bash .bin/deploy.sh"
   },
   "devDependencies": {
     "babel-plugin-transform-es2015-modules-commonjs": "^6.22.0",
