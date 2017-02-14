@@ -69,60 +69,65 @@ class DrumEditor extends Component {
         })
     }
 
-    getActiveEffectAtPosition (position) {
-        const effects = this.props.activeTrack.notes
-        const effectsToRemove = []
-        const fourInterestingPositions = [effects[position-3] || {}, effects[position-2] || {}, effects[position-1] || {}, effects[position] || {}]
-        if ( fourInterestingPositions[0].type === 'crash' )
-            effectsToRemove.push(position-3)
-        if ( fourInterestingPositions[1].type === 'crash' )
-            effectsToRemove.push(position-2)
-        if ( fourInterestingPositions[2].type === 'crash' || fourInterestingPositions[2].type === 'snake' )
-            effectsToRemove.push(position-1)
-        if ( fourInterestingPositions[3].type )
-            effectsToRemove.push(position)
-        return effectsToRemove
-    }
-
-    getActiveEffectAfterPosition (position, length) {
-        const effects = this.props.activeTrack.notes
-        const effectsToRemove = []
-        for ( let x = 0; x < length; x++ )
-            if ( (effects[position + x + 1] || {}).type )
-                effectsToRemove.push(position + x + 1)
-        return effectsToRemove
-    }
-
     addEffectAtPosition (position) {
-        const isPositionTaken = this.getActiveEffectAtPosition(position)
 
         const track = Object.assign({}, this.props.activeTrack)
-        const effects = track.notes.slice()
+        const ticks = track.ticks
+        let effects = track.notes.slice()
 
-        if ( isPositionTaken.length )
-            for ( const pos of isPositionTaken )
-                effects[pos] = undefined
-        else {
-            const selectedEffect = this.state.selectedEffect
-
-            if ( position + (selectedEffect === 'crash' ? 3 : selectedEffect === 'snake' ? 1 : 0) >= this.props.activeTrack.ticks )
-                return
-
-            effects[position] = {type: selectedEffect}
-            let isNextPositionTaken = []
-            if ( selectedEffect === 'crash' ) {
-                isNextPositionTaken = this.getActiveEffectAfterPosition(position, 3)
-            } else if ( selectedEffect === 'snake' ) {
-                isNextPositionTaken = this.getActiveEffectAfterPosition(position, 1)
-            }
-            for ( const pos of isNextPositionTaken ) {
-                effects[pos] = undefined
-            }
-        }
+        if ( effects[position] !== undefined )
+            effects[position] = undefined
+        else
+            effects = this.updateEffectsList(effects, position)
 
         track.notes = effects
 
         this.props.updateDrumTrack(track.id, track)
+    }
+
+    updateEffectsList (effects, position) {
+        const selectedEffect = this.state.selectedEffect
+        const track = this.props.activeTrack
+
+        const effectLength = selectedEffect === 'snare' ? 2 : selectedEffect === 'snake' ? 4 : 16
+        if ( position + effectLength > track.ticks )
+            return effects
+
+        effects[position] = selectedEffect
+
+        if ( selectedEffect === 'snare' )
+            // remove next
+            effects[position+1] = undefined
+        else if ( selectedEffect === 'snake' )
+            for ( let x = 1; x < 4; x++ )
+                effects[position+x] = undefined
+            // remove next 4
+        else if ( selectedEffect === 'crash' )
+            for ( let x = 1; x < 16; x++ )
+                effects[position+x] = undefined
+            // remove next 16
+
+        // remove previous if previous is long enough
+        const indexToStartSlicingFrom = position - 15 < 0 ? 0 : position - 15
+        const previousEffects = effects.slice(indexToStartSlicingFrom, position)
+        const selectLength = previousEffects.length
+
+        let thisEffect
+        for ( let x = 0; x < selectLength; x++ ) {
+            thisEffect = previousEffects[x]
+            if ( thisEffect === 'crash' ) {
+                effects[x+indexToStartSlicingFrom] = undefined
+                break
+            } else if ( thisEffect === 'snake' && selectLength - x <= 3 ) {
+                effects[x+indexToStartSlicingFrom] = undefined
+                break
+            } else if ( thisEffect === 'snare' && selectLength - x === 1 ) {
+                effects[x+indexToStartSlicingFrom] = undefined
+                break
+            }
+        }
+
+        return effects
     }
 
     render () {
@@ -138,8 +143,8 @@ class DrumEditor extends Component {
                 <div>
                     <label htmlFor="track-ticks">Ticks: </label>
                     <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
+                    <button onClick={ this.changeTicksAmount }>ok</button>
                 </div>
-                <div onClick={ this.changeTicksAmount }>ok</div>
                 <DrumTable notes={activeTrack.notes} ticks={activeTrack.ticks} addEffectAtPosition={this.addEffectAtPosition} />
 
                 <div className="drum-selector-container">

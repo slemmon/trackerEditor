@@ -195,32 +195,21 @@ body {
             width: 16px;
             height: 16px;
             display: flex;
-            justify-content: center;
-            align-items: center;
             .editor-drum-block-note {
-                &.editor-drum-block-note-snare {
-                    width: 14px;
-                    border-radius: 2px;
-                }
-                &.editor-drum-block-note-middle {
-                    width: 100%;
-                }
-                &.editor-drum-block-note-start {
-                    border-top-left-radius: 2px;
-                    border-bottom-left-radius: 2px;
-                    width: 16px;
-                    position: relative;
-                    right: -1px;
-                }
-                &.editor-drum-block-note-end {
-                    border-top-right-radius: 2px;
-                    border-bottom-right-radius: 2px;
-                    width: 16px;
-                    position: relative;
-                    left: -1px;
-                }
+                border-radius: 2px;
+                position: absolute;
+                margin: 1px;
                 height: 14px;
                 background-color: #584d4c;
+                &.editor-drum-block-note-snare {
+                    width: 30px;
+                }
+                &.editor-drum-block-note-snake {
+                    width: 65px;
+                }
+                &.editor-drum-block-note-crash {
+                    width: 269px;
+                }
             }
         }
     }
@@ -241,13 +230,13 @@ body {
             height: 14px;
             background-color: #584d4c;
             &.snare {
-                width: 14px;
+                width: 30px;
             }
             &.snake {
-                width: 28px;
+                width: 65px;
             }
             &.crash {
-                width: 56px;
+                width: 269px;
             }
         }
     }

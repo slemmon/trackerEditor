@@ -90,8 +90,8 @@ class TrackEditor extends Component {
                 <div>
                     <label htmlFor="track-ticks">Ticks: </label>
                     <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
+                    <button onClick={ this.changeTicksAmount }>ok</button>
                 </div>
-                <div onClick={ this.changeTicksAmount }>ok</div>
                 <button onClick={this.props.playSong}>play once</button>
                 <button onClick={this.props.togglePauseSong}>autoplay</button>
                 <button onClick={this.props.toggleMuteSong}>mute</button>
