@@ -55,7 +55,7 @@ class DrumEditor extends Component {
 
     trimNotes (notes, ticks) {
         const newNotes = notes.map((note={}, i) => {
-            if ( i + (note.type === 'crash' ? 3 : note.type === 'snake' ? 1 : 0) >= ticks )
+            if ( i + (note.type === 'crash' ? 3 : note.type === 'shake' ? 1 : 0) >= ticks )
                 return undefined
             else
                 return note
@@ -89,7 +89,7 @@ class DrumEditor extends Component {
         const selectedEffect = this.state.selectedEffect
         const track = this.props.activeTrack
 
-        const effectLength = selectedEffect === 'snare' ? 2 : selectedEffect === 'snake' ? 4 : 16
+        const effectLength = selectedEffect === 'snare' ? 2 : selectedEffect === 'shake' ? 4 : 16
         if ( position + effectLength > track.ticks )
             return effects
 
@@ -98,7 +98,7 @@ class DrumEditor extends Component {
         if ( selectedEffect === 'snare' )
             // remove next
             effects[position+1] = undefined
-        else if ( selectedEffect === 'snake' )
+        else if ( selectedEffect === 'shake' )
             for ( let x = 1; x < 4; x++ )
                 effects[position+x] = undefined
             // remove next 4
@@ -118,7 +118,7 @@ class DrumEditor extends Component {
             if ( thisEffect === 'crash' ) {
                 effects[x+indexToStartSlicingFrom] = undefined
                 break
-            } else if ( thisEffect === 'snake' && selectLength - x <= 3 ) {
+            } else if ( thisEffect === 'shake' && selectLength - x <= 3 ) {
                 effects[x+indexToStartSlicingFrom] = undefined
                 break
             } else if ( thisEffect === 'snare' && selectLength - x === 1 ) {
@@ -152,9 +152,9 @@ class DrumEditor extends Component {
                         <span className="effect-text">snare</span>
                         <span className="effect-preview snare"></span>
                     </span>
-                    <span className="drum-selector" onClick={ e => this.selectEffect('snake') }>
-                        <span className="effect-text">snake</span>
-                        <span className="effect-preview snake"></span>
+                    <span className="drum-selector" onClick={ e => this.selectEffect('shake') }>
+                        <span className="effect-text">shake</span>
+                        <span className="effect-preview shake"></span>
                     </span>
                     <span className="drum-selector" onClick={ e => this.selectEffect('crash') }>
                         <span className="effect-text">crash</span>
