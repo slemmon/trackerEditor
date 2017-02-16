@@ -4,8 +4,7 @@ import Editor from './editor/Editor'
 class Body extends Component {
     render () {
         return (
-            <div>
-                <h3>body</h3>
+            <div id="app-body-container">
                 <Editor />
             </div>
         )

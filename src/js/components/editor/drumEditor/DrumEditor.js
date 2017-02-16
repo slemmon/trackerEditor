@@ -134,16 +134,18 @@ class DrumEditor extends Component {
         const activeTrack = this.props.activeTrack
 
         return (
-            <div className={ activeTrack.id === undefined ? 'hidden' : '' }>
-                <h5>DrumEditor</h5>
-                <div>
-                    <label htmlFor="track-name">Name: </label>
-                    <input id="track-name" onChange={this.changeTrackName} type="text" value={activeTrack.name || ""} />
-                </div>
-                <div>
-                    <label htmlFor="track-ticks">Ticks: </label>
-                    <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
-                    <button onClick={ this.changeTicksAmount }>ok</button>
+            <div id="drum-editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
+                <h5>Drum track editor</h5>
+                <div className="editor-info">
+                    <div className="editor-info-row">
+                        <label htmlFor="track-name">Name: </label>
+                        <input id="track-name" onChange={this.changeTrackName} type="text" value={activeTrack.name || ""} />
+                    </div>
+                    <div className="editor-info-row">
+                        <label htmlFor="track-ticks">Ticks: </label>
+                        <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
+                        <button onClick={ this.changeTicksAmount }>ok</button>
+                    </div>
                 </div>
                 <DrumTable notes={activeTrack.notes} ticks={activeTrack.ticks} addEffectAtPosition={this.addEffectAtPosition} />
 

@@ -475,7 +475,6 @@ class Editor extends Component {
         const activeTrack = this.state.activeTrack
         return (
             <div>
-                <h4>editor</h4>
                 <button onClick={this.createSong}>create song</button>
                 <TrackList
                     tracks = { this.state.tracks }

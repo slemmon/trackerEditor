@@ -9,6 +9,9 @@ touch build/css/style.css
 mkdir build/js
 touch build/js/app.js
 
+cp font-awesome-4.7.0/css/font-awesome.min.css build/css
+cp -r font-awesome-4.7.0/fonts build
+
 cp src/html/index.html build/index.html
 cp icon.png build/icon.png
 

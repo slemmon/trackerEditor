@@ -100,7 +100,7 @@ class NewNotesTable extends Component {
         const rows = this.state.rows
 
         return (
-            <div className="editor-container">
+            <div className="editor-table-container">
                 <div className="editor-table">
                     {rows}
                 </div>

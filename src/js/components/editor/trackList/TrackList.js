@@ -3,16 +3,16 @@ import React, { Component } from 'react'
 const TrackList = ({tracks, createNewTrack, deleteTrack, setActiveTrack}) => {
     const last = tracks.length
     return (
-        <div>
+        <div id="track-list-container">
             <h5>Track list</h5>
-            <span onClick = { () => createNewTrack('tune') }>New tune track</span>
-            <span onClick = { () => createNewTrack('drum') }>New drum track</span>
+            <button className="button" onClick = { () => createNewTrack('tune') }>New tune track</button>
+            <button className="button" onClick = { () => createNewTrack('drum') }>New drum track</button>
             <ul className = "track-list">
             {tracks.map( (t, i) =>
                 <li key={i} className={`track-list-item ${ last === i + 1 ? 'track-list-item-last' : '' }`}>
-                    <span>{t.type}</span>
-                    <span>{t.name}</span>
-                    <span>{t.ticks}</span>
+                    <span className="track-list-item-icon"><i className="fa fa-music" aria-hidden="true"></i></span>
+                    <span className="track-list-item-text">{t.name}</span>
+                    <span className="track-list-item-text"><span>Ticks: </span><span>{t.ticks}</span></span>
                     <span className="track-list-item-tickbar">
                         <span
                             className = "track-list-item-tickbar-bar"
@@ -26,8 +26,8 @@ const TrackList = ({tracks, createNewTrack, deleteTrack, setActiveTrack}) => {
                             className = "track-list-item-buttons-color-button"
                             style = {{ backgroundColor: t.color }}
                         ></span>
-                        <span onClick={ () => deleteTrack(t.id) }>D</span>
-                        <span onClick={ () => setActiveTrack(t) }>E</span>
+                        <span onClick={ () => deleteTrack(t.id) }><i className="fa fa-trash-o" aria-hidden="true"></i></span>
+                        <span onClick={ () => setActiveTrack(t) }><i className="fa fa-pencil" aria-hidden="true"></i></span>
                     </span>
                 </li>
             )}

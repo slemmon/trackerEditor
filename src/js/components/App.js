@@ -4,7 +4,7 @@ import Body from './Body'
 class App extends Component {
     render () {
         return (
-            <div>
+            <div id="app-container">
                 <Body />
             </div>
         )

@@ -77,24 +77,28 @@ class TrackEditor extends Component {
         const activeTrack = this.props.activeTrack
 
         return (
-            <div className={ activeTrack.id === undefined ? 'hidden' : '' }>
+            <div id="editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
                 <h5>Tune track editor</h5>
-                <div>
-                    <label htmlFor="track-name">Name: </label>
-                    <input id="track-name" onChange={this.changeTrackName} type="text" value={activeTrack.name || ""} />
+                <div className="editor-info">
+                    <div className="editor-info-row">
+                        <label htmlFor="track-name">Name: </label>
+                        <input id="track-name" onChange={this.changeTrackName} type="text" value={activeTrack.name || ""} />
+                    </div>
+                    <div className="editor-info-row">
+                        <label htmlFor="track-channel">Channel: </label>
+                        <input id="track-channel" onChange={this.changeTrackChannel} type="number" min="1" max="3" value={activeTrack.channel || 0} />
+                    </div>
+                    <div className="editor-info-row">
+                        <label htmlFor="track-ticks">Ticks: </label>
+                        <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
+                        <button onClick={ this.changeTicksAmount }>apply</button>
+                    </div>
                 </div>
-                <div>
-                    <label htmlFor="track-channel">Channel: </label>
-                    <input id="track-channel" onChange={this.changeTrackChannel} type="number" min="1" max="3" value={activeTrack.channel || 0} />
+                <div className="editor-play-buttons">
+                    <button onClick={this.props.playSong}>play once</button>
+                    <button onClick={this.props.togglePauseSong}>autoplay</button>
+                    <button onClick={this.props.toggleMuteSong}>mute</button>
                 </div>
-                <div>
-                    <label htmlFor="track-ticks">Ticks: </label>
-                    <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
-                    <button onClick={ this.changeTicksAmount }>ok</button>
-                </div>
-                <button onClick={this.props.playSong}>play once</button>
-                <button onClick={this.props.togglePauseSong}>autoplay</button>
-                <button onClick={this.props.toggleMuteSong}>mute</button>
                 <NewNotesTable notes={activeTrack.notes} toggleNote={this.toggleNote} />
 
                 <NoteSheet />
