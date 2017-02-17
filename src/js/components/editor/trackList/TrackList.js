@@ -11,7 +11,7 @@ const TrackList = ({tracks, createNewTrack, deleteTrack, setActiveTrack}) => {
             {tracks.map( (t, i) =>
                 <li key={i} className={`track-list-item ${ last === i + 1 ? 'track-list-item-last' : '' }`}>
                     <span className="track-list-item-icon"><i className="fa fa-music" aria-hidden="true"></i></span>
-                    <span className="track-list-item-text">{t.name}</span>
+                    <span className="track-list-item-text">{`${t.name} - (${t.type})`}</span>
                     <span className="track-list-item-text"><span>Ticks: </span><span>{t.ticks}</span></span>
                     <span className="track-list-item-tickbar">
                         <span

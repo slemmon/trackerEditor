@@ -8,7 +8,7 @@ body {
 
 #app {
     width: 750px;
-    height: 100%;
+    min-height: 100%;
     position: absolute;
     top: 0;
     box-shadow: 0 0 20px;
@@ -58,6 +58,7 @@ button {
 }
 
 #track-list-container {
+    margin-bottom: 10px;
 
     .track-list {
         list-style: none;
@@ -115,6 +116,7 @@ button {
 }
 
 #editor-container, #drum-editor-container {
+    margin-bottom: 10px;
 
     display: flex;
     flex-flow: column;
@@ -333,4 +335,75 @@ button {
             }
         }
     }
+}
+
+#song-editor-container {
+    margin-bottom: 10px;
+
+    .song-editor-channels {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        :first-child.song-editor-channels-item > * {
+            border-top-color: #00969c;
+        }
+
+        :last-child.song-editor-channels-item > * {
+            border-bottom: 1px solid #00969c;
+        }
+
+        .song-editor-channels-item {
+            display: flex;
+            height: 25px;
+
+            > * {
+                border: 1px solid #00969c;
+                border-bottom: none;
+                border-top-color: #bfe4e4;
+            }
+
+            .song-editor-channels-item-name {
+                margin-right: 1px;
+                flex: 0 0 10%;
+                display: flex;
+
+                > * {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                > :first-child {
+                    flex: 1;
+                }
+
+                > :last-child {
+                    flex: 2;
+                }
+
+            }
+
+            .song-editor-channels-item-editor {
+                flex: 1;
+            }
+
+        }
+
+    }
+
+}
+
+.idk {
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%;
+    padding: 0 5px;
+
+    .thingy {
+        height: 15px;
+    }
+
 }
