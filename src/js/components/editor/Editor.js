@@ -72,7 +72,7 @@ class Editor extends Component {
             name: `Track ${myId + 1}`,
             type,
             notes: [],
-            channel: type === 'tune' ? 1 : 4
+            channel: type === 'tune' ? 0 : 3
         }
         if ( type === 'tune' )
             for ( let x = 0; x < ticks; x++ ) {
@@ -216,9 +216,9 @@ class Editor extends Component {
 
         ]
 
-        if ( track.channel !== 1 ) {
+        if ( track.channel !== 0 ) {
             templateSong[5] = 0
-            templateSong[track.channel + 4] = 1
+            templateSong[track.channel + 5] = 1
         }
 
         const completeSong = templateSong.concat(noteSequence, [159])
