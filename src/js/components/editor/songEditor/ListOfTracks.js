@@ -5,10 +5,14 @@ class ListOfTracks extends Component {
         super()
 
         this.state = {
-            target: null
+            target: null,
+            originalPos: null
         }
 
         this.handleEnter = this.handleEnter.bind(this)
+        this.handleLeave = this.handleLeave.bind(this)
+        this.confirmDrag = this.confirmDrag.bind(this)
+        this.handleDrop = this.handleDrop.bind(this)
     }
 
     componentDidMount() {
@@ -22,24 +26,59 @@ class ListOfTracks extends Component {
         const rowElement = this.rowElement
         if ( rowElement ) {
             rowElement.addEventListener('dragenter', this.handleEnter )
-            // rowElement.addEventListener('dragleave', this.handleLeave )
-            // rowElement.addEventListener('dragover', this.asd)
+            rowElement.addEventListener('dragleave', this.handleLeave )
+            rowElement.addEventListener('dragover', this.handleDragover )
+            rowElement.addEventListener('drop', this.handleDrop )
         }
     }
 
+    // componentWillReceiveProps(nextProps) {
+    //     this.setState({
+    //         target: null,
+    //         originalPos: null
+    //     })
+    // }
+
     handleEnter (e) {
-        console.log(e)
         if ( e.target.classList.contains('thingy') ) {
-            console.log('set new target')
             this.setState({
-                target: e
+                target: parseInt(e.target.dataset.position)
             })
         } else if ( e.target.classList.contains('idk') ) {
-            console.log('clear target')
             this.setState({
-                target: null
+                target: -1
             })
         }
+    }
+
+    handleLeave (e) {
+        if ( e.target.classList.contains('idk') && this.state.target === -1 ) {
+            this.setState({target: null})
+        }
+    }
+
+    handleDragover (e) {
+        e.preventDefault()
+        e.stopPropagation()
+        e.dataTransfer.dropEffect = 'copy'
+    }
+
+    handleDrop (e) {
+        const state = Object.assign({}, this.state)
+        if ( state.originalPos !== null )
+            this.props.moveTrackToIndex( this.props.channel, state.originalPos, state.target )
+        else
+            this.props.addTrackAtIndex( this.props.channel, state.target, parseInt(e.dataTransfer.getData('trackId')) )
+    }
+
+    confirmDrag (track) {
+        if ( this.state.target === null )
+            this.props.removeTrackAtIndex(this.props.channel, this.state.originalPos)
+
+        this.setState({
+            target: null,
+            originalPos: null
+        })
     }
 
     render () {
@@ -49,9 +88,12 @@ class ListOfTracks extends Component {
                 className="idk"
                 ref={ e => this.rowElement = e }
             >
-                {tracks.map( t =>
+                {tracks.map( (t, i) =>
                     <Track
-                        key={t.id}
+                        key={i}
+                        confirmDrag={this.confirmDrag}
+                        setOriginalPosition={ () => this.setState({originalPos: i}) }
+                        position={i}
                         track={t}
                     />
                 )}
@@ -85,18 +127,19 @@ class Track extends Component {
     }
 
     handleDragStart (e) {
-        console.log('start')
+        e.dataTransfer.setData('trackId', this.props.track.id)
         setTimeout(
-            () => this.setState({imBeingDragged: true}),
-            // () => el.classList.add('hidden'),
+            () => {
+                this.setState({imBeingDragged: true})
+                this.props.setOriginalPosition()
+            },
             1
         )
     }
 
     handleDragEnd (e) {
-        console.log('stop')
         this.setState({imBeingDragged: false})
-        // el.classList.remove('hidden')
+        this.props.confirmDrag(this.props.track)
     }
 
     render () {
@@ -104,6 +147,7 @@ class Track extends Component {
         return (
             <span
                 ref={ e => this.element = e }
+                data-position={ this.props.position }
                 className={`thingy ${this.state.imBeingDragged ? 'beingdragged' : ''}`}
                 style={{width: track.ticks*2, backgroundColor: track.color}}
             >

@@ -11,18 +11,15 @@ class SongEditor extends Component {
             songString: '',
             showString: false,
             channels: [
-                [
-                    {ticks: 10, color: '#abc', id: 0},
-                    {ticks: 18, color: '#edf', id: 1},
-                    {ticks: 18, color: '#05a', id: 2},
-                    {ticks: 18, color: '#8da', id: 3},
-                    {ticks: 18, color: '#edc', id: 4}
-                ],[],[],[]
+                [],[],[],[]
             ]
         }
 
         this.playSong = this.playSong.bind(this)
         this.exportSong = this.exportSong.bind(this)
+        this.addTrackAtIndex = this.addTrackAtIndex.bind(this)
+        this.moveTrackToIndex = this.moveTrackToIndex.bind(this)
+        this.removeTrackAtIndex = this.removeTrackAtIndex.bind(this)
     }
 
     playSong () {
@@ -39,6 +36,43 @@ class SongEditor extends Component {
         this.setState(createSong(this.props.tracks))
     }
 
+    addTrackAtIndex (channel, index, trackId) {
+        const tracks = this.state.channels[channel]
+        const pos = ~index ? index : tracks.length
+        const newTracks = [].concat( tracks.slice(0, pos), this.props.tracks.find(t => t.id === trackId), tracks.slice(pos) )
+        const newChannels = this.state.channels.slice()
+        newChannels[channel] = newTracks
+        console.log('addTrackAtIndex', newChannels)
+        this.setState({
+            channels: newChannels
+        })
+    }
+
+    moveTrackToIndex (channel, fromIndex, toIndex) {
+        console.log(arguments)
+        const tracks = this.state.channels[channel]
+        const track = tracks[fromIndex]
+        let newTracks = [].concat( tracks.slice(0, fromIndex), tracks.slice(fromIndex + 1) )
+        newTracks = [].concat( newTracks.slice(0, toIndex), track, newTracks.slice(toIndex) )
+        const newChannels = this.state.channels.slice()
+        newChannels[channel] = newTracks
+        console.log('moveTrackToIndex', newChannels)
+        this.setState({
+            channels: newChannels
+        })
+    }
+
+    removeTrackAtIndex (channel, index) {
+        const tracks = this.state.channels[channel]
+        const newTracks = [].concat( tracks.slice(0, index), tracks.slice(index + 1) )
+        const newChannels = this.state.channels.slice()
+        newChannels[channel] = newTracks
+        console.log('removeTrackAtIndex', newChannels)
+        this.setState({
+            channels: newChannels
+        })
+    }
+
     render () {
         const state = this.state
         return (
@@ -53,18 +87,30 @@ class SongEditor extends Component {
                     <OneOfTheRows
                         channel={0}
                         tracks={state.channels[0]}
+                        addTrackAtIndex={this.addTrackAtIndex}
+                        removeTrackAtIndex={this.removeTrackAtIndex}
+                        moveTrackToIndex={this.moveTrackToIndex}
                     />
                     <OneOfTheRows
                         channel={1}
                         tracks={state.channels[1]}
+                        addTrackAtIndex={this.addTrackAtIndex}
+                        removeTrackAtIndex={this.removeTrackAtIndex}
+                        moveTrackToIndex={this.moveTrackToIndex}
                     />
                     <OneOfTheRows
                         channel={2}
                         tracks={state.channels[2]}
+                        addTrackAtIndex={this.addTrackAtIndex}
+                        removeTrackAtIndex={this.removeTrackAtIndex}
+                        moveTrackToIndex={this.moveTrackToIndex}
                     />
                     <OneOfTheRows
                         channel={3}
                         tracks={state.channels[3]}
+                        addTrackAtIndex={this.addTrackAtIndex}
+                        removeTrackAtIndex={this.removeTrackAtIndex}
+                        moveTrackToIndex={this.moveTrackToIndex}
                     />
                 </ul>
 
@@ -86,73 +132,7 @@ class SongEditor extends Component {
 
 export default SongEditor
 
-// class OneOfTheRows extends Component {
-//     // constructor () {
-//     //     super()
-
-//     //     this.handleEnter = this.handleEnter.bind(this)
-//     //     this.handleLeave = this.handleLeave.bind(this)
-//     // }
-//     // componentDidMount() {
-//     //     // every li needs to be droppable
-//     //     // block that's dragged away needs to be removed from channel array
-//     //     // block that's added to an li needs to be added to a channel array at the correct position
-//     //     // block that's rearranged needs to be rearranged in a channel array
-
-//     //     // how do we know what index the block gets?
-//     //     // position? compare with blocks left and right?
-
-//     //     const rowElement = this.rowElement
-//     //     if ( rowElement ) {
-//     //         rowElement.addEventListener('dragenter', this.handleEnter )
-//     //         // rowElement.addEventListener('dragleave', this.handleLeave )
-//     //         // rowElement.addEventListener('dragover', this.asd)
-//     //     }
-//     // }
-
-//     // asd (e) {
-//     //     console.log(e)
-//     // }
-
-//     // handleEnter (e) {
-//     //     console.log(e)
-//     //     if ( e.target.classList.contains('thingy') ) {
-//     //         this.setState({
-//     //             target: e
-//     //         })
-//     //     } else if ( e.target.classList.contains('') ) {
-//     //         this.setState({
-//     //             target: null
-//     //         })
-//     //     }
-//     // }
-
-//     // // handleLeave (e) {
-//     // //     this.setState({
-//     // //         target: null
-//     // //     })
-//     // // }
-
-//     render () {
-//         const props = this.props
-//         return (
-//             <li className="song-editor-channels-item">
-//             {/*<li className="song-editor-channels-item" ref={ e => this.rowElement = e }>*/}
-//                 <div className="song-editor-channels-item-name">
-//                     <span><i className="fa fa-music" aria-hidden="true"></i></span>
-//                     <span>{`CH ${props.channel}`}</span>
-//                 </div>
-//                 <div className="song-editor-channels-item-editor">
-//                     <ListOfTracks
-//                         tracks={props.tracks}
-//                     />
-//                 </div>
-//             </li>
-//         )
-//     }
-// }
-
-const OneOfTheRows = ({channel, tracks}) =>
+const OneOfTheRows = ({channel, tracks, addTrackAtIndex, removeTrackAtIndex, moveTrackToIndex}) =>
     <li className="song-editor-channels-item">
         <div className="song-editor-channels-item-name">
             <span><i className="fa fa-music" aria-hidden="true"></i></span>
@@ -160,7 +140,11 @@ const OneOfTheRows = ({channel, tracks}) =>
         </div>
         <div className="song-editor-channels-item-editor">
             <ListOfTracks
+                channel={channel}
                 tracks={tracks}
+                addTrackAtIndex={addTrackAtIndex}
+                removeTrackAtIndex={removeTrackAtIndex}
+                moveTrackToIndex={moveTrackToIndex}
             />
         </div>
     </li>

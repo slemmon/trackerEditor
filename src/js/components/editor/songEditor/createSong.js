@@ -3,7 +3,6 @@ export { createNoteSequence }
 
 function createSong (tracks) {
     const tracksLength = tracks.length
-    // let modifiedTracksLength = tracks.length
 
     if ( !tracksLength ) {
         return {
