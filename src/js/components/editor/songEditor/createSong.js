@@ -278,7 +278,6 @@ function concatAllChannels (bytesOffset, tracksOffset, channels) {
 
     for ( let x = 0; x < 4; x++ ) {
         channel = channels[x]
-        console.log(channel)
         channelAddresses += `0x${hexify(totalBytes)}, 0x00,\t\t// Address of track ${totalTracks + x}\n`
         channelString += `${channel.notes.join('\n')}\n`
         channelEntryTracks += `0x${hexify(totalTracks + x)},\t\t\t// Channel ${x} entry track\n`
