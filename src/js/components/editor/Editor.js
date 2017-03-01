@@ -16,7 +16,8 @@ class Editor extends Component {
             },
             autoplay: false,
             songIsMuted: false,
-            activeTrackPlayable: [1,0,0,0,0,0,0,"Track 0",64,0,159]
+            activeTrackPlayable: [1,0,0,0,0,0,0,"Track 0",64,0,159],
+            channel: 0
         }
 
         this.nextId = 0
@@ -43,6 +44,7 @@ class Editor extends Component {
         this.togglePauseSong = this.togglePauseSong.bind(this)
         this.toggleMuteSong = this.toggleMuteSong.bind(this)
         this.stopSong = this.stopSong.bind(this)
+        this.changeChannel = this.changeChannel.bind(this)
     }
 
     getNewTrackColor (id) {
@@ -57,11 +59,6 @@ class Editor extends Component {
     }
 
     createNewTrack (type) {
-        if ( type === 'drum' && this.state.tracks.filter(t => t.type === 'drum').length )
-            return
-        else if ( type === 'tune' && this.state.tracks.filter(t => t.type === 'tune').length === 3 )
-            return
-
         const ticks = 8
         const myId = this.nextId
         this.nextId++
@@ -71,8 +68,7 @@ class Editor extends Component {
             id: myId,
             name: `Track ${myId + 1}`,
             type,
-            notes: [],
-            channel: type === 'tune' ? 0 : 3
+            notes: []
         }
         if ( type === 'tune' )
             for ( let x = 0; x < ticks; x++ ) {
@@ -185,7 +181,7 @@ class Editor extends Component {
         })
     }
 
-    createTheSongArray (track) {
+    createTheSongArray (track = this.state.activeTrack, channel = this.state.channel) {
         const notes = track.notes
 
         const noteSequence = createNoteSequence(notes)
@@ -216,9 +212,9 @@ class Editor extends Component {
 
         ]
 
-        if ( track.channel !== 0 ) {
+        if ( channel !== 0 ) {
             templateSong[5] = 0
-            templateSong[track.channel + 5] = 1
+            templateSong[channel + 5] = 1
         }
 
         const completeSong = templateSong.concat(noteSequence, [159])
@@ -271,33 +267,43 @@ class Editor extends Component {
         this.output.pause(true)
     }
 
+    changeChannel (channel) {
+        this.setState({
+            channel,
+            activeTrackPlayable: this.createTheSongArray(undefined, channel)
+        })
+    }
+
     render () {
-        const activeTrack = this.state.activeTrack
+        const state = this.state
+        const activeTrack = state.activeTrack
         return (
             <div>
                 <SongEditor
-                    tracks={ this.state.tracks}
+                    tracks={ state.tracks}
                     playSong={ this.playSong }
                     stopSong={ this.stopSong }
                 />
                 <TrackList
-                    tracks = { this.state.tracks }
+                    tracks = { state.tracks }
                     setActiveTrack = { this.setActiveTrack }
                     createNewTrack = { this.createNewTrack }
                     deleteTrack = { this.deleteTrack }
                 />
                 { activeTrack.type === 'tune' ?
                     <TrackEditor
-                        activeTrack = { this.state.activeTrack }
+                        activeTrack = { state.activeTrack }
                         toggleNote = { this.toggleNote }
                         updateTrack = { this.updateTrack }
                         playSong = { () => this.playSong(undefined, true) }
-                        togglePauseSong = {this.togglePauseSong }
-                        toggleMuteSong = {this.toggleMuteSong }
+                        togglePauseSong = { this.togglePauseSong }
+                        toggleMuteSong = { this.toggleMuteSong }
+                        channel = { state.channel }
+                        changeChannel = { this.changeChannel }
                     />
                 :
                     <DrumEditor
-                        activeTrack = { this.state.activeTrack }
+                        activeTrack = { state.activeTrack }
                         updateDrumTrack = { this.updateDrumTrack }
                     />
                 }

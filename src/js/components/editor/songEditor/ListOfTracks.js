@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 class ListOfTracks extends Component {
-    constructor () {
+    constructor (props) {
         super()
 
         this.state = {
@@ -13,38 +13,16 @@ class ListOfTracks extends Component {
         this.handleLeave = this.handleLeave.bind(this)
         this.confirmDrag = this.confirmDrag.bind(this)
         this.handleDrop = this.handleDrop.bind(this)
+
+        this.iAmTheDrumChannel = props.channel === 3
     }
-
-    componentDidMount() {
-        // every li needs to be droppable
-        // block that's dragged away needs to be removed from channel array
-        // block that's added to an li needs to be added to a channel array at the correct position
-        // block that's rearranged needs to be rearranged in a channel array
-
-        // how do we know what index the block gets?
-        // position? compare with blocks left and right?
-        const rowElement = this.rowElement
-        if ( rowElement ) {
-            rowElement.addEventListener('dragenter', this.handleEnter )
-            rowElement.addEventListener('dragleave', this.handleLeave )
-            rowElement.addEventListener('dragover', this.handleDragover )
-            rowElement.addEventListener('drop', this.handleDrop )
-        }
-    }
-
-    // componentWillReceiveProps(nextProps) {
-    //     this.setState({
-    //         target: null,
-    //         originalPos: null
-    //     })
-    // }
 
     handleEnter (e) {
-        if ( e.target.classList.contains('thingy') ) {
+        if ( e.target.classList.contains('draggable') ) {
             this.setState({
                 target: parseInt(e.target.dataset.position)
             })
-        } else if ( e.target.classList.contains('idk') ) {
+        } else if ( e.target.classList.contains('droppable') ) {
             this.setState({
                 target: -1
             })
@@ -52,7 +30,7 @@ class ListOfTracks extends Component {
     }
 
     handleLeave (e) {
-        if ( e.target.classList.contains('idk') && this.state.target === -1 ) {
+        if ( e.target.classList.contains('droppable') && this.state.target === -1 ) {
             this.setState({target: null})
         }
     }
@@ -64,16 +42,21 @@ class ListOfTracks extends Component {
     }
 
     handleDrop (e) {
-        const state = Object.assign({}, this.state)
-        if ( state.originalPos !== null )
+        if ( this.iAmTheDrumChannel !== (e.dataTransfer.getData('type') === 'drum') ) return
+
+        const state = this.state
+        if ( state.originalPos !== null ) {
             this.props.moveTrackToIndex( this.props.channel, state.originalPos, state.target )
-        else
+        }
+        else {
             this.props.addTrackAtIndex( this.props.channel, state.target, parseInt(e.dataTransfer.getData('trackId')) )
+        }
     }
 
     confirmDrag (track) {
-        if ( this.state.target === null )
+        if ( this.state.target === null ) {
             this.props.removeTrackAtIndex(this.props.channel, this.state.originalPos)
+        }
 
         this.setState({
             target: null,
@@ -85,16 +68,19 @@ class ListOfTracks extends Component {
         const tracks = this.props.tracks
         return (
             <div
-                className="idk"
-                ref={ e => this.rowElement = e }
+                onDragLeave = { this.handleLeave }
+                onDragEnter = { this.handleEnter }
+                onDragOver = { this.handleDragover }
+                onDrop = { this.handleDrop }
+                className = "droppable"
             >
                 {tracks.map( (t, i) =>
                     <Track
-                        key={i}
-                        confirmDrag={this.confirmDrag}
-                        setOriginalPosition={ () => this.setState({originalPos: i}) }
-                        position={i}
-                        track={t}
+                        key = {i}
+                        confirmDrag = {this.confirmDrag}
+                        setOriginalPosition = { () => this.setState({originalPos: i, target: null}) }
+                        position = {i}
+                        track = {t}
                     />
                 )}
             </div>
@@ -116,18 +102,9 @@ class Track extends Component {
         this.handleDragEnd = this.handleDragEnd.bind(this)
     }
 
-    componentDidMount() {
-        // all blocks need to be draggable
-        const el = this.element
-        if ( el ) {
-            el.addEventListener('dragstart', this.handleDragStart )
-            el.addEventListener('dragend', this.handleDragEnd )
-            el.draggable = true
-        }
-    }
-
     handleDragStart (e) {
         e.dataTransfer.setData('trackId', this.props.track.id)
+        e.dataTransfer.setData('type', this.props.track.type)
         setTimeout(
             () => {
                 this.setState({imBeingDragged: true})
@@ -146,10 +123,12 @@ class Track extends Component {
         const track = this.props.track
         return (
             <span
-                ref={ e => this.element = e }
-                data-position={ this.props.position }
-                className={`thingy ${this.state.imBeingDragged ? 'beingdragged' : ''}`}
-                style={{width: track.ticks*2, backgroundColor: track.color}}
+                draggable = { true }
+                onDragStart = { this.handleDragStart }
+                onDragEnd = { this.handleDragEnd }
+                data-position = { this.props.position }
+                className = { `draggable ${track.type === 'tune' ? 'draggable-tune' : 'draggable-drum' } ${this.state.imBeingDragged ? 'beingdragged' : ''}` }
+                style = { {width: track.ticks*2, backgroundColor: track.color} }
             >
             </span>
         )

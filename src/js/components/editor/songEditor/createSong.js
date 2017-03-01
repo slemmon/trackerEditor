@@ -1,5 +1,300 @@
 export default createSong
-export { createNoteSequence }
+export { createNoteSequence, createSongFromChannels }
+
+const drumTracks = {
+    snare: {
+        notes: [
+            "//\"Track\"",
+            "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
+            "0x41, -16,\t\t// FX: VOLUME SLIDE ON: steps = -16",
+            "0x9F + 2,\t\t// DELAY: ticks = 2",
+            "0x43,\t\t\t// FX: VOLUME SLIDE OFF",
+            "0xFE,\t\t\t// RETURN"
+        ],
+        bytes: 7
+    },
+    shake: {
+        notes: [
+            "//\"Track\"",
+            "0x49, 4 + 0,\t\t// FX: RETRIG NOISE: point = 1 (*4) / speed = 0 (fastest)",
+            "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
+            "0x41, -8,\t\t// FX: VOLUME SLIDE ON: steps = -8",
+            "0x9F + 4,\t\t// DELAY: ticks = 4",
+            "0x4A,\t\t\t// FX: RETRIG: off",
+            "0x43,\t\t\t// FX: VOLUME SLIDE OFF",
+            "0xFE,\t\t\t// RETURN"
+        ],
+        bytes: 10
+    },
+    crash: {
+        notes: [
+            "//\"Track\"",
+            "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
+            "0x41, -2,\t\t// FX: VOLUME SLIDE ON: steps = -2",
+            "0x9F + 16,\t\t// DELAY: ticks = 16",
+            "0x43,\t\t\t// FX: VOLUME SLIDE OFF",
+            "0xFE,\t\t\t// RETURN"
+        ],
+        bytes: 7
+    }
+}
+
+function createSongFromChannels (tracks, channels) {
+
+    const trackAtm = {}
+    let totalTracks = 0
+
+    const requiredDrumTracks = getRequiredDrumTracks(tracks)
+    for ( const key in requiredDrumTracks ) {
+        if ( requiredDrumTracks[key] !== false ) {
+            totalTracks++
+            trackAtm[key] = {
+                track: {},
+                index: totalTracks - 1,
+                atm: drumTracks[key]
+            }
+        }
+    }
+
+    let track
+    for ( let x = 0, l = tracks.length; x < l; x++ ) {
+        track = tracks[x]
+        totalTracks++
+        trackAtm[track.id] = {
+            track,
+            index: totalTracks - 1,
+            atm: atmifyTrack(requiredDrumTracks, track)
+        }
+    }
+
+    const channelTracks = []
+    let once = true
+    for ( const channel of channels ) {
+        channelTracks.push(atmifyChannel(trackAtm, channel, once))
+        once = false
+    }
+
+    const { trackAddresses, trackString, totalBytes } = concatAllTracks(trackAtm)
+    const { channelAddresses, channelString, channelEntryTracks } = concatAllChannels(totalBytes, totalTracks, channelTracks)
+    totalTracks += 4
+
+    let completeSong = '#ifndef SONG_H\n#define SONG_H\n\n#define Song const uint8_t PROGMEM\n\nSong music[] = {\n'
+    completeSong += `0x${hexify(totalTracks)},\t\t\t// Number of tracks\n`
+    completeSong += trackAddresses
+    completeSong += channelAddresses
+    completeSong += channelEntryTracks
+    completeSong += trackString
+    completeSong += channelString
+    completeSong += '\n};\n\n\n\n#endif\n'
+
+    return completeSong
+
+}
+
+function atmifyChannel (tracks, channel, addTempo) {
+    const channelTrack = []
+    let totalBytes = 0
+    if ( addTempo ) {
+        channelTrack.push('0x9D, 50,\t\t// SET song tempo: value = 50')                                     // add song tempo
+        totalBytes += 2
+    }
+
+    channelTrack.push(`0x40, ${48},\t\t// FX: SET VOLUME: volume = ${48}`)
+    totalBytes += 2
+
+    for ( const track of channel ) {
+        channelTrack.push(`0xFC, ${tracks[track.id].index},\t\t// GOTO track ${tracks[track.id].index}`)    // goto track
+        totalBytes += 2
+    }
+
+    channelTrack.push(`0x00 + 0,\t\t// NOTE ON: note = 0`)
+    totalBytes++
+
+    channelTrack.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL')                                             // end of channel
+    totalBytes++
+
+    channelTrack.unshift("//\"Track\"")
+
+    return { notes: channelTrack, bytes: totalBytes }
+}
+
+function atmifyTrack (requiredDrumTracks, track) {
+    if ( track.type === 'tune' )
+        return atmifyRegularTrack(track)
+    else
+        return atmifyDrumTrack(requiredDrumTracks, track)
+}
+
+function atmifyRegularTrack (track) {
+    const notes = track.notes
+    const noteSequence = []
+
+    let thisNote,
+        lastNote = -1,
+        thisNoteNumber,
+        lastDelayTotal,
+        totalBytes = 0
+
+    for ( const note of notes ) {
+        thisNote = (note||{}).active
+        thisNoteNumber = ~thisNote ? thisNote : 0
+        if ( thisNote === lastNote ) {
+            if ( !noteSequence.length ) {
+                noteSequence[0] = `0x00 + ${thisNoteNumber},\t\t// NOTE ON: note = ${thisNoteNumber}`
+                noteSequence[1] = '0x9F + 1,\t\t// DELAY: ticks = 1'
+                lastDelayTotal = 1
+                totalBytes = 2
+            } else {
+                const lastDelay = noteSequence[noteSequence.length - 1]
+                lastDelayTotal++
+                noteSequence[noteSequence.length - 1] = `0x9F + ${lastDelayTotal},\t\t// DELAY: ticks = ${lastDelayTotal}`
+            }
+        } else {
+            noteSequence.push(`0x00 + ${thisNoteNumber},\t\t// NOTE ON: note = ${thisNoteNumber}`)  // note to play
+            noteSequence.push('0x9F + 1,\t\t// DELAY: ticks = 1')                                   // play for 1 tick
+            lastDelayTotal = 1
+            totalBytes += 2
+        }
+        lastNote = thisNote
+    }
+
+    noteSequence.push('0xFE,\t\t\t// RETURN')                 // end of track (RETURN)
+    totalBytes++
+
+    noteSequence.unshift("//\"Track\"")
+
+    return { notes: noteSequence, bytes: totalBytes }
+}
+
+function atmifyDrumTrack (drumTrackNumbers, track) {
+    const notes = track.notes
+
+    let note,
+        noteSequence = [],
+        wasEmpty = false,
+        skip = 0,
+        lastDelayTotal,
+        totalBytes = 0
+
+    for ( let x = 0, l = track.ticks; x < l; x++ ) {
+        note = notes[x]
+        if ( note === undefined && skip-- < 1 ) {
+            if ( wasEmpty ) {
+                lastDelayTotal++
+                noteSequence[noteSequence.length - 1] = `0x9F + ${lastDelayTotal},\t\t// DELAY: ticks = ${lastDelayTotal}`
+                totalBytes++
+            } else {
+                wasEmpty = true
+                noteSequence.push(`0x00 + 0,\t\t// NOTE ON: note = 0`)
+                noteSequence.push(`0x9F + 1,\t\t// DELAY: ticks = 1`)
+                lastDelayTotal = 1
+                totalBytes += 2
+            }
+        } else if ( note !== undefined && Object.prototype.toString.apply(note).slice(8, -1) === 'String' ) {
+            skip = note === 'snare' ? 1 : note === 'shake' ? 3 : 15
+            wasEmpty = false
+            noteSequence.push(`0xFC, ${drumTrackNumbers[note]},\t\t// GOTO track ${drumTrackNumbers[note]}`)
+            totalBytes += 2
+        }
+    }
+
+    noteSequence.push('0xFE,\t\t\t// RETURN')                 // end of track (RETURN)
+    totalBytes++
+
+    noteSequence.unshift("//\"Track\"")
+
+    return {
+        notes: noteSequence,
+        bytes: totalBytes
+    }
+}
+
+function getRequiredDrumTracks (tracks) {
+    const required = []
+    let counter = 0
+    let snare = false
+    let shake = false
+    let crash = false
+    for ( const track of tracks ) {
+        if ( counter === 3 ) break
+        const notes = track.notes
+        for ( const note of notes ) {
+            switch (note) {
+                case 'snare':
+                snare = 0
+                counter++
+                break
+
+                case 'shake':
+                shake = snare !== false ? 1 : 0
+                counter++
+                break
+
+                case 'crash':
+                crash = shake !== false ? shake + 1 : (snare !== false ? 1 : 0)
+                counter++
+                break
+            }
+        }
+    }
+    return { snare, shake, crash }
+}
+
+function concatAllTracks (tracks) {
+    let trackAddresses = '',
+        trackString = '',
+        totalBytes = 0,
+        track
+
+    const sorted = []
+    for ( const key in tracks )
+        sorted[tracks[key].index] = tracks[key]
+
+    for ( const track of sorted ) {
+        trackAddresses += `0x${hexify(totalBytes)}, 0x00,\t\t// Address of track ${track.index}\n`
+        trackString += `${track.atm.notes.join('\n')}\n`
+        totalBytes += track.atm.bytes
+    }
+
+    return {
+        totalBytes,
+        trackAddresses,
+        trackString
+    }
+}
+
+function hexify (number) {
+    const hex = number.toString(16)
+    return `${hex.length < 2 ? 0 : ''}${hex}`
+}
+
+function concatAllChannels (bytesOffset, tracksOffset, channels) {
+    let channelAddresses = '',
+        channelString = '',
+        totalBytes = bytesOffset,
+        totalTracks = tracksOffset,
+        channelEntryTracks = '',
+        channel
+
+    for ( let x = 0; x < 4; x++ ) {
+        channel = channels[x]
+        console.log(channel)
+        channelAddresses += `0x${hexify(totalBytes)}, 0x00,\t\t// Address of track ${totalTracks + x}\n`
+        channelString += `${channel.notes.join('\n')}\n`
+        channelEntryTracks += `0x${hexify(totalTracks + x)},\t\t\t// Channel ${x} entry track\n`
+        totalBytes += channel.bytes
+    }
+
+    return {
+        channelAddresses,
+        channelString,
+        channelEntryTracks
+    }
+}
+
+
+
+
 
 function createSong (tracks) {
     const tracksLength = tracks.length
@@ -33,8 +328,8 @@ function createSong (tracks) {
         } else {
             converted = convertTrack(track)                  // get array from track notes
 
-            converted.noteSequence.unshift(`$$$0x40, ${63},\t\t\t// FX: SET VOLUME: volume = ${63}$$$`)
-            // converted.noteSequence.unshift(63)                          // volume value
+            converted.noteSequence.unshift(`$$$0x40, ${48},\t\t\t// FX: SET VOLUME: volume = ${48}$$$`)
+            // converted.noteSequence.unshift(48)                          // volume value
             // converted.noteSequence.unshift(64)                          // set volume
             converted.trackBytes += 2
         }

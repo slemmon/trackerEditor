@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import createSong from './createSong'
+import createSong, { createSongFromChannels } from './createSong'
 import ListOfTracks from './ListOfTracks'
 
 class SongEditor extends Component {
@@ -22,6 +22,40 @@ class SongEditor extends Component {
         this.removeTrackAtIndex = this.removeTrackAtIndex.bind(this)
     }
 
+    componentWillReceiveProps(nextProps) {
+        if ( nextProps.tracks.length < this.props.tracks.length )
+            this.deleteRemovedTrackFromAllChannels(nextProps.tracks)
+    }
+
+    deleteRemovedTrackFromAllChannels (newTracks) {
+        const tracks = this.props.tracks
+        let removedTrack
+        for ( const track of tracks ) {
+            let stillExists = false
+            for ( const newTrack of newTracks ) {
+                if ( track.id === newTrack.id ) {
+                    stillExists = true
+                    break
+                }
+            }
+            if ( !stillExists ) {
+                removedTrack = track
+                break
+            }
+        }
+
+        const channels = this.state.channels
+        const newChannels = []
+        for ( const channel of channels ) {
+            const newChannel = channel.filter(t => t.id !== removedTrack.id)
+            newChannels.push(newChannel)
+        }
+
+        this.setState({
+            channels: newChannels
+        })
+    }
+
     playSong () {
         const updatedSong = createSong(this.props.tracks)
         this.setState(updatedSong)
@@ -33,7 +67,9 @@ class SongEditor extends Component {
         this.setState({
             showString: !this.state.showString
         })
-        this.setState(createSong(this.props.tracks))
+        this.setState({
+            songString: createSongFromChannels(this.props.tracks, this.state.channels)
+        })
     }
 
     addTrackAtIndex (channel, index, trackId) {
@@ -42,21 +78,18 @@ class SongEditor extends Component {
         const newTracks = [].concat( tracks.slice(0, pos), this.props.tracks.find(t => t.id === trackId), tracks.slice(pos) )
         const newChannels = this.state.channels.slice()
         newChannels[channel] = newTracks
-        console.log('addTrackAtIndex', newChannels)
         this.setState({
             channels: newChannels
         })
     }
 
     moveTrackToIndex (channel, fromIndex, toIndex) {
-        console.log(arguments)
         const tracks = this.state.channels[channel]
         const track = tracks[fromIndex]
         let newTracks = [].concat( tracks.slice(0, fromIndex), tracks.slice(fromIndex + 1) )
         newTracks = [].concat( newTracks.slice(0, toIndex), track, newTracks.slice(toIndex) )
         const newChannels = this.state.channels.slice()
         newChannels[channel] = newTracks
-        console.log('moveTrackToIndex', newChannels)
         this.setState({
             channels: newChannels
         })
@@ -67,7 +100,6 @@ class SongEditor extends Component {
         const newTracks = [].concat( tracks.slice(0, index), tracks.slice(index + 1) )
         const newChannels = this.state.channels.slice()
         newChannels[channel] = newTracks
-        console.log('removeTrackAtIndex', newChannels)
         this.setState({
             channels: newChannels
         })
@@ -78,9 +110,9 @@ class SongEditor extends Component {
         return (
             <div id="song-editor-container">
                 <h5>Song editor</h5>
-                <button onClick={ this.playSong }>Play</button>
+                {/*<button onClick={ this.playSong }>Play</button>*/}
                 {/*<button>Pause</button>*/}
-                <button onClick={ this.props.stopSong }>Stop</button>
+                {/*<button onClick={ this.props.stopSong }>Stop</button>*/}
                 <button onClick={ this.exportSong }>Export song</button>
 
                 <ul className="song-editor-channels">

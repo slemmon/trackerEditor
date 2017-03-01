@@ -25,42 +25,37 @@ const TrackList = ({tracks, createNewTrack, deleteTrack, setActiveTrack}) => {
 
 export default TrackList
 
-class TrackRow extends Component {
-    constructor (props) {
-        super(props)
+const TrackRow = ({last, i, track, deleteTrack, setActiveTrack}) =>
+// class TrackRow extends Component {
+//     constructor (props) {
+//         super(props)
 
-        this.handleDragStart = this.handleDragStart.bind(this)
-    }
+//         this.handleDragStart = this.handleDragStart.bind(this)
+//     }
 
-    componentDidMount() {
-        if ( this.el ) {
-            this.el.draggable = true
-            this.el.addEventListener('dragstart', this.handleDragStart )
-        }
-    }
+//     handleDragStart (e) {
+//         e.dataTransfer.setData('trackId', this.props.track.id)
+//     }
 
-    handleDragStart (e) {
-        e.dataTransfer.setData('trackId', this.props.track.id)
-    }
-
-    render () {
-        const {
-            last,
-            i,
-            track,
-            deleteTrack,
-            setActiveTrack
-        } = this.props
-        return (
+//     render () {
+        // const {
+        //     last,
+        //     i,
+        //     track,
+        //     deleteTrack,
+        //     setActiveTrack
+        // } = this.props
+        // return (
             <li className={`track-list-item ${ last === i + 1 ? 'track-list-item-last' : '' }`}>
                 <span className="track-list-item-icon"><i className="fa fa-music" aria-hidden="true"></i></span>
                 <span className="track-list-item-text">{`${track.name} - (${track.type})`}</span>
                 <span className="track-list-item-text"><span>Ticks: </span><span>{track.ticks}</span></span>
                 <span className="track-list-item-tickbar">
                     <span
-                        ref = { el => this.el = el }
+                        draggable = { true }
+                        onDragStart = { e => { e.dataTransfer.setData('trackId', track.id); e.dataTransfer.setData('type', track.type) } }
                         data-track-id = { track.id }
-                        className = "track-list-item-tickbar-bar"
+                        className = { `track-list-item-tickbar-bar ${track.type === 'tune' ? 'tickbar-tune' : 'tickbar-drum' }` }
                         style = {{ width: track.ticks * 2, backgroundColor: track.color }}
                     ></span>
                 </span>
@@ -75,6 +70,6 @@ class TrackRow extends Component {
                     <span onClick={ () => setActiveTrack(track) }><i className="fa fa-pencil" aria-hidden="true"></i></span>
                 </span>
             </li>
-        )
-    }
-}
+//         )
+//     }
+// }

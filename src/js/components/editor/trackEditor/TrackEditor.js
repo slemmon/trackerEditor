@@ -65,12 +65,7 @@ class TrackEditor extends Component {
     }
 
     changeTrackChannel (e) {
-        const track = Object.assign({}, this.props.activeTrack)
-        const newValue = parseInt(e.target.value)
-
-        track.channel = newValue
-
-        this.props.updateTrack(track.id, track)
+        this.props.changeChannel(parseInt(e.target.value))
     }
 
     render () {
@@ -86,7 +81,7 @@ class TrackEditor extends Component {
                     </div>
                     <div className="editor-info-row">
                         <label htmlFor="track-channel">Channel: </label>
-                        <input id="track-channel" onChange={this.changeTrackChannel} type="number" min="1" max="3" value={activeTrack.channel || 0} />
+                        <input id="track-channel" onChange={this.changeTrackChannel} type="number" min="0" max="3" value={this.props.channel || 0} />
                     </div>
                     <div className="editor-info-row">
                         <label htmlFor="track-ticks">Ticks: </label>
