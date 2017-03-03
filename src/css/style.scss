@@ -42,7 +42,7 @@ input {
     outline: none;
 }
 
-button {
+button, input[type="submit"] {
     border: 2px solid;
     background-color: white;
     outline: none;
@@ -133,7 +133,8 @@ button {
             input {
                 flex: 0 0 10%;
             }
-            button {
+            input[type="submit"] {
+            // button {
                 margin: 0;
                 margin-left: 10px;
                 flex: 0 0 10%;
@@ -279,9 +280,11 @@ button {
 
 .editor-drum-container {
     display: flex;
+    overflow-x: scroll;
     .editor-drum-row {
         display: flex;
         .editor-drum-block {
+            position: relative;
             &:last-child {
                 border-right: 1px solid #00969c;
             }
@@ -291,6 +294,7 @@ button {
             height: 16px;
             display: flex;
             .editor-drum-block-note {
+                z-index: 1;
                 border-radius: 2px;
                 position: absolute;
                 margin: 1px;

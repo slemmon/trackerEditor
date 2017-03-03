@@ -42,6 +42,8 @@ class DrumEditor extends Component {
     }
 
     changeTicksAmount (e) {
+        e.preventDefault()
+
         const track = Object.assign({}, this.props.activeTrack)
         const currentTicks = this.state.currentTicks
         const newValue = currentTicks > 0 && currentTicks < 65 ? currentTicks : currentTicks > 64 ? 64 : 1
@@ -147,11 +149,11 @@ class DrumEditor extends Component {
                         <label htmlFor="track-name">Name: </label>
                         <input id="track-name" onChange={this.changeTrackName} type="text" value={activeTrack.name || ""} />
                     </div>
-                    <div className="editor-info-row">
+                    <form onSubmit={this.changeTicksAmount} className="editor-info-row">
                         <label htmlFor="track-ticks">Ticks: </label>
                         <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
-                        <button onClick={ this.changeTicksAmount }>ok</button>
-                    </div>
+                        <input type="submit" value="ok" />
+                    </form>
                 </div>
                 <DrumTable notes={activeTrack.notes} ticks={activeTrack.ticks} addEffectAtPosition={this.addEffectAtPosition} />
 

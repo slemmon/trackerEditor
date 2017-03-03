@@ -46,6 +46,8 @@ class TrackEditor extends Component {
     }
 
     changeTicksAmount (e) {
+        e.preventDefault()
+
         const track = Object.assign({}, this.props.activeTrack)
         const currentTicks = this.state.currentTicks
         const newValue = currentTicks > 0 && currentTicks < 65 ? currentTicks : currentTicks > 64 ? 64 : 1
@@ -83,11 +85,11 @@ class TrackEditor extends Component {
                         <label htmlFor="track-channel">Channel: </label>
                         <input id="track-channel" onChange={this.changeTrackChannel} type="number" min="0" max="3" value={this.props.channel || 0} />
                     </div>
-                    <div className="editor-info-row">
+                    <form className="editor-info-row" onSubmit={ this.changeTicksAmount }>
                         <label htmlFor="track-ticks">Ticks: </label>
                         <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
-                        <button onClick={ this.changeTicksAmount }>apply</button>
-                    </div>
+                        <input type="submit" value="apply" />
+                    </form>
                 </div>
                 <div className="editor-play-buttons">
                     <button onClick={this.props.playSong}>play once</button>
