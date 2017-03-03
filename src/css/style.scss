@@ -315,6 +315,7 @@ button {
     flex-flow: column;
     .drum-selector {
         margin-top: 5px;
+        min-height: 20px;
         display: flex;
         align-items: center;
         .effect-text {

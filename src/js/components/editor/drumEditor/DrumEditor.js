@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import DrumTable from './DrumTable'
+import ArrowIcon from '../../../ArrowIcon'
 
 class DrumEditor extends Component {
     constructor (props) {
@@ -130,8 +131,13 @@ class DrumEditor extends Component {
         return effects
     }
 
+    getIsSelected (name) {
+        return this.state.selectedEffect === name
+    }
+
     render () {
         const activeTrack = this.props.activeTrack
+        const arrowIcon = <ArrowIcon size={16} color={'#584d4c'} />
 
         return (
             <div id="drum-editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
@@ -153,14 +159,35 @@ class DrumEditor extends Component {
                     <span className="drum-selector" onClick={ e => this.selectEffect('snare') }>
                         <span className="effect-text">snare</span>
                         <span className="effect-preview snare"></span>
+                        { this.getIsSelected('snare') ?
+                            <span>
+                                <span>&nbsp;</span>
+                                {arrowIcon}
+                            </span>
+                            :null
+                        }
                     </span>
                     <span className="drum-selector" onClick={ e => this.selectEffect('shake') }>
                         <span className="effect-text">shake</span>
                         <span className="effect-preview shake"></span>
+                        { this.getIsSelected('shake') ?
+                            <span>
+                                <span>&nbsp;</span>
+                                {arrowIcon}
+                            </span>
+                            :null
+                        }
                     </span>
                     <span className="drum-selector" onClick={ e => this.selectEffect('crash') }>
                         <span className="effect-text">crash</span>
                         <span className="effect-preview crash"></span>
+                        { this.getIsSelected('crash') ?
+                            <span>
+                                <span>&nbsp;</span>
+                                {arrowIcon}
+                            </span>
+                            :null
+                        }
                     </span>
                 </div>
 
