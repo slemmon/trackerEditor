@@ -4,7 +4,7 @@ export { createNoteSequence, createSongFromChannels }
 const drumTracks = {
     snare: {
         notes: [
-            "//\"Track\"",
+            "//\"Track snare\"",
             "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
             "0x41, -16,\t\t// FX: VOLUME SLIDE ON: steps = -16",
             "0x9F + 2,\t\t// DELAY: ticks = 2",
@@ -15,7 +15,7 @@ const drumTracks = {
     },
     shake: {
         notes: [
-            "//\"Track\"",
+            "//\"Track shake\"",
             "0x49, 4 + 0,\t\t// FX: RETRIG NOISE: point = 1 (*4) / speed = 0 (fastest)",
             "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
             "0x41, -8,\t\t// FX: VOLUME SLIDE ON: steps = -8",
@@ -28,7 +28,7 @@ const drumTracks = {
     },
     crash: {
         notes: [
-            "//\"Track\"",
+            "//\"Track crash\"",
             "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
             "0x41, -2,\t\t// FX: VOLUME SLIDE ON: steps = -2",
             "0x9F + 16,\t\t// DELAY: ticks = 16",
@@ -68,11 +68,8 @@ function createSongFromChannels (tracks, channels) {
     }
 
     const channelTracks = []
-    let once = true
-    for ( const channel of channels ) {
-        channelTracks.push(atmifyChannel(trackAtm, channel, once))
-        once = false
-    }
+    for ( let i = 0; i < 4; i++ )
+        channelTracks.push(atmifyChannel(trackAtm, channels[i], i===0, i))
 
     const { trackAddresses, trackString, totalBytes } = concatAllTracks(trackAtm)
     const { channelAddresses, channelString, channelEntryTracks } = concatAllChannels(totalBytes, totalTracks, channelTracks)
@@ -91,7 +88,7 @@ function createSongFromChannels (tracks, channels) {
 
 }
 
-function atmifyChannel (tracks, channel, addTempo) {
+function atmifyChannel (tracks, channel, addTempo, index) {
     const channelTrack = []
     let totalBytes = 0
     if ( addTempo ) {
@@ -113,7 +110,7 @@ function atmifyChannel (tracks, channel, addTempo) {
     channelTrack.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL')                                             // end of channel
     totalBytes++
 
-    channelTrack.unshift("//\"Track\"")
+    channelTrack.unshift(`//\"Track channel ${index}\"`)
 
     return { notes: channelTrack, bytes: totalBytes }
 }
@@ -161,7 +158,7 @@ function atmifyRegularTrack (track) {
     noteSequence.push('0xFE,\t\t\t// RETURN')                 // end of track (RETURN)
     totalBytes++
 
-    noteSequence.unshift("//\"Track\"")
+    noteSequence.unshift(`//\"Track ${track.name}\"`)
 
     return { notes: noteSequence, bytes: totalBytes }
 }
@@ -201,7 +198,7 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
     noteSequence.push('0xFE,\t\t\t// RETURN')                 // end of track (RETURN)
     totalBytes++
 
-    noteSequence.unshift("//\"Track\"")
+    noteSequence.unshift(`//\"Track ${track.name}\"`)
 
     return {
         notes: noteSequence,
