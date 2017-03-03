@@ -64,12 +64,20 @@ class SongEditor extends Component {
     }
 
     exportSong () {
+        const songString = createSongFromChannels(this.props.tracks, this.state.channels)
         this.setState({
-            showString: !this.state.showString
+            songString
         })
-        this.setState({
-            songString: createSongFromChannels(this.props.tracks, this.state.channels)
-        })
+
+        // make the browser download the file
+        const download = document.createElement('a')
+        download.href = `data:text/h;charset=utf-8,${encodeURI(songString)}`
+        download.download = 'song_export.h'
+
+        document.body.appendChild(download)
+        download.click()
+        document.body.removeChild(download)
+
     }
 
     addTrackAtIndex (channel, index, trackId) {
@@ -114,6 +122,7 @@ class SongEditor extends Component {
                 {/*<button>Pause</button>*/}
                 {/*<button onClick={ this.props.stopSong }>Stop</button>*/}
                 <button onClick={ this.exportSong }>Export song</button>
+                <button onClick={ e => this.setState({showString: !state.showString}) }>Show code</button>
 
                 <ul className="song-editor-channels">
                     <OneOfTheRows
@@ -153,7 +162,7 @@ class SongEditor extends Component {
                         padding: 2,
                         backgroundColor: '#f3f3f3'
                     }}>
-                        {this.state.songString || "Nothing to listen to yet."}
+                        {this.state.songString || "Nothing to show yet."}
                     </pre>
                     :null
                 }
