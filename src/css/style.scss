@@ -64,8 +64,8 @@ button, input[type="submit"] {
         list-style: none;
         padding: 0;
         margin: 0;
-        overflow: auto;
-        max-height: 150px;
+        // overflow: auto;
+        // max-height: 150px;
         border: 1px solid #4e999c;
         .track-list-item {
             height: 23px;
@@ -415,4 +415,10 @@ button, input[type="submit"] {
 
 .beingdragged {
     opacity: 0.5;
+}
+
+.colorpicker {
+    position: relative;
+    top: 18px;
+    left: -10px;
 }

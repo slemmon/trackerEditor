@@ -45,17 +45,43 @@ class Editor extends Component {
         this.toggleMuteSong = this.toggleMuteSong.bind(this)
         this.stopSong = this.stopSong.bind(this)
         this.changeChannel = this.changeChannel.bind(this)
+        this.setNewTrackColor = this.setNewTrackColor.bind(this)
     }
 
     getNewTrackColor (id) {
         switch (( parseInt(id)||0 ) % 5) {
-            case 0: return '#ff7e00'
-            case 1: return '#ff69a8'
-            case 2: return '#00a8cc'
-            case 3: return '#00d2ae'
-            case 4: return '#584d4d'
-            default: return '#ff7e00'
+            case 0: return '#b80000'
+            case 1: return '#fccb00'
+            case 2: return '#008b02'
+            case 3: return '#1273de'
+            case 4: return '#5300eb'
+            default: return '#b80000'
         }
+    }
+
+    setNewTrackColor (id, color) {
+
+        const tracks = this.state.tracks
+        let track,
+            trackIndex
+        for ( let x = 0, l = tracks.length; x < l; x++ ) {
+            track = tracks[x]
+            if ( track.id === id ) {
+                trackIndex = x
+                track = Object.assign({}, track)
+                break
+            }
+        }
+
+        track.color = color.hex
+
+        const newTracks = tracks.slice()
+        newTracks[trackIndex] = track
+
+        this.setState({
+            tracks: newTracks
+        })
+
     }
 
     createNewTrack (type) {
@@ -289,6 +315,7 @@ class Editor extends Component {
                     setActiveTrack = { this.setActiveTrack }
                     createNewTrack = { this.createNewTrack }
                     deleteTrack = { this.deleteTrack }
+                    setTrackColor = { this.setNewTrackColor }
                 />
                 { activeTrack.type === 'tune' ?
                     <TrackEditor
