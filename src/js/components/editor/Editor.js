@@ -49,13 +49,24 @@ class Editor extends Component {
     }
 
     getNewTrackColor (id) {
-        switch (( parseInt(id)||0 ) % 5) {
-            case 0: return '#b80000'
-            case 1: return '#fccb00'
-            case 2: return '#008b02'
-            case 3: return '#1273de'
-            case 4: return '#5300eb'
-            default: return '#b80000'
+        switch (( parseInt(id)||0 ) % 16) {
+            case 0: return '#ff7e00'
+            case 1: return '#ff69a8'
+            case 2: return '#00a8cc'
+            case 3: return '#00d2ae'
+            case 4: return '#584d4d'
+            case 5: return '#7171d8'
+            case 6: return '#df2020'
+            case 7: return '#24eb24'
+            case 8: return '#ffcc99'
+            case 9: return '#ffbdd8'
+            case 10: return '#85e9ff'
+            case 11: return '#75ffe8'
+            case 12: return '#aea2a2'
+            case 13: return '#b7b7eb'
+            case 14: return '#ef8f8f'
+            case 15: return '#98f598'
+            default: return '#ff7e00'
         }
     }
 
@@ -104,7 +115,8 @@ class Editor extends Component {
 
         this.setState({
             tracks,
-            activeTrack: newTrackData
+            activeTrack: newTrackData,
+            activeTrackPlayable: [1,0,0,0,0,0,0,"Track 0",64,0,159]
         })
     }
 
@@ -120,16 +132,19 @@ class Editor extends Component {
     }
 
     setActiveTrack (activeTrack) {
-        this.setState({activeTrack})
+        this.setState({
+            activeTrack,
+            activeTrackPlayable: this.createTheSongArray(activeTrack)
+        })
     }
 
-    toggleNote (id, note, row) {
+    toggleNote (trackId, note, row) {
         const tracks = this.state.tracks
         let track,
             trackIndex
         for ( let x = 0, l = tracks.length; x < l; x++ ) {
             track = tracks[x]
-            if ( track.id === id ) {
+            if ( track.id === trackId ) {
                 trackIndex = x
                 track = Object.assign({}, track)
                 track.notes = track.notes.slice()
@@ -137,12 +152,12 @@ class Editor extends Component {
             }
         }
 
-        track.notes[row] = { active: note }
+        track.notes[track.ticks - 1 - row] = { active: note }
         const newTracks = this.state.tracks.slice()
         newTracks[trackIndex] = track
 
         let activeTrack = this.state.activeTrack
-        if ( this.state.activeTrack.id === id )
+        if ( this.state.activeTrack.id === trackId )
             activeTrack = track
 
         const newPlayable = this.createTheSongArray(activeTrack)

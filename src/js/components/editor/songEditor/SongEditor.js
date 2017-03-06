@@ -79,7 +79,6 @@ class SongEditor extends Component {
                     newChannels[i][j].color = newColor
             }
         }
-        console.log(newColor)
     }
 
     playSong () {

@@ -13,10 +13,11 @@ class NewNotesTable extends Component {
     }
 
     componentWillReceiveProps (nextProps) {
-        if ( nextProps.notes.length !== this.props.notes.length )
-            this.createRows(nextProps.notes)
+        const notes = nextProps.notes.slice().reverse()
+        if ( notes.length !== this.props.notes.length )
+            this.createRows(notes)
         else
-            this.updateRows(nextProps.notes)
+            this.updateRows(notes)
     }
 
     createRows (notes, returnResult) {
