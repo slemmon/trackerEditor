@@ -23,16 +23,22 @@ class SongEditor extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if ( nextProps.tracks.length < this.props.tracks.length )
+        const l1 = nextProps.tracks.length,
+              l2 = this.props.tracks.length
+        if ( l1 < l2 )
             this.deleteRemovedTrackFromAllChannels(nextProps.tracks)
-        else {
+        else if ( l1 === l2 ) {
             const colors = this.props.tracks.map( t => t.color )
             const newColors = nextProps.tracks.map( t => t.color )
 
             const l = colors.length
             let changed
             for ( let i = 0; i < l; i++ )
-                return this.updateTrackInAllChannels(this.props.tracks[i], newColors[i])
+                if ( colors[i] !== newColors[i] )
+                    changed = i
+
+            if ( changed !== undefined )
+                this.updateTrackInAllChannels(this.props.tracks[changed], newColors[changed])
         }
     }
 
@@ -68,7 +74,7 @@ class SongEditor extends Component {
     updateTrackInAllChannels (trackToChange, newColor) {
         const trackToChangeId = trackToChange.id
         const channels = this.state.channels
-        const newChannels = channels.map( c => c.slice())
+        const newChannels = channels.map( c => c.map( t => Object.assign(t) ) )
         let channel
         let track
         for ( let i = 0; i < 4; i++ ) {
@@ -79,6 +85,9 @@ class SongEditor extends Component {
                     newChannels[i][j].color = newColor
             }
         }
+        this.setState({
+            channels: newChannels
+        })
     }
 
     playSong () {
