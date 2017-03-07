@@ -210,7 +210,7 @@ export default SongEditor
 const OneOfTheRows = ({channel, tracks, addTrackAtIndex, removeTrackAtIndex, moveTrackToIndex}) =>
     <li className="song-editor-channels-item">
         <div className="song-editor-channels-item-name">
-            <span><i className="fa fa-music" aria-hidden="true"></i></span>
+            <span><i className={`fa fa-${ channel !== 3 ? 'music' : 'superpowers' }`} aria-hidden="true"></i></span>
             <span>{`CH ${channel}`}</span>
         </div>
         <div className="song-editor-channels-item-editor">

@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import DrumTable from './DrumTable'
-import ArrowIcon from '../../../ArrowIcon'
 
 class DrumEditor extends Component {
     constructor (props) {
@@ -139,7 +138,7 @@ class DrumEditor extends Component {
 
     render () {
         const activeTrack = this.props.activeTrack
-        const arrowIcon = <ArrowIcon size={16} color={'#584d4c'} />
+        const arrowIcon = <i className="fa fa-arrow-left" aria-hidden="true"></i>
 
         return (
             <div id="drum-editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>

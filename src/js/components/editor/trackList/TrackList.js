@@ -25,7 +25,9 @@ export default TrackList
 
 const TrackRow = ({last, i, track, deleteTrack, setActiveTrack, setTrackColor}) =>
     <li className={`track-list-item ${ last === i + 1 ? 'track-list-item-last' : '' }`}>
-        <span className="track-list-item-icon"><i className="fa fa-music" aria-hidden="true"></i></span>
+        <span className="track-list-item-icon">
+            <i className={`fa fa-${ track.type === 'tune' ? 'music' : 'superpowers' }`} aria-hidden="true"></i>
+        </span>
         <span className="track-list-item-text">{`${track.name} - (${track.type})`}</span>
         <span className="track-list-item-text"><span>Ticks: </span><span>{track.ticks}</span></span>
         <span className="track-list-item-tickbar">
