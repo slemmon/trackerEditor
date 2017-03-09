@@ -29,7 +29,7 @@ class DrumEditor extends Component {
 
         track.name = newName
 
-        this.props.updateDrumTrack(track.id, track)
+        this.props.updateTrack(track.id, track)
     }
 
     trackTicksAmount (e) {
@@ -52,12 +52,12 @@ class DrumEditor extends Component {
         const newNotes = this.trimNotes(track.notes, newValue)
         track.notes = newNotes
 
-        this.props.updateDrumTrack(track.id, track)
+        this.props.updateTrack(track.id, track)
     }
 
     trimNotes (notes, ticks) {
-        const newNotes = notes.map((note={}, i) => {
-            if ( i + (note.type === 'crash' ? 3 : note.type === 'shake' ? 1 : 0) >= ticks )
+        const newNotes = notes.map((note, i) => {
+            if ( i + ( (note === 'crash') ? 15 : ( (note === 'shake') ? 3 : 1) ) >= ticks )
                 return undefined
             else
                 return note
@@ -84,7 +84,7 @@ class DrumEditor extends Component {
 
         track.notes = effects
 
-        this.props.updateDrumTrack(track.id, track)
+        this.props.updateTrack(track.id, track)
     }
 
     updateEffectsList (effects, position) {
@@ -142,7 +142,9 @@ class DrumEditor extends Component {
 
         return (
             <div id="drum-editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
+
                 <h5>Drum track editor</h5>
+
                 <div className="editor-info">
                     <div className="editor-info-row">
                         <label htmlFor="track-name">Name: </label>
@@ -154,6 +156,13 @@ class DrumEditor extends Component {
                         <input type="submit" value="ok" />
                     </form>
                 </div>
+
+                <div className="editor-play-buttons">
+                    <button onClick={this.props.playSong}>play once</button>
+                    <button onClick={this.props.togglePauseSong}>autoplay</button>
+                    <button onClick={this.props.toggleMuteSong}>mute</button>
+                </div>
+
                 <DrumTable notes={activeTrack.notes} ticks={activeTrack.ticks} addEffectAtPosition={this.addEffectAtPosition} />
 
                 <div className="drum-selector-container">

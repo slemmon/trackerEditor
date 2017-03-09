@@ -75,7 +75,9 @@ class TrackEditor extends Component {
 
         return (
             <div id="editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
+
                 <h5>Tune track editor</h5>
+
                 <div className="editor-info">
                     <div className="editor-info-row">
                         <label htmlFor="track-name">Name: </label>
@@ -91,14 +93,17 @@ class TrackEditor extends Component {
                         <input type="submit" value="apply" />
                     </form>
                 </div>
+
                 <div className="editor-play-buttons">
                     <button onClick={this.props.playSong}>play once</button>
                     <button onClick={this.props.togglePauseSong}>autoplay</button>
                     <button onClick={this.props.toggleMuteSong}>mute</button>
                 </div>
+
                 <NewNotesTable notes={activeTrack.notes} toggleNote={this.toggleNote} />
 
                 <NoteSheet />
+
             </div>
         )
     }

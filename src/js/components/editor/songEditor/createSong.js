@@ -1,4 +1,4 @@
-export default createSong
+// export default createSong
 export { createNoteSequence, createSongFromChannels }
 
 const drumTracks = {
@@ -292,6 +292,89 @@ function concatAllChannels (bytesOffset, tracksOffset, channels) {
 
 
 
+function createNoteSequence (track) {
+    if ( track.type === 'tune')
+        return tuneSequence(track)
+    else
+        return drumSequence(track)
+}
+
+function tuneSequence (track) {
+    const notes = track.notes,
+          noteSequence = []
+
+    let thisNote,
+        lastNote = -1,
+        thisNoteNumber
+
+    for ( const note of notes ) {
+        thisNote = (note||{}).active
+        thisNoteNumber = ~thisNote ? thisNote : 0
+        if ( thisNote === lastNote ) {
+            if ( !noteSequence.length ) {
+                noteSequence[0] = thisNoteNumber
+                noteSequence[1] = 159 + 1
+            } else
+                noteSequence[noteSequence.length - 1]++
+        } else {
+            noteSequence.push(thisNoteNumber) // note to play
+            noteSequence.push(159 + 1)  // play for 1 tick
+        }
+        lastNote = thisNote
+    }
+
+    noteSequence.push(67)
+
+    return noteSequence
+}
+
+function drumSequence (track) {
+    const notes = track.notes
+
+    let note,
+        noteSequence = [],
+        wasEmpty = false,
+        skip = 0,
+        lastDelayTotal
+
+    for ( let x = 0, l = track.ticks; x < l; x++ ) {
+        note = notes[x]
+        if ( note === undefined && skip-- < 1 ) {
+            if ( wasEmpty ) {
+                lastDelayTotal++
+                noteSequence[noteSequence.length - 1] = 0x9F + lastDelayTotal
+            } else {
+                wasEmpty = true
+                noteSequence.push(0x00 + 0)
+                noteSequence.push(0x9F + 1)
+                lastDelayTotal = 1
+            }
+        } else if ( note !== undefined && Object.prototype.toString.apply(note).slice(8, -1) === 'String' ) {
+            skip = note === 'snare' ? 1 : note === 'shake' ? 3 : 15
+            wasEmpty = false
+            noteSequence = noteSequence.concat( getEffect(note) )
+        }
+    }
+
+    return noteSequence
+}
+
+function getEffect (note) {
+    switch (note) {
+        case 'snare':
+        return [64, 32, 65, -16, 161, 67]
+        case 'shake':
+        return [73, 4, 64, 32, 65, -8, 163, 74, 67]
+        case 'crash':
+        return [64, 32, 65, -2, 175, 67]
+    }
+}
+
+
+
+
+
+
 function createSong (tracks) {
     const tracksLength = tracks.length
 
@@ -539,32 +622,6 @@ function addTrackAddress (song) {
     const address = `$$$0x${lastTrackBytes}, 0x00,\t\t\t// Address of track ${tracks}$$$`
     const result = [].concat(song.slice(0, afterLastTrackIndex), address, song.slice(afterLastTrackIndex)) // add track address to song
     return result
-}
-
-function createNoteSequence (notes) {
-    const noteSequence = []
-
-    let thisNote,
-        lastNote = -1,
-        thisNoteNumber
-
-    for ( const note of notes ) {
-        thisNote = (note||{}).active
-        thisNoteNumber = ~thisNote ? thisNote : 0
-        if ( thisNote === lastNote ) {
-            if ( !noteSequence.length ) {
-                noteSequence[0] = thisNoteNumber
-                noteSequence[1] = 159 + 1
-            } else
-                noteSequence[noteSequence.length - 1]++
-        } else {
-            noteSequence.push(thisNoteNumber) // note to play
-            noteSequence.push(159 + 1)  // play for 1 tick
-        }
-        lastNote = thisNote
-    }
-
-    return noteSequence
 }
 
 function createNoteSequenceWithComments (notes) {

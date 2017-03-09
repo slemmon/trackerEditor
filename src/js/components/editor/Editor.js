@@ -37,7 +37,7 @@ class Editor extends Component {
         this.setActiveTrack = this.setActiveTrack.bind(this)
         this.toggleNote = this.toggleNote.bind(this)
         this.updateTrack = this.updateTrack.bind(this)
-        this.updateDrumTrack = this.updateDrumTrack.bind(this)
+        // this.updateDrumTrack = this.updateDrumTrack.bind(this)
         this.createTheSongArray = this.createTheSongArray.bind(this)
         this.playSong = this.playSong.bind(this)
         this.listenForSongEnd = this.listenForSongEnd.bind(this)
@@ -198,34 +198,34 @@ class Editor extends Component {
         })
     }
 
-    updateDrumTrack (id, newTrack) {
-        const tracks = this.state.tracks
-        let track,
-            trackIndex
-        for ( let x = 0, l = tracks.length; x < l; x++ ) {
-            track = tracks[x]
-            if ( track.id === id ) {
-                trackIndex = x
-                break
-            }
-        }
-        const newTracks = tracks.slice()
-        newTracks[trackIndex] = newTrack
+    // updateDrumTrack (id, newTrack) {
+    //     const tracks = this.state.tracks
+    //     let track,
+    //         trackIndex
+    //     for ( let x = 0, l = tracks.length; x < l; x++ ) {
+    //         track = tracks[x]
+    //         if ( track.id === id ) {
+    //             trackIndex = x
+    //             break
+    //         }
+    //     }
+    //     const newTracks = tracks.slice()
+    //     newTracks[trackIndex] = newTrack
 
-        let activeTrack = this.state.activeTrack
-        if ( this.state.activeTrack.id === id )
-            activeTrack = newTrack
+    //     let activeTrack = this.state.activeTrack
+    //     if ( this.state.activeTrack.id === id )
+    //         activeTrack = newTrack
 
-        this.setState({
-            tracks: newTracks,
-            activeTrack
-        })
-    }
+    //     this.setState({
+    //         tracks: newTracks,
+    //         activeTrack
+    //     })
+    // }
 
     createTheSongArray (track = this.state.activeTrack, channel = this.state.channel) {
         const notes = track.notes
 
-        const noteSequence = createNoteSequence(notes)
+        const noteSequence = createNoteSequence(track)
 
         const templateSong = [
 
@@ -346,7 +346,10 @@ class Editor extends Component {
                 :
                     <DrumEditor
                         activeTrack = { state.activeTrack }
-                        updateDrumTrack = { this.updateDrumTrack }
+                        updateTrack = { this.updateTrack }
+                        playSong = { () => this.playSong(undefined, true) }
+                        togglePauseSong = { this.togglePauseSong }
+                        toggleMuteSong = { this.toggleMuteSong }
                     />
                 }
             </div>
