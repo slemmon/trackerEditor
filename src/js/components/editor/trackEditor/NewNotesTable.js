@@ -86,7 +86,7 @@ class NewNotesTable extends Component {
     }
 
     findDifference (notes) {
-        const oldNotes = this.props.notes
+        const oldNotes = this.props.notes.slice().reverse()
         let note
         const changedNoteIndexes = []
         for ( let x = 0, l = notes.length; x < l; x++ ) {
