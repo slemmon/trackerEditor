@@ -20,6 +20,7 @@ class SongEditor extends Component {
         this.addTrackAtIndex = this.addTrackAtIndex.bind(this)
         this.moveTrackToIndex = this.moveTrackToIndex.bind(this)
         this.removeTrackAtIndex = this.removeTrackAtIndex.bind(this)
+        this.toggleShowCode = this.toggleShowCode.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -105,12 +106,21 @@ class SongEditor extends Component {
 
         // make the browser download the file
         const download = document.createElement('a')
-        download.href = `data:text/h;charset=utf-8,${encodeURI(songString)}`
+        download.href = `data:text/plain;charset=utf-8;base64,${btoa(songString)}`
         download.download = 'song_export.h'
 
         document.body.appendChild(download)
         download.click()
         document.body.removeChild(download)
+
+    }
+
+    toggleShowCode () {
+
+        this.setState({
+            songString: createSongFromChannels(this.props.tracks, this.state.channels),
+            showString: !this.state.showString
+        })
 
     }
 
@@ -156,7 +166,7 @@ class SongEditor extends Component {
                 {/*<button>Pause</button>*/}
                 {/*<button onClick={ this.props.stopSong }>Stop</button>*/}
                 <button onClick={ this.exportSong }>Export song</button>
-                <button onClick={ e => this.setState({showString: !state.showString}) }>Show code</button>
+                <button onClick={ this.toggleShowCode }>Show code</button>
 
                 <ul className="song-editor-channels">
                     <OneOfTheRows
