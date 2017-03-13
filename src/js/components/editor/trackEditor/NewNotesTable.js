@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import uniq from 'lodash.uniq'
 
 import Row from './Row'
+import PlayPositionPointer from './PlayPositionPointer'
 
 class NewNotesTable extends Component {
     constructor (props) {
@@ -105,6 +106,8 @@ class NewNotesTable extends Component {
                 <div className="editor-table">
                     {rows}
                 </div>
+
+                <PlayPositionPointer ticks={rows.length}/>
             </div>
         )
     }

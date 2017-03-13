@@ -1,7 +1,7 @@
 body {
     display: flex;
     justify-content: center;
-    font-family: system-ui;
+    font-family: system-ui, -apple-system, "Segoe UI";
     text-transform: uppercase;
     color: #594e4e;
 }
@@ -118,8 +118,8 @@ button, input[type="submit"] {
 #editor-container, #drum-editor-container {
     margin-bottom: 10px;
 
-    display: flex;
-    flex-flow: column;
+    // display: flex;
+    // flex-flow: column;
 
     .editor-info {
         margin-bottom: 10px;
@@ -132,6 +132,10 @@ button, input[type="submit"] {
             }
             input {
                 flex: 0 0 10%;
+                min-width: 50px;
+                &#track-name {
+                    flex: 0 0 25%;
+                }
             }
             input[type="submit"] {
             // button {
@@ -145,8 +149,16 @@ button, input[type="submit"] {
     .editor-play-buttons {}
 
     .editor-table-container {
-        align-self: center;
-        display: flex;
+        // align-self: center;
+
+        // display: flex;
+        // flex-flow: column;
+        // align-items: flex-end;
+        position: relative;
+        overflow: auto;
+        max-height: 140px;
+        // width: 100%;
+
         .editor-table {
             display: flex;
             flex-flow: column;
@@ -195,12 +207,36 @@ button, input[type="submit"] {
                 }
             }
         }
+
+        .play-position {
+            position: absolute;
+            width: 100%;
+            color: red;
+            pointer-events: none;
+
+            .play-position-caret {
+                top: -9px;
+                position: relative;
+                // cursor: -webkit-grab;
+                // pointer-events: initial;
+            }
+
+            .play-position-line {
+                // pointer-events: none;
+                position: absolute;
+                border-bottom: 1px solid red;
+                width: calc(100% - 5px);
+                right: 0;
+            }
+
+        }
+
     }
 
 }
 
 .sheet-note-container {
-    align-self: center;
+    // align-self: center;
     margin-top: 10px;
     width: 694px;
     font-family: initial;
@@ -280,7 +316,10 @@ button, input[type="submit"] {
 
 .editor-drum-container {
     display: flex;
+    align-items: flex-end;
+    height: 50px;
     overflow-x: scroll;
+    position: relative;
     .editor-drum-row {
         display: flex;
         .editor-drum-block {
@@ -312,6 +351,55 @@ button, input[type="submit"] {
             }
         }
     }
+
+    .play-position-drum {
+        position: absolute;
+        height: 100%;
+        color: red;
+        pointer-events: none;
+
+        .play-position-drum-caret {
+            top: 5px;
+            left: -4px;
+            position: relative;
+        }
+
+        .play-position-drum-line {
+            position: absolute;
+            border-left: 1px solid red;
+            height: 18px;
+            left: 0;
+            bottom: 0;
+        }
+
+    }
+
+
+
+    .play-position {
+        position: absolute;
+        width: 100%;
+        color: red;
+        pointer-events: none;
+
+        .play-position-caret {
+            top: -9px;
+            position: relative;
+            // cursor: -webkit-grab;
+            // pointer-events: initial;
+        }
+
+        .play-position-line {
+            // pointer-events: none;
+            position: absolute;
+            border-bottom: 1px solid red;
+            width: calc(100% - 5px);
+            right: 0;
+        }
+
+    }
+
+
 }
 
 .drum-selector-container {

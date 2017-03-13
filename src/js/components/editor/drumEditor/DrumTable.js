@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import isEqual from 'lodash.isEqual'
+import Pointer from './Pointer'
 
 class DrumTable extends Component {
     constructor (props) {
@@ -43,10 +44,11 @@ class DrumTable extends Component {
                 <div className="editor-drum-row">
                     {row}
                 </div>
+
+                <Pointer ticks={this.props.ticks}/>
             </div>
         )
     }
 }
 
 export default DrumTable
-

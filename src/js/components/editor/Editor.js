@@ -30,14 +30,13 @@ class Editor extends Component {
         }
         this.emulateSampleRate = 16000.0    // Emulation sample rate
         this.converter = new SampleRateConverter(this.emulateSampleRate, this.output.getSampleRate())
-        this.playSong()
+        // this.playSong()
 
         this.createNewTrack = this.createNewTrack.bind(this)
         this.deleteTrack = this.deleteTrack.bind(this)
         this.setActiveTrack = this.setActiveTrack.bind(this)
         this.toggleNote = this.toggleNote.bind(this)
         this.updateTrack = this.updateTrack.bind(this)
-        // this.updateDrumTrack = this.updateDrumTrack.bind(this)
         this.createTheSongArray = this.createTheSongArray.bind(this)
         this.playSong = this.playSong.bind(this)
         this.listenForSongEnd = this.listenForSongEnd.bind(this)
@@ -161,7 +160,8 @@ class Editor extends Component {
             activeTrack = track
 
         const newPlayable = this.createTheSongArray(activeTrack)
-        this.playSong(newPlayable)
+        if ( this.state.autoplay )
+            this.playSong(newPlayable)
 
         this.setState({
             tracks: newTracks,
@@ -189,7 +189,8 @@ class Editor extends Component {
             activeTrack = newTrack
 
         const newPlayable = this.createTheSongArray(activeTrack)
-        this.playSong(newPlayable)
+        if ( this.state.autoplay )
+            this.playSong(newPlayable)
 
         this.setState({
             tracks: newTracks,
@@ -197,30 +198,6 @@ class Editor extends Component {
             activeTrackPlayable: newPlayable
         })
     }
-
-    // updateDrumTrack (id, newTrack) {
-    //     const tracks = this.state.tracks
-    //     let track,
-    //         trackIndex
-    //     for ( let x = 0, l = tracks.length; x < l; x++ ) {
-    //         track = tracks[x]
-    //         if ( track.id === id ) {
-    //             trackIndex = x
-    //             break
-    //         }
-    //     }
-    //     const newTracks = tracks.slice()
-    //     newTracks[trackIndex] = newTrack
-
-    //     let activeTrack = this.state.activeTrack
-    //     if ( this.state.activeTrack.id === id )
-    //         activeTrack = newTrack
-
-    //     this.setState({
-    //         tracks: newTracks,
-    //         activeTrack
-    //     })
-    // }
 
     createTheSongArray (track = this.state.activeTrack, channel = this.state.channel) {
         const notes = track.notes
@@ -276,6 +253,7 @@ class Editor extends Component {
         // Begin playback (?)
         this.output.play(forcePlay || this.state.autoplay)
 
+        this.trackPlayPosition()
         this.listenForSongEnd()
     }
 
@@ -286,14 +264,39 @@ class Editor extends Component {
             () => {
                 if ( this.player.getChannelActiveMute() === 0 ) {
                     this.output.pause(true)
+
+                    clearInterval(this.listenForSongEndInterval)
+                    clearInterval(this.trackPlayPositionInterval)
+
                 }
             }, 100)
+    }
+
+    trackPlayPosition () {
+        if ( this.trackPlayPositionInterval )
+            clearInterval(this.trackPlayPositionInterval)
+        this.trackPlayPositionInterval = setInterval(
+            () => {
+                document.dispatchEvent(
+                    new CustomEvent(
+                        'playPosition',
+                        {
+                            detail: {
+                                ticks: this.player.getTickCount()
+                            }
+                        }
+                    )
+                )
+            },
+            5
+        )
     }
 
     togglePauseSong () {
         const currentState = this.state.autoplay
         const newState = !currentState
-        this.output.pause(newState)
+        this.output.pause(true)
+        // this.output.pause(newState)
         this.setState({autoplay: newState})
     }
 
@@ -343,7 +346,7 @@ class Editor extends Component {
                         channel = { state.channel }
                         changeChannel = { this.changeChannel }
                     />
-                :
+                : activeTrack.type === 'drum' ?
                     <DrumEditor
                         activeTrack = { state.activeTrack }
                         updateTrack = { this.updateTrack }
@@ -351,6 +354,7 @@ class Editor extends Component {
                         togglePauseSong = { this.togglePauseSong }
                         toggleMuteSong = { this.toggleMuteSong }
                     />
+                    :null
                 }
             </div>
         )
