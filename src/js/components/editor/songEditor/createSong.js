@@ -39,7 +39,7 @@ const drumTracks = {
     }
 }
 
-function createSongFromChannels (tracks, channels) {
+function createSongFromChannels (tracks, channels, tempo) {
 
     const trackAtm = {}
     let totalTracks = 0
@@ -69,7 +69,7 @@ function createSongFromChannels (tracks, channels) {
 
     const channelTracks = []
     for ( let i = 0; i < 4; i++ )
-        channelTracks.push(atmifyChannel(trackAtm, channels[i], i===0, i))
+        channelTracks.push(atmifyChannel(trackAtm, channels[i], i===0, i, tempo))
 
     const { trackAddresses, trackString, totalBytes } = concatAllTracks(trackAtm)
     const { channelAddresses, channelString, channelEntryTracks } = concatAllChannels(totalBytes, totalTracks, channelTracks)
@@ -88,11 +88,11 @@ function createSongFromChannels (tracks, channels) {
 
 }
 
-function atmifyChannel (tracks, channel, addTempo, index) {
+function atmifyChannel (tracks, channel, addTempo, index, tempo) {
     const channelTrack = []
     let totalBytes = 0
     if ( addTempo ) {
-        channelTrack.push('0x9D, 50,\t\t// SET song tempo: value = 50')                                     // add song tempo
+        channelTrack.push(`0x9D, ${tempo},\t\t// SET song tempo: value = ${tempo}`)                                     // add song tempo
         totalBytes += 2
     }
 

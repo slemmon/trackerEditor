@@ -12,7 +12,8 @@ class SongEditor extends Component {
             showString: false,
             channels: [
                 [],[],[],[]
-            ]
+            ],
+            tempo: 50
         }
 
         this.playSong = this.playSong.bind(this)
@@ -21,6 +22,7 @@ class SongEditor extends Component {
         this.moveTrackToIndex = this.moveTrackToIndex.bind(this)
         this.removeTrackAtIndex = this.removeTrackAtIndex.bind(this)
         this.toggleShowCode = this.toggleShowCode.bind(this)
+        this.validateTempo = this.validateTempo.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -113,7 +115,7 @@ class SongEditor extends Component {
     }
 
     exportSong () {
-        const songString = createSongFromChannels(this.props.tracks, this.state.channels)
+        const songString = createSongFromChannels(this.props.tracks, this.state.channels, this.state.tempo)
         this.setState({
             songString
         })
@@ -132,7 +134,7 @@ class SongEditor extends Component {
     toggleShowCode () {
 
         this.setState({
-            songString: createSongFromChannels(this.props.tracks, this.state.channels),
+            songString: createSongFromChannels(this.props.tracks, this.state.channels, this.state.tempo),
             showString: !this.state.showString
         })
 
@@ -171,6 +173,15 @@ class SongEditor extends Component {
         })
     }
 
+    validateTempo (e) {
+        const tempo = parseInt(this.state.tempo, 10)
+        let newTempo = tempo
+        if ( tempo < 0 ) newTempo = 0
+        if ( tempo > 127 ) newTempo = 127
+        if ( tempo !== newTempo )
+            this.setState({tempo: newTempo})
+    }
+
     render () {
         const state = this.state
         return (
@@ -181,6 +192,19 @@ class SongEditor extends Component {
                 {/*<button onClick={ this.props.stopSong }>Stop</button>*/}
                 <button onClick={ this.exportSong }>Export song</button>
                 <button onClick={ this.toggleShowCode }>Show code</button>
+
+                <label htmlFor="tempo">
+                    Tempo&nbsp;
+                </label>
+                <input
+                    id="tempo"
+                    type="number"
+                    min="0"
+                    max="127"
+                    value={state.tempo}
+                    onChange={ e => this.setState({tempo: e.target.value}) }
+                    onBlur={ this.validateTempo }
+                />
 
                 <ul className="song-editor-channels">
                     <OneOfTheRows
