@@ -179,7 +179,6 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
             if ( wasEmpty ) {
                 lastDelayTotal++
                 noteSequence[noteSequence.length - 1] = `0x9F + ${lastDelayTotal},\t\t// DELAY: ticks = ${lastDelayTotal}`
-                totalBytes++
             } else {
                 wasEmpty = true
                 noteSequence.push(`0x00 + 0,\t\t// NOTE ON: note = 0`)
