@@ -227,7 +227,7 @@ class Editor extends Component {
 
             "Track 1",
             157, 50,        // SET song tempo: value = 50
-            64, 63          // FX: SET VOLUME: volume = 63
+            64, 48          // FX: SET VOLUME: volume = 48
 
         ]
 

@@ -96,7 +96,8 @@ function atmifyChannel (tracks, channel, addTempo, index) {
         totalBytes += 2
     }
 
-    channelTrack.push(`0x40, ${48},\t\t// FX: SET VOLUME: volume = ${48}`)
+    const iWantMyVolumeToBe = channel.length && index !== 3 ? 48 : 0
+    channelTrack.push(`0x40, ${iWantMyVolumeToBe},\t\t// FX: SET VOLUME: volume = ${iWantMyVolumeToBe}`)
     totalBytes += 2
 
     for ( const track of channel ) {
@@ -104,8 +105,8 @@ function atmifyChannel (tracks, channel, addTempo, index) {
         totalBytes += 2
     }
 
-    channelTrack.push(`0x00 + 0,\t\t// NOTE ON: note = 0`)
-    totalBytes++
+    // channelTrack.push(`0x00 + 0,\t\t// NOTE ON: note = 0`)
+    // totalBytes++
 
     channelTrack.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL')                                             // end of channel
     totalBytes++
@@ -181,10 +182,10 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
                 noteSequence[noteSequence.length - 1] = `0x9F + ${lastDelayTotal},\t\t// DELAY: ticks = ${lastDelayTotal}`
             } else {
                 wasEmpty = true
-                noteSequence.push(`0x00 + 0,\t\t// NOTE ON: note = 0`)
+                // noteSequence.push(`0x00 + 0,\t\t// NOTE ON: note = 0`)
                 noteSequence.push(`0x9F + 1,\t\t// DELAY: ticks = 1`)
                 lastDelayTotal = 1
-                totalBytes += 2
+                totalBytes += 1
             }
         } else if ( note !== undefined && Object.prototype.toString.apply(note).slice(8, -1) === 'String' ) {
             skip = note === 'snare' ? 1 : note === 'shake' ? 3 : 15
@@ -344,7 +345,7 @@ function drumSequence (track) {
                 noteSequence[noteSequence.length - 1] = 0x9F + lastDelayTotal
             } else {
                 wasEmpty = true
-                noteSequence.push(0x00 + 0)
+                // noteSequence.push(0x00 + 0)
                 noteSequence.push(0x9F + 1)
                 lastDelayTotal = 1
             }
@@ -355,17 +356,18 @@ function drumSequence (track) {
         }
     }
 
+    console.log(noteSequence)
     return noteSequence
 }
 
 function getEffect (note) {
     switch (note) {
         case 'snare':
-        return [64, 32, 65, -16, 161, 67]
+        return [64, 32, 65, -16, 161]
         case 'shake':
-        return [73, 4, 64, 32, 65, -8, 163, 74, 67]
+        return [73, 4, 64, 32, 65, -8, 163, 74]
         case 'crash':
-        return [64, 32, 65, -2, 175, 67]
+        return [64, 32, 65, -2, 175]
     }
 }
 
