@@ -355,6 +355,7 @@ button, input[type="submit"] {
     }
 
     .play-position-drum {
+        z-index: 2;
         position: absolute;
         height: 100%;
         color: red;

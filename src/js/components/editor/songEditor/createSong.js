@@ -357,7 +357,6 @@ function drumSequence (track) {
         }
     }
 
-    console.log(noteSequence)
     return noteSequence
 }
 
