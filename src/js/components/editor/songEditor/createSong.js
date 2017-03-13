@@ -224,6 +224,7 @@ function getRequiredDrumTracks (tracks) {
 
                 case 'shake':
                 shake = snare !== false ? 1 : 0
+                crash = crash === 1 ? 2 : crash
                 counter++
                 break
 
