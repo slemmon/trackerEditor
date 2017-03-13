@@ -201,6 +201,7 @@ class Editor extends Component {
 
     createTheSongArray (track = this.state.activeTrack, channel = this.state.channel) {
         const notes = track.notes
+        const drum = track.type === 'drum'
 
         const noteSequence = createNoteSequence(track)
 
@@ -212,10 +213,10 @@ class Editor extends Component {
             3,              // address of track 1
             0,              // address of track 1
 
-            1,              // Channel 0 entry track (PULSE)
+            drum?0:1,              // Channel 0 entry track (PULSE)
             0,              // Channel 1 entry track (SQUARE)
             0,              // Channel 2 entry track (TRIANGLE)
-            0,              // Channel 3 entry track (NOISE)
+            drum?1:0,              // Channel 3 entry track (NOISE)
 
 
             "Track 0",      // ticks = 0 / bytes = 3
