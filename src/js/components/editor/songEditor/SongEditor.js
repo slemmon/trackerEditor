@@ -35,11 +35,25 @@ class SongEditor extends Component {
             const l = colors.length
             let changed
             for ( let i = 0; i < l; i++ )
-                if ( colors[i] !== newColors[i] )
+                if ( colors[i].hex !== newColors[i].hex )
                     changed = i
 
             if ( changed !== undefined )
-                this.updateTrackInAllChannels(this.props.tracks[changed], newColors[changed])
+                return this.updateTrackInAllChannels(this.props.tracks[changed], newColors[changed], 'color')
+
+
+
+            const ticks = this.props.tracks.map( t => t.ticks )
+            const newTicks = nextProps.tracks.map( t => t.ticks )
+
+            for ( let i = 0; i < l; i++ ) {
+                if ( ticks[i] !== newTicks[i] )
+                    changed = i
+            }
+
+            if ( changed !== undefined )
+                return this.updateTrackInAllChannels(this.props.tracks[changed], newTicks[changed], 'ticks')
+
         }
     }
 
@@ -72,7 +86,7 @@ class SongEditor extends Component {
         })
     }
 
-    updateTrackInAllChannels (trackToChange, newColor) {
+    updateTrackInAllChannels (trackToChange, changeValue, type) {
         const trackToChangeId = trackToChange.id
         const channels = this.state.channels
         const newChannels = channels.map( c => c.map( t => Object.assign(t) ) )
@@ -83,7 +97,7 @@ class SongEditor extends Component {
             for ( let j = 0, l = channel.length; j < l; j++ ) {
                 track = channel[j]
                 if ( track.id === trackToChangeId )
-                    newChannels[i][j].color = newColor
+                    newChannels[i][j][type] = changeValue
             }
         }
         this.setState({

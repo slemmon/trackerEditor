@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import stringifyColor from '../../../stringifyColor'
 
 class ListOfTracks extends Component {
     constructor (props) {
@@ -128,7 +129,7 @@ class Track extends Component {
                 onDragEnd = { this.handleDragEnd }
                 data-position = { this.props.position }
                 className = { `draggable ${track.type === 'tune' ? 'draggable-tune' : 'draggable-drum' } ${this.state.imBeingDragged ? 'beingdragged' : ''}` }
-                style = { {width: track.ticks*2, backgroundColor: track.color} }
+                style = { {width: track.ticks*2, backgroundColor: stringifyColor(track.color, 'rgba', {a: 0.5}), borderColor: stringifyColor(track.color, 'rgb')} }
             >
             </span>
         )
