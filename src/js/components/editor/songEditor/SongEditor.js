@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import createSong, { createSongFromChannels } from './createSong'
+import /*createSong, */{ createSongFromChannels } from './createSong'
 import ListOfTracks from './ListOfTracks'
 
 class SongEditor extends Component {
@@ -108,10 +108,10 @@ class SongEditor extends Component {
     }
 
     playSong () {
-        const updatedSong = createSong(this.props.tracks)
-        this.setState(updatedSong)
-        if ( !updatedSong.song.length ) return
-        this.props.playSong(updatedSong.song, true)
+        // const updatedSong = createSong(this.props.tracks)
+        // this.setState(updatedSong)
+        // if ( !updatedSong.song.length ) return
+        // this.props.playSong(updatedSong.song, true)
     }
 
     exportSong () {

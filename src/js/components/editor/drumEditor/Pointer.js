@@ -23,9 +23,15 @@ class Pointer extends Component {
     }
 
     updatePosition (e) {
-        const ticks = e.detail.ticks
+        const ticks = e.detail.ticks,
+              repeatIsOn = this.props.repeatIsOn
+
         if ( ticks <= this.props.ticks ) {
             const newPosition = ticks * this.tickStep
+            this.el.style.left = `${newPosition}px`
+            this.scrollable.scrollLeft = newPosition - 400
+        } else if ( repeatIsOn ) {
+            const newPosition = ticks * this.tickStep % this.parentWidth
             this.el.style.left = `${newPosition}px`
             this.scrollable.scrollLeft = newPosition - 400
         }

@@ -45,6 +45,7 @@ class Editor extends Component {
         this.stopSong = this.stopSong.bind(this)
         this.changeChannel = this.changeChannel.bind(this)
         this.setNewTrackColor = this.setNewTrackColor.bind(this)
+        this.playSongAndRepeat = this.playSongAndRepeat.bind(this)
     }
 
     getNewTrackColor (id) {
@@ -242,7 +243,7 @@ class Editor extends Component {
 
     }
 
-    playSong (song=this.state.activeTrackPlayable, forcePlay) {
+    playSong (song=this.state.activeTrackPlayable, forcePlay, keepRepeatOn) {
         // Initialize player
         this.player = new SquawkStream(this.emulateSampleRate)
         this.player.setSource(song)
@@ -256,6 +257,48 @@ class Editor extends Component {
 
         this.trackPlayPosition()
         this.listenForSongEnd()
+
+        if ( !keepRepeatOn ) this.setState({repeatIsOn: false})
+        // if ( !keepRepeatOn ) this.repeatIsOn = false
+    }
+
+    playSongAndRepeat () {
+        const repeatIsOn = this.state.repeatIsOn
+
+        if ( repeatIsOn ) {
+            clearInterval(this.listenForSongEndInterval)
+            clearInterval(this.trackPlayPositionInterval)
+            this.output.pause(true)
+            this.setState({repeatIsOn: false})
+            return
+        }
+
+        this.setState({repeatIsOn: true})
+
+        let song = this.state.activeTrackPlayable.slice()
+        song.pop()
+        song.push(254)
+        song[0]++
+
+        const asd = [
+            "Track 2",
+            253,
+            255,
+            1,
+            159
+        ]
+
+        song = song.concat(asd)
+
+        const d = song.join(',')
+        const a = d.slice(d.indexOf('Track 1') + 8, d.indexOf('Track 2') - 1)
+        const q = a.split(',')
+
+        song = [].concat(song.slice(0, 5), [q.length + song[3], 0], song.slice(5))
+
+        song[10] = 2
+
+        this.playSong(song, true, true)
     }
 
     listenForSongEnd () {
@@ -294,6 +337,7 @@ class Editor extends Component {
     }
 
     togglePauseSong () {
+        this.state.repeatIsOn = false
         const currentState = this.state.autoplay
         const newState = !currentState
         this.output.pause(true)
@@ -325,7 +369,7 @@ class Editor extends Component {
         return (
             <div>
                 <SongEditor
-                    tracks={ state.tracks}
+                    tracks={ state.tracks }
                     playSong={ this.playSong }
                     stopSong={ this.stopSong }
                 />
@@ -352,8 +396,10 @@ class Editor extends Component {
                         activeTrack = { state.activeTrack }
                         updateTrack = { this.updateTrack }
                         playSong = { () => this.playSong(undefined, true) }
+                        playSongAndRepeat = { this.playSongAndRepeat }
                         togglePauseSong = { this.togglePauseSong }
                         toggleMuteSong = { this.toggleMuteSong }
+                        repeatIsOn = { state.repeatIsOn }
                     />
                     :null
                 }

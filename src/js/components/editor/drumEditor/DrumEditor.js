@@ -57,12 +57,23 @@ class DrumEditor extends Component {
 
     trimNotes (notes, ticks) {
         const newNotes = notes.map((note, i) => {
-            if ( i + ( (note === 'crash') ? 15 : ( (note === 'shake') ? 3 : 1) ) >= ticks )
+            const noteTicks = this.getEffectLength(note) - 1
+            if ( i + noteTicks >= ticks )
                 return undefined
             else
                 return note
         })
         return newNotes
+    }
+
+    getEffectLength (effect) {
+        switch (effect) {
+            case 'snare': return 2
+            case 'shake': return 4
+            case 'crash': return 16
+            case 'tick': return 1
+            case 'short_crash': return 8
+        }
     }
 
     selectEffect (value) {
@@ -91,14 +102,15 @@ class DrumEditor extends Component {
         const selectedEffect = this.state.selectedEffect
         const track = this.props.activeTrack
 
-        const effectLength = selectedEffect === 'snare' ? 2 : selectedEffect === 'shake' ? 4 : 16
+        const effectLength = this.getEffectLength(selectedEffect)
+        // const effectLength = selectedEffect === 'snare' ? 2 : selectedEffect === 'shake' ? 4 : 16
         if ( position + effectLength > track.ticks )
             return effects
 
         effects[position] = selectedEffect
 
         if ( selectedEffect === 'snare' )
-            // remove next
+            // remove next 1
             effects[position+1] = undefined
         else if ( selectedEffect === 'shake' )
             for ( let x = 1; x < 4; x++ )
@@ -108,6 +120,14 @@ class DrumEditor extends Component {
             for ( let x = 1; x < 16; x++ )
                 effects[position+x] = undefined
             // remove next 16
+        // else if ( selectedEffect === 'crash' )
+        //     for ( let x = 1; x < 16; x++ )
+        //         effects[position+x] = undefined
+        //     // remove next 0
+        else if ( selectedEffect === 'short_crash' )
+            for ( let x = 1; x < 8; x++ )
+                effects[position+x] = undefined
+            // remove next 8
 
         // remove previous if previous is long enough
         const indexToStartSlicingFrom = position - 15 < 0 ? 0 : position - 15
@@ -126,19 +146,18 @@ class DrumEditor extends Component {
             } else if ( thisEffect === 'snare' && selectLength - x === 1 ) {
                 effects[x+indexToStartSlicingFrom] = undefined
                 break
+            } else if ( thisEffect === 'short_crash' && selectLength - x <= 7 ) {
+                effects[x+indexToStartSlicingFrom] = undefined
+                break
             }
         }
 
         return effects
     }
 
-    getIsSelected (name) {
-        return this.state.selectedEffect === name
-    }
-
     render () {
         const activeTrack = this.props.activeTrack
-        const arrowIcon = <i className="fa fa-arrow-left" aria-hidden="true"></i>
+        const selectedEffect = this.state.selectedEffect
 
         return (
             <div id="drum-editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
@@ -159,46 +178,39 @@ class DrumEditor extends Component {
 
                 <div className="editor-play-buttons">
                     <button onClick={this.props.playSong}>play once</button>
+                    <button onClick={this.props.playSongAndRepeat}>play repeat</button>
                     <button onClick={this.props.togglePauseSong}>autoplay</button>
                     <button onClick={this.props.toggleMuteSong}>mute</button>
                 </div>
 
-                <DrumTable notes={activeTrack.notes} ticks={activeTrack.ticks} addEffectAtPosition={this.addEffectAtPosition} />
+                <DrumTable notes={activeTrack.notes} ticks={activeTrack.ticks} addEffectAtPosition={this.addEffectAtPosition} repeatIsOn={this.props.repeatIsOn} />
 
                 <div className="drum-selector-container">
-                    <span className="drum-selector" onClick={ e => this.selectEffect('snare') }>
-                        <span className="effect-text">snare</span>
-                        <span className="effect-preview snare"></span>
-                        { this.getIsSelected('snare') ?
-                            <span>
-                                <span>&nbsp;</span>
-                                {arrowIcon}
-                            </span>
-                            :null
-                        }
-                    </span>
-                    <span className="drum-selector" onClick={ e => this.selectEffect('shake') }>
-                        <span className="effect-text">shake</span>
-                        <span className="effect-preview shake"></span>
-                        { this.getIsSelected('shake') ?
-                            <span>
-                                <span>&nbsp;</span>
-                                {arrowIcon}
-                            </span>
-                            :null
-                        }
-                    </span>
-                    <span className="drum-selector" onClick={ e => this.selectEffect('crash') }>
-                        <span className="effect-text">crash</span>
-                        <span className="effect-preview crash"></span>
-                        { this.getIsSelected('crash') ?
-                            <span>
-                                <span>&nbsp;</span>
-                                {arrowIcon}
-                            </span>
-                            :null
-                        }
-                    </span>
+                    <DrumEffectSelector
+                        name = "snare"
+                        selectEffect = {this.selectEffect}
+                        selected = {'snare' === selectedEffect}
+                    />
+                    <DrumEffectSelector
+                        name = "shake"
+                        selectEffect = {this.selectEffect}
+                        selected = {'shake' === selectedEffect}
+                    />
+                    <DrumEffectSelector
+                        name = "crash"
+                        selectEffect = {this.selectEffect}
+                        selected = {'crash' === selectedEffect}
+                    />
+                    <DrumEffectSelector
+                        name = "tick"
+                        selectEffect = {this.selectEffect}
+                        selected = {'tick' === selectedEffect}
+                    />
+                    <DrumEffectSelector
+                        name = "short_crash"
+                        selectEffect = {this.selectEffect}
+                        selected = {'short_crash' === selectedEffect}
+                    />
                 </div>
 
             </div>
@@ -207,3 +219,25 @@ class DrumEditor extends Component {
 }
 
 export default DrumEditor
+
+class DrumEffectSelector extends Component {
+    render () {
+        const effectName = this.props.name
+        return (
+            <span className="drum-selector" onClick={ e => this.props.selectEffect(effectName) }>
+                <span className="effect-text">{effectName}</span>
+                <span className={`effect-preview ${effectName}`}></span>
+                { this.props.selected ?
+                    <span>
+                        <span>&nbsp;</span>
+                        <ArrowIcon />
+                    </span>
+                    :null
+                }
+            </span>
+        )
+    }
+}
+
+const ArrowIcon = () => <i className="fa fa-arrow-left" aria-hidden="true"></i>
+

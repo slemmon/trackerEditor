@@ -45,7 +45,7 @@ class DrumTable extends Component {
                     {row}
                 </div>
 
-                <Pointer ticks={this.props.ticks}/>
+                <Pointer ticks={this.props.ticks} repeatIsOn={this.props.repeatIsOn} />
             </div>
         )
     }
