@@ -141,17 +141,10 @@ function atmifyChannel (tracks, channel, addTempo, index, tempo) {
 
     }
 
-    // channelTrack.push(`0x00 + 0,\t\t// NOTE ON: note = 0`)
-    // totalBytes++
-    console.log(channelTrack.slice(-1)[0])
     if ( channelTrack.slice(-1)[0] !== '0x40, 0,\t\t// FX: SET VOLUME: volume = 0' ) {
         channelTrack.push('0x40, 0,\t\t// FX: SET VOLUME: volume = 0')
         totalBytes++
     }
-    // if ( channelTrack.length > 3 ) {
-    //     channelTrack.push(`0x40, 0,\t\t// FX: SET VOLUME: volume = 0`)
-    //     totalBytes++
-    // }
 
     channelTrack.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL')                                             // end of channel
     totalBytes++

@@ -55,7 +55,6 @@ class Pointer extends Component {
                 ref={ this.prepareElements }
             >
                 <span className="play-position-drum-caret"><i className="fa fa-angle-down" aria-hidden="true"></i></span>
-                <span className="play-position-drum-line"></span>
             </span>
         )
     }

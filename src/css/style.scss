@@ -381,18 +381,13 @@ button, input[type="submit"] {
         position: absolute;
         color: red;
         pointer-events: none;
+        border-left: 1px solid red;
+        height: 18px;
 
         .play-position-drum-caret {
             top: -11px;
             left: -6px;
             position: relative;
-        }
-
-        .play-position-drum-line {
-            position: relative;
-            border-left: 1px solid red;
-            height: 18px;
-            left: -11px;
         }
 
     }
@@ -406,12 +401,9 @@ button, input[type="submit"] {
         .play-position-caret {
             top: -9px;
             position: relative;
-            // cursor: -webkit-grab;
-            // pointer-events: initial;
         }
 
         .play-position-line {
-            // pointer-events: none;
             position: absolute;
             border-bottom: 1px solid red;
             width: calc(100% - 5px);
