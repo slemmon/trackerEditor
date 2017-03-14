@@ -1,6 +1,5 @@
 body {
     display: flex;
-    display: -webkit-flex;
     justify-content: center;
     font-family: system-ui, -apple-system, "Segoe UI";
     text-transform: uppercase;
@@ -71,7 +70,6 @@ button, input[type="submit"] {
         .track-list-item {
             height: 23px;
             display: flex;
-            display: -webkit-flex;
             align-items: center;
             border-bottom: 1px solid #bfe4e4;
             &.track-list-item-last {
@@ -88,7 +86,6 @@ button, input[type="submit"] {
             .track-list-item-tickbar {
                 flex: 2;
                 display: flex;
-                display: -webkit-flex;
                 height: 15px;
                 .track-list-item-tickbar-bar {
                     border-radius: 2px;
@@ -107,7 +104,6 @@ button, input[type="submit"] {
                 flex: 0 0 50px;
                 margin-right: 4px;
                 display: flex;
-                display: -webkit-flex;
                 align-items: center;
                 justify-content: space-between;
                 .track-list-item-buttons-color-button {
@@ -125,14 +121,12 @@ button, input[type="submit"] {
     margin-bottom: 10px;
 
     // display: flex;
-    // display: -webkit-flex;
     // flex-flow: column;
 
     .editor-info {
         margin-bottom: 10px;
         .editor-info-row {
             display: flex;
-            display: -webkit-flex;
             align-items: center;
             height: 30px;
             label {
@@ -160,7 +154,6 @@ button, input[type="submit"] {
         // align-self: center;
 
         // display: flex;
-        // display: -webkit-flex;
         // flex-flow: column;
         // align-items: flex-end;
         position: relative;
@@ -170,17 +163,14 @@ button, input[type="submit"] {
 
         .editor-table {
             display: flex;
-            display: -webkit-flex;
             flex-flow: column;
             .editor-table-row {
                 display: flex;
-                display: -webkit-flex;
                 &.editor-table-row-last .editor-table-block {
                     border-bottom: 1px solid #00969c;
                 }
                 .editor-table-block {
                     display: flex;
-                    display: -webkit-flex;
                     justify-content: center;
                     align-items: center;
                     width: 10px;
@@ -259,7 +249,6 @@ button, input[type="submit"] {
         border-right: 1px solid;
     }
     display: flex;
-    display: -webkit-flex;
     font-size: 6pt;
     position: relative;
 }
@@ -270,7 +259,6 @@ button, input[type="submit"] {
     border: 1px solid;
     border-right: none;
     display: flex;
-    display: -webkit-flex;
 }
 
 .sheet-note-low {
@@ -286,7 +274,6 @@ button, input[type="submit"] {
         border-right: 1px solid;
     }
     display: flex;
-    display: -webkit-flex;
 }
 
 .sheet-note-key {
@@ -331,14 +318,12 @@ button, input[type="submit"] {
 
 .editor-drum-container {
     display: flex;
-    display: -webkit-flex;
     align-items: flex-end;
     height: 50px;
     overflow-x: scroll;
     position: relative;
     .editor-drum-row {
         display: flex;
-        display: -webkit-flex;
         .editor-drum-block {
             position: relative;
             &:last-child {
@@ -349,7 +334,6 @@ button, input[type="submit"] {
             width: 16px;
             height: 16px;
             display: flex;
-            display: -webkit-flex;
             .editor-drum-block-note {
                 z-index: 1;
                 border-radius: 2px;
@@ -416,13 +400,11 @@ button, input[type="submit"] {
 
 .drum-selector-container {
     display: flex;
-    display: -webkit-flex;
     flex-flow: column;
     .drum-selector {
         margin-top: 5px;
         min-height: 20px;
         display: flex;
-        display: -webkit-flex;
         align-items: center;
         .effect-text {
             flex: 0 0 18%;
@@ -468,7 +450,6 @@ button, input[type="submit"] {
 
         .song-editor-channels-item {
             display: flex;
-            display: -webkit-flex;
             height: 25px;
 
             > * {
@@ -481,11 +462,9 @@ button, input[type="submit"] {
                 margin-right: 1px;
                 flex: 0 0 10%;
                 display: flex;
-                display: -webkit-flex;
 
                 > * {
                     display: flex;
-                    display: -webkit-flex;
                     justify-content: center;
                     align-items: center;
                 }
@@ -513,7 +492,6 @@ button, input[type="submit"] {
 .droppable {
 
     display: flex;
-    display: -webkit-flex;
     justify-content: flex-start;
     align-items: center;
     height: 100%;
