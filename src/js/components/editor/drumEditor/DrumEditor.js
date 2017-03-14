@@ -187,6 +187,11 @@ class DrumEditor extends Component {
 
                 <div className="drum-selector-container">
                     <DrumEffectSelector
+                        name = "tick"
+                        selectEffect = {this.selectEffect}
+                        selected = {'tick' === selectedEffect}
+                    />
+                    <DrumEffectSelector
                         name = "snare"
                         selectEffect = {this.selectEffect}
                         selected = {'snare' === selectedEffect}
@@ -197,19 +202,14 @@ class DrumEditor extends Component {
                         selected = {'shake' === selectedEffect}
                     />
                     <DrumEffectSelector
-                        name = "crash"
-                        selectEffect = {this.selectEffect}
-                        selected = {'crash' === selectedEffect}
-                    />
-                    <DrumEffectSelector
-                        name = "tick"
-                        selectEffect = {this.selectEffect}
-                        selected = {'tick' === selectedEffect}
-                    />
-                    <DrumEffectSelector
                         name = "short_crash"
                         selectEffect = {this.selectEffect}
                         selected = {'short_crash' === selectedEffect}
+                    />
+                    <DrumEffectSelector
+                        name = "crash"
+                        selectEffect = {this.selectEffect}
+                        selected = {'crash' === selectedEffect}
                     />
                 </div>
 
