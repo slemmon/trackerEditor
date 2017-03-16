@@ -165,6 +165,10 @@ button, input[type="submit"] {
         position: relative;
         overflow: auto;
         max-height: 140px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
         // width: 100%;
 
         .editor-table {
@@ -219,6 +223,7 @@ button, input[type="submit"] {
                 .editor-table-row-numbers {
                     position: absolute;
                     font-size: 8pt;
+                    pointer-events: none;
                     &.left {
                         left: 1px;
                     }
