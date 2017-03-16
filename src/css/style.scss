@@ -175,6 +175,9 @@ button, input[type="submit"] {
                 &.editor-table-row-last .editor-table-block {
                     border-bottom: 1px solid #00969c;
                 }
+                &.editor-table-row-highlighted {
+                    background-color: #ececec;
+                }
                 .editor-table-block {
                     display: flex;
                     justify-content: center;
@@ -211,6 +214,16 @@ button, input[type="submit"] {
                             border-top-right-radius: 0;
                             align-self: flex-start;
                         }
+                    }
+                }
+                .editor-table-row-numbers {
+                    position: absolute;
+                    font-size: 8pt;
+                    &.left {
+                        left: 1px;
+                    }
+                    &.right {
+                        right: 2px;
                     }
                 }
             }
@@ -332,6 +345,14 @@ button, input[type="submit"] {
         display: flex;
         .editor-drum-block {
             position: relative;
+            &.editor-drum-highlighted {
+                background-color: #ececec;
+            }
+            .editor-drum-number {
+                top: -12px;
+                font-size: 8pt;
+                position: relative;
+            }
             &:last-child {
                 border-right: 1px solid #00969c;
             }
@@ -348,7 +369,7 @@ button, input[type="submit"] {
                 height: 14px;
                 background-color: #584d4c;
                 &.editor-drum-block-note-snare {
-                    width: 30px;
+                    width: 31px;
                 }
                 &.editor-drum-block-note-shake {
                     width: 65px;
@@ -421,7 +442,7 @@ button, input[type="submit"] {
             background-color: #584d4c;
             cursor: pointer;
             &.snare {
-                width: 30px;
+                width: 31px;
             }
             &.shake {
                 width: 65px;

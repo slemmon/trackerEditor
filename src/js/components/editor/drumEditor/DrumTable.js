@@ -18,15 +18,22 @@ class DrumTable extends Component {
 
     createRow ({ticks, notes}, returnResult) {
         const row = []
-        for ( let x = 0; x < ticks; x++ )
+        let isHighlighted
+        for ( let x = 0; x < ticks; x++ ) {
+            isHighlighted = (x + 1) % 4 === 0
             row.push(
-                <span key={x} className="editor-drum-block" onClick={ () => this.props.addEffectAtPosition(x) }>
+                <span key={x} className={`editor-drum-block ${isHighlighted ? 'editor-drum-highlighted' : ''}`} onClick={ () => this.props.addEffectAtPosition(x) }>
+                    {isHighlighted ?
+                        <span className="editor-drum-number">{x+1}</span>
+                        :null
+                    }
                     { notes[x] ?
                         <span className={`editor-drum-block-note editor-drum-block-note-${notes[x]}`}></span>
                         : null
                     }
                 </span>
             )
+        }
 
         if ( returnResult )
             return row

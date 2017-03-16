@@ -12,14 +12,22 @@ class Row extends Component {
     }
 
     render () {
-        const toggleNote = this.props.toggleNote
-        const last = this.props.last
-        const modifier = this.props.nextIsSame && this.props.previousIsSame ? 'editor-table-block-note-middle' : this.props.nextIsSame ? 'editor-table-block-note-first' : this.props.previousIsSame ? 'editor-table-block-note-last' : ''
-        const activeNote = this.props.note.active
+
+        const toggleNote = this.props.toggleNote,
+              last = this.props.last,
+              modifier = this.props.nextIsSame && this.props.previousIsSame ? 'editor-table-block-note-middle' : this.props.nextIsSame ? 'editor-table-block-note-first' : this.props.previousIsSame ? 'editor-table-block-note-last' : '',
+              activeNote = this.props.note.active,
+              rowNumber = this.props.totalRows - this.props.row,
+              isHighlightedRow = rowNumber % 4 === 0
+
         return (
             <div
-                className = { `editor-table-row ${ last ? 'editor-table-row-last' : '' }` }
+                className = { `editor-table-row ${ last ? 'editor-table-row-last' : '' } ${ isHighlightedRow ? 'editor-table-row-highlighted' : '' }` }
             >
+                {isHighlightedRow?
+                    <Asd number={rowNumber} />
+                    :null
+                }
                 <span
                     onClick = { () => this.toggleNote(1) }
                     className = "editor-table-block"
@@ -467,3 +475,9 @@ class Row extends Component {
 }
 
 export default Row
+
+const Asd = ({number}) =>
+    <span>
+        <span className="editor-table-row-numbers left">{number}</span>
+        <span className="editor-table-row-numbers right">{number}</span>
+    </span>

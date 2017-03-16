@@ -33,6 +33,7 @@ class NewNotesTable extends Component {
                     row = { x }
                     note = { note }
                     last = { x === notesLength - 1 }
+                    totalRows = { notesLength }
                     toggleNote = { toggleNote }
                     previousIsSame = { note.active === (notes[x-1]||{}).active }
                     nextIsSame = { note.active === (notes[x+1]||{}).active }
@@ -75,6 +76,7 @@ class NewNotesTable extends Component {
                     row={ row }
                     note={ note }
                     last={ row === notesLength - 1 }
+                    totalRows = { notesLength }
                     toggleNote={ toggleNote }
                     previousIsSame = { note.active === (notes[row-1]||{}).active }
                     nextIsSame = { note.active === (notes[row+1]||{}).active }
