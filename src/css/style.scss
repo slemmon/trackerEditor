@@ -54,6 +54,7 @@ button, input[type="submit"] {
     text-transform: uppercase;
     // -webkit-text-fill-color: white;
     // -webkit-text-stroke: 2px #594e4e;
+    cursor: pointer;
 
     margin-right: 10px;
     margin-bottom: 10px;
@@ -108,6 +109,9 @@ button, input[type="submit"] {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
+                > * {
+                    cursor: pointer;
+                }
                 .track-list-item-buttons-color-button {
                     width: 15px;
                     height: 15px;
@@ -415,6 +419,7 @@ button, input[type="submit"] {
             border-radius: 2px;
             height: 14px;
             background-color: #584d4c;
+            cursor: pointer;
             &.snare {
                 width: 30px;
             }

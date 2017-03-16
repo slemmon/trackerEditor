@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import DrumTable from './DrumTable'
+import DrumEffectSelector from './DrumEffectSelector'
 
 class DrumEditor extends Component {
     constructor (props) {
@@ -178,9 +179,9 @@ class DrumEditor extends Component {
 
                 <div className="editor-play-buttons">
                     <button onClick={this.props.playSong}>play once</button>
-                    <button onClick={this.props.playSongAndRepeat}>play repeat</button>
-                    <button onClick={this.props.togglePauseSong}>autoplay</button>
-                    <button onClick={this.props.toggleMuteSong}>mute</button>
+                    <button onClick={this.props.playSongAndRepeat}>{ `${this.props.repeatIsOn ? 'stop' : 'play'} repeat` }</button>
+                    <button onClick={this.props.togglePauseSong}>{ `autoplay ${this.props.autoplayIsOn ? 'off' : 'on'}` }</button>
+                    <button onClick={this.props.toggleMuteSong}>{ `${this.props.isMuted ? 'un' : ''}mute` }</button>
                 </div>
 
                 <DrumTable notes={activeTrack.notes} ticks={activeTrack.ticks} addEffectAtPosition={this.addEffectAtPosition} repeatIsOn={this.props.repeatIsOn} />
@@ -219,25 +220,3 @@ class DrumEditor extends Component {
 }
 
 export default DrumEditor
-
-class DrumEffectSelector extends Component {
-    render () {
-        const effectName = this.props.name
-        return (
-            <span className="drum-selector" onClick={ e => this.props.selectEffect(effectName) }>
-                <span className="effect-text">{effectName}</span>
-                <span className={`effect-preview ${effectName}`}></span>
-                { this.props.selected ?
-                    <span>
-                        <span>&nbsp;</span>
-                        <ArrowIcon />
-                    </span>
-                    :null
-                }
-            </span>
-        )
-    }
-}
-
-const ArrowIcon = () => <i className="fa fa-arrow-left" aria-hidden="true"></i>
-

@@ -390,6 +390,8 @@ class Editor extends Component {
                         toggleMuteSong = { this.toggleMuteSong }
                         channel = { state.channel }
                         changeChannel = { this.changeChannel }
+                        autoplayIsOn = { state.autoplay }
+                        isMuted = { state.songIsMuted }
                     />
                 : activeTrack.type === 'drum' ?
                     <DrumEditor
@@ -399,6 +401,8 @@ class Editor extends Component {
                         playSongAndRepeat = { this.playSongAndRepeat }
                         togglePauseSong = { this.togglePauseSong }
                         toggleMuteSong = { this.toggleMuteSong }
+                        autoplayIsOn = { state.autoplay }
+                        isMuted = { state.songIsMuted }
                         repeatIsOn = { state.repeatIsOn }
                     />
                     :null

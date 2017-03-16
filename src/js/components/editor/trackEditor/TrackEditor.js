@@ -96,8 +96,8 @@ class TrackEditor extends Component {
 
                 <div className="editor-play-buttons">
                     <button onClick={this.props.playSong}>play once</button>
-                    <button onClick={this.props.togglePauseSong}>autoplay</button>
-                    <button onClick={this.props.toggleMuteSong}>mute</button>
+                    <button onClick={this.props.togglePauseSong}>{ `autoplay ${this.props.autoplayIsOn ? 'off' : 'on'}` }</button>
+                    <button onClick={this.props.toggleMuteSong}>{ `${this.props.isMuted ? 'un' : ''}mute` }</button>
                 </div>
 
                 <NewNotesTable notes={activeTrack.notes} toggleNote={this.toggleNote} />

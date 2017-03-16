@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import /*createSong, */{ createSongFromChannels } from './createSong'
-import ListOfTracks from './ListOfTracks'
+import ChannelRow from './ChannelRow'
 
 class SongEditor extends Component {
     constructor (props) {
@@ -191,7 +191,7 @@ class SongEditor extends Component {
                 {/*<button>Pause</button>*/}
                 {/*<button onClick={ this.props.stopSong }>Stop</button>*/}
                 <button onClick={ this.exportSong }>Export song</button>
-                <button onClick={ this.toggleShowCode }>Show code</button>
+                <button onClick={ this.toggleShowCode }>{ `${state.showString ? 'Hide' : 'Show'} code` }</button>
 
                 <label htmlFor="tempo">
                     Tempo&nbsp;
@@ -207,28 +207,28 @@ class SongEditor extends Component {
                 />
 
                 <ul className="song-editor-channels">
-                    <OneOfTheRows
+                    <ChannelRow
                         channel={0}
                         tracks={state.channels[0]}
                         addTrackAtIndex={this.addTrackAtIndex}
                         removeTrackAtIndex={this.removeTrackAtIndex}
                         moveTrackToIndex={this.moveTrackToIndex}
                     />
-                    <OneOfTheRows
+                    <ChannelRow
                         channel={1}
                         tracks={state.channels[1]}
                         addTrackAtIndex={this.addTrackAtIndex}
                         removeTrackAtIndex={this.removeTrackAtIndex}
                         moveTrackToIndex={this.moveTrackToIndex}
                     />
-                    <OneOfTheRows
+                    <ChannelRow
                         channel={2}
                         tracks={state.channels[2]}
                         addTrackAtIndex={this.addTrackAtIndex}
                         removeTrackAtIndex={this.removeTrackAtIndex}
                         moveTrackToIndex={this.moveTrackToIndex}
                     />
-                    <OneOfTheRows
+                    <ChannelRow
                         channel={3}
                         tracks={state.channels[3]}
                         addTrackAtIndex={this.addTrackAtIndex}
@@ -254,20 +254,3 @@ class SongEditor extends Component {
 }
 
 export default SongEditor
-
-const OneOfTheRows = ({channel, tracks, addTrackAtIndex, removeTrackAtIndex, moveTrackToIndex}) =>
-    <li className="song-editor-channels-item">
-        <div className="song-editor-channels-item-name">
-            <span><i className={`fa fa-${ channel !== 3 ? 'music' : 'superpowers' }`} aria-hidden="true"></i></span>
-            <span>{`CH ${channel}`}</span>
-        </div>
-        <div className="song-editor-channels-item-editor">
-            <ListOfTracks
-                channel={channel}
-                tracks={tracks}
-                addTrackAtIndex={addTrackAtIndex}
-                removeTrackAtIndex={removeTrackAtIndex}
-                moveTrackToIndex={moveTrackToIndex}
-            />
-        </div>
-    </li>
