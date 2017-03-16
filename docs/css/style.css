@@ -111,7 +111,11 @@ button, input[type="submit"] {
   #editor-container .editor-table-container, #drum-editor-container .editor-table-container {
     position: relative;
     overflow: auto;
-    max-height: 140px; }
+    max-height: 140px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; }
     #editor-container .editor-table-container .editor-table, #drum-editor-container .editor-table-container .editor-table {
       display: flex;
       flex-flow: column; }
@@ -155,7 +159,8 @@ button, input[type="submit"] {
               align-self: flex-start; }
         #editor-container .editor-table-container .editor-table .editor-table-row .editor-table-row-numbers, #drum-editor-container .editor-table-container .editor-table .editor-table-row .editor-table-row-numbers {
           position: absolute;
-          font-size: 8pt; }
+          font-size: 8pt;
+          pointer-events: none; }
           #editor-container .editor-table-container .editor-table .editor-table-row .editor-table-row-numbers.left, #drum-editor-container .editor-table-container .editor-table .editor-table-row .editor-table-row-numbers.left {
             left: 1px; }
           #editor-container .editor-table-container .editor-table .editor-table-row .editor-table-row-numbers.right, #drum-editor-container .editor-table-container .editor-table .editor-table-row .editor-table-row-numbers.right {
