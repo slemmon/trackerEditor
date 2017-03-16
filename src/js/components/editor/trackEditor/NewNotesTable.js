@@ -11,6 +11,10 @@ class NewNotesTable extends Component {
         this.state = {
             rows: this.createRows(props.notes, true)
         }
+
+        this.last = Date.now()
+
+        this.setMouseDown = this.setMouseDown.bind(this)
     }
 
     componentWillReceiveProps (nextProps) {
@@ -23,6 +27,7 @@ class NewNotesTable extends Component {
 
     createRows (notes, returnResult) {
         const toggleNote = this.props.toggleNote
+        const toggleNoteIfMouseIsHeld = this.toggleNoteIfMouseIsHeld
         const rows = []
         let note
         for ( let x = 0, notesLength = notes.length; x < notesLength; x++ ) {
@@ -37,6 +42,7 @@ class NewNotesTable extends Component {
                     toggleNote = { toggleNote }
                     previousIsSame = { note.active === (notes[x-1]||{}).active }
                     nextIsSame = { note.active === (notes[x+1]||{}).active }
+                    toggleNoteIfMouseIsHeld = { toggleNoteIfMouseIsHeld.bind(this) }
                 />
             )
         }
@@ -66,6 +72,7 @@ class NewNotesTable extends Component {
 
         const notesLength = notes.length
         const toggleNote = this.props.toggleNote
+        const toggleNoteIfMouseIsHeld = this.toggleNoteIfMouseIsHeld
         const rows = this.state.rows.slice()
         let note
         for ( const row of rowsToUpdate ) {
@@ -80,6 +87,7 @@ class NewNotesTable extends Component {
                     toggleNote={ toggleNote }
                     previousIsSame = { note.active === (notes[row-1]||{}).active }
                     nextIsSame = { note.active === (notes[row+1]||{}).active }
+                    toggleNoteIfMouseIsHeld = { toggleNoteIfMouseIsHeld.bind(this) }
                 />
             )
         }
@@ -100,11 +108,41 @@ class NewNotesTable extends Component {
         return changedNoteIndexes
     }
 
+    toggleNoteIfMouseIsHeld (note, row) {
+
+        if ( Date.now() - this.last > 20 ) { // little bit of throttling, probably doesn't do much though
+
+            if ( this.state.mouseDown )
+                this.props.toggleNote(this.state.mouseDownNotesTurnOff ? -1 : note, row)
+
+            this.last = Date.now()
+        }
+
+    }
+
+    setMouseDown (e) {
+        const target = e.target
+
+        let newNotesTurnOff = true
+        if ( target.hasChildNodes() && target.childNodes[0].classList.contains('hidden') )
+            newNotesTurnOff = false
+
+        this.setState({
+            mouseDown: true,
+            mouseDownNotesTurnOff: newNotesTurnOff
+        })
+    }
+
     render () {
         const rows = this.state.rows
 
         return (
-            <div className="editor-table-container">
+            <div
+                className="editor-table-container"
+                onMouseDown={ this.setMouseDown }
+                onMouseUp={ () => this.setState({mouseDown: false}) }
+                onMouseLeave={ () => this.setState({mouseDown: false}) }
+            >
                 <div className="editor-table">
                     {rows}
                 </div>
