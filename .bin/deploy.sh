@@ -9,6 +9,9 @@ touch docs/css/style.css
 mkdir docs/js
 touch docs/js/app.js
 
+cp src/css/font-awesome.min.css build/css
+cp -r src/fonts build
+
 cp src/html/index.html docs/index.html
 cp icon.png docs/icon.png
 
