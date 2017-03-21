@@ -23,6 +23,12 @@ header {
     margin: 0 25px; }
   header .banner {
     margin: 25px; }
+    header .banner > div {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center; }
+      header .banner > div > * {
+        margin: 0 10px; }
   header .line {
     margin: 0 25px 25px; }
 

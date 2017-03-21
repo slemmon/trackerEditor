@@ -30,6 +30,14 @@ header {
 
     .banner {
         margin: 25px;
+        > div {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            > * {
+                margin: 0 10px;
+            }
+        }
     }
 
     .line {
