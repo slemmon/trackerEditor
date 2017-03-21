@@ -27,6 +27,14 @@ header {
         justify-content: space-between;
         margin: 0 25px;
     }
+
+    .banner {
+        margin: 25px;
+    }
+
+    .line {
+        margin: 0 25px 25px;
+    }
 }
 
 footer {
@@ -62,7 +70,7 @@ footer {
 }
 
 #app {
-    margin-top: 30px;
+    // margin-top: 30px;
     margin-bottom: 30px;
     // background-color: white;
     // width: 750px;
