@@ -1,23 +1,77 @@
 body {
-    // display: flex;
-    width: 750px;
-    margin: 0 auto;
-    justify-content: center;
+    margin: 0;
     font-family: system-ui, -apple-system, "Segoe UI";
     text-transform: uppercase;
     color: #594e4e;
 }
 
-#app {
+.white-background {
+    background-color: white;
+    min-height: 100vh;
     width: 750px;
-    min-height: 100%;
-    position: absolute;
-    top: 0;
-    box-shadow: 0 0 20px;
+    margin: 0 auto;
+}
+
+header {
+    background-color: white;
+    margin: 0 auto;
+    width: 750px;
+
+    .title {
+        display: flex;
+        justify-content: center;
+    }
+
+    .header-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 25px;
+    }
+}
+
+footer {
+    background-color: white;
+    margin: 0 auto;
+    width: 750px;
+
+    > div {
+        margin: 0 25px;
+
+        .line {
+            margin-bottom: 3px;
+        }
+
+        .spread {
+            display: flex;
+            justify-content: space-between;
+
+            .link-images > a {
+                text-decoration: none;
+            }
+
+    }
+
+    }
+}
+
+.shadow {
+    background-image: url('images/background_shadow.png');
+    background-repeat: repeat-y;
+    background-position: 50% 0px;
+    min-height: 100vh;
+}
+
+#app {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    // background-color: white;
+    // width: 750px;
+    // margin: 0 auto;
+    // min-height: 100vh;
 }
 
 #app-container {
-    margin: 20px;
+    margin: 0 25px;
 }
 
 .hidden {
@@ -52,8 +106,6 @@ button, input[type="submit"] {
     font-weight: 800;
     color: #594e4e;
     text-transform: uppercase;
-    // -webkit-text-fill-color: white;
-    // -webkit-text-stroke: 2px #594e4e;
     cursor: pointer;
 
     margin-right: 10px;
@@ -67,8 +119,6 @@ button, input[type="submit"] {
         list-style: none;
         padding: 0;
         margin: 0;
-        // overflow: auto;
-        // max-height: 150px;
         border: 1px solid #4e999c;
         .track-list-item {
             height: 23px;
@@ -94,13 +144,6 @@ button, input[type="submit"] {
                     border-radius: 2px;
                     border: 1px solid;
                     box-sizing: border-box;
-
-                    // background-size: 3px 3px;
-                    // background-image: linear-gradient(45deg, #fff 25%, transparent 25%, transparent),
-                                              // linear-gradient(-45deg, #fff 25%, transparent 25%, transparent),
-                                              // linear-gradient(45deg, transparent 75%, #fff 75%),
-                                              // linear-gradient(-45deg, transparent 75%, #fff 75%)
-
                 }
             }
             .track-list-item-buttons {
@@ -125,9 +168,6 @@ button, input[type="submit"] {
 
 #editor-container, #drum-editor-container {
     margin-bottom: 10px;
-
-    // display: flex;
-    // flex-flow: column;
 
     .editor-info {
         margin-bottom: 10px;
@@ -157,19 +197,13 @@ button, input[type="submit"] {
     .editor-play-buttons {}
 
     .editor-table-container {
-        // align-self: center;
-
-        // display: flex;
-        // flex-flow: column;
-        // align-items: flex-end;
         position: relative;
         overflow: auto;
-        max-height: 140px;
+        max-height: 280px;
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        // width: 100%;
 
         .editor-table {
             display: flex;
@@ -243,12 +277,9 @@ button, input[type="submit"] {
             .play-position-caret {
                 top: -9px;
                 position: relative;
-                // cursor: -webkit-grab;
-                // pointer-events: initial;
             }
 
             .play-position-line {
-                // pointer-events: none;
                 position: absolute;
                 border-bottom: 1px solid red;
                 width: calc(100% - 5px);
@@ -262,7 +293,6 @@ button, input[type="submit"] {
 }
 
 .sheet-note-container {
-    // align-self: center;
     margin-top: 10px;
     width: 694px;
     font-family: initial;
