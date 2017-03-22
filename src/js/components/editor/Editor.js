@@ -20,6 +20,7 @@ class Editor extends Component {
             channel: 0
         }
 
+        this.tempo = 25
         this.nextId = 0
         this.synth = new SquawkSynth()
         try {
@@ -46,6 +47,7 @@ class Editor extends Component {
         this.changeChannel = this.changeChannel.bind(this)
         this.setNewTrackColor = this.setNewTrackColor.bind(this)
         this.playSongAndRepeat = this.playSongAndRepeat.bind(this)
+        this.setTempo = this.setTempo.bind(this)
     }
 
     getNewTrackColor (id) {
@@ -227,7 +229,7 @@ class Editor extends Component {
 
 
             "Track 1",
-            157, 50,        // SET song tempo: value = 50
+            157, this.tempo,        // SET song tempo: value = 50
             64, 48          // FX: SET VOLUME: volume = 48
 
         ]
@@ -363,6 +365,13 @@ class Editor extends Component {
         })
     }
 
+    setTempo (tempo) {
+        this.tempo = tempo
+        this.setState({
+            activeTrackPlayable: this.createTheSongArray()
+        })
+    }
+
     render () {
         const state = this.state
         const activeTrack = state.activeTrack
@@ -372,6 +381,7 @@ class Editor extends Component {
                     tracks={ state.tracks }
                     playSong={ this.playSong }
                     stopSong={ this.stopSong }
+                    setTempo={ this.setTempo }
                 />
                 <TrackList
                     tracks = { state.tracks }

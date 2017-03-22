@@ -13,7 +13,7 @@ class SongEditor extends Component {
             channels: [
                 [],[],[],[]
             ],
-            tempo: 50
+            tempo: 25
         }
 
         this.playSong = this.playSong.bind(this)
@@ -178,8 +178,10 @@ class SongEditor extends Component {
         let newTempo = tempo
         if ( tempo < 0 ) newTempo = 0
         if ( tempo > 127 ) newTempo = 127
-        if ( tempo !== newTempo )
+        if ( tempo !== newTempo ) {
             this.setState({tempo: newTempo})
+        }
+        this.props.setTempo(newTempo)
     }
 
     render () {
