@@ -1,0 +1,60 @@
+
+#song-editor-container {
+    margin-bottom: 10px;
+
+    .song-editor-channels {
+        display: flex;
+
+        .channel-titles {
+            flex: 0 0 10%;
+            border: 1px solid #00969c;
+
+            .channel-title {
+                display: flex;
+                height: 25px;
+                border-bottom: 1px solid #bfe4e4;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                > :first-child {
+                    flex: 0 0 35%;
+                }
+
+                > :last-child {
+                    flex: 1;
+                }
+
+                > * {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+            }
+        }
+
+        .channel-tracks {
+            flex: 1;
+            max-width: 627px;
+            overflow-x: scroll;
+            display: flex;
+            // flex-flow: column;
+            border: 1px solid #00969c;
+            margin-left: 1px;
+
+            > * {
+                flex: 1;
+            }
+
+            .channel-track {
+                height: 25px;
+                border-bottom: 1px solid #bfe4e4;
+                &:last-child {
+                    border-bottom: none;
+                }
+            }
+        }
+    }
+
+}

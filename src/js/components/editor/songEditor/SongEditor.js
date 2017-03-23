@@ -208,36 +208,92 @@ class SongEditor extends Component {
                     onBlur={ this.validateTempo }
                 />
 
-                <ul className="song-editor-channels">
-                    <ChannelRow
+                <div className="song-editor-channels">
+
+                    <div className="channel-titles">
+                        <div className="channel-title">
+                            <span><i className='fa fa-music' aria-hidden="true"></i></span>
+                            <span>CH 0</span>
+                        </div>
+                        <div className="channel-title">
+                            <span><i className='fa fa-music' aria-hidden="true"></i></span>
+                            <span>CH 1</span>
+                        </div>
+                        <div className="channel-title">
+                            <span><i className='fa fa-music' aria-hidden="true"></i></span>
+                            <span>CH 2</span>
+                        </div>
+                        <div className="channel-title">
+                            <span><i className='fa fa-superpowers' aria-hidden="true"></i></span>
+                            <span>CH 3</span>
+                        </div>
+                    </div>
+
+                    <div className="channel-tracks">
+                        <div>
+                            <ChannelRow
+                                channel={0}
+                                tracks={state.channels[0]}
+                                addTrackAtIndex={this.addTrackAtIndex}
+                                removeTrackAtIndex={this.removeTrackAtIndex}
+                                moveTrackToIndex={this.moveTrackToIndex}
+                            />
+                            <ChannelRow
+                                channel={1}
+                                tracks={state.channels[1]}
+                                addTrackAtIndex={this.addTrackAtIndex}
+                                removeTrackAtIndex={this.removeTrackAtIndex}
+                                moveTrackToIndex={this.moveTrackToIndex}
+                            />
+                            <ChannelRow
+                                channel={2}
+                                tracks={state.channels[2]}
+                                addTrackAtIndex={this.addTrackAtIndex}
+                                removeTrackAtIndex={this.removeTrackAtIndex}
+                                moveTrackToIndex={this.moveTrackToIndex}
+                            />
+                            <ChannelRow
+                                channel={3}
+                                tracks={state.channels[3]}
+                                addTrackAtIndex={this.addTrackAtIndex}
+                                removeTrackAtIndex={this.removeTrackAtIndex}
+                                moveTrackToIndex={this.moveTrackToIndex}
+                            />
+                        </div>
+                    </div>
+
+                </div>
+
+                {/*<ul className="song-editor-channels2">
+                    <ChannelRow2
                         channel={0}
                         tracks={state.channels[0]}
                         addTrackAtIndex={this.addTrackAtIndex}
                         removeTrackAtIndex={this.removeTrackAtIndex}
                         moveTrackToIndex={this.moveTrackToIndex}
                     />
-                    <ChannelRow
+                    <ChannelRow2
                         channel={1}
                         tracks={state.channels[1]}
                         addTrackAtIndex={this.addTrackAtIndex}
                         removeTrackAtIndex={this.removeTrackAtIndex}
                         moveTrackToIndex={this.moveTrackToIndex}
                     />
-                    <ChannelRow
+                    <ChannelRow2
                         channel={2}
                         tracks={state.channels[2]}
                         addTrackAtIndex={this.addTrackAtIndex}
                         removeTrackAtIndex={this.removeTrackAtIndex}
                         moveTrackToIndex={this.moveTrackToIndex}
                     />
-                    <ChannelRow
+                    <ChannelRow2
                         channel={3}
                         tracks={state.channels[3]}
                         addTrackAtIndex={this.addTrackAtIndex}
                         removeTrackAtIndex={this.removeTrackAtIndex}
                         moveTrackToIndex={this.moveTrackToIndex}
                     />
-                </ul>
+                </ul>*/}
 
                 { state.showString ?
                     <pre style={{

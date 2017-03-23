@@ -36286,33 +36286,15 @@ var ChannelRow = function ChannelRow(_ref) {
         removeTrackAtIndex = _ref.removeTrackAtIndex,
         moveTrackToIndex = _ref.moveTrackToIndex;
     return _react2.default.createElement(
-        'li',
-        { className: 'song-editor-channels-item' },
-        _react2.default.createElement(
-            'div',
-            { className: 'song-editor-channels-item-name' },
-            _react2.default.createElement(
-                'span',
-                null,
-                _react2.default.createElement('i', { className: 'fa fa-' + (channel !== 3 ? 'music' : 'superpowers'), 'aria-hidden': 'true' })
-            ),
-            _react2.default.createElement(
-                'span',
-                null,
-                'CH ' + channel
-            )
-        ),
-        _react2.default.createElement(
-            'div',
-            { className: 'song-editor-channels-item-editor' },
-            _react2.default.createElement(_ListOfTracks2.default, {
-                channel: channel,
-                tracks: tracks,
-                addTrackAtIndex: addTrackAtIndex,
-                removeTrackAtIndex: removeTrackAtIndex,
-                moveTrackToIndex: moveTrackToIndex
-            })
-        )
+        'div',
+        { className: 'channel-track' },
+        _react2.default.createElement(_ListOfTracks2.default, {
+            channel: channel,
+            tracks: tracks,
+            addTrackAtIndex: addTrackAtIndex,
+            removeTrackAtIndex: removeTrackAtIndex,
+            moveTrackToIndex: moveTrackToIndex
+        })
     );
 };
 
@@ -36834,36 +36816,104 @@ var SongEditor = function (_Component) {
                     onBlur: this.validateTempo
                 }),
                 _react2.default.createElement(
-                    'ul',
+                    'div',
                     { className: 'song-editor-channels' },
-                    _react2.default.createElement(_ChannelRow2.default, {
-                        channel: 0,
-                        tracks: state.channels[0],
-                        addTrackAtIndex: this.addTrackAtIndex,
-                        removeTrackAtIndex: this.removeTrackAtIndex,
-                        moveTrackToIndex: this.moveTrackToIndex
-                    }),
-                    _react2.default.createElement(_ChannelRow2.default, {
-                        channel: 1,
-                        tracks: state.channels[1],
-                        addTrackAtIndex: this.addTrackAtIndex,
-                        removeTrackAtIndex: this.removeTrackAtIndex,
-                        moveTrackToIndex: this.moveTrackToIndex
-                    }),
-                    _react2.default.createElement(_ChannelRow2.default, {
-                        channel: 2,
-                        tracks: state.channels[2],
-                        addTrackAtIndex: this.addTrackAtIndex,
-                        removeTrackAtIndex: this.removeTrackAtIndex,
-                        moveTrackToIndex: this.moveTrackToIndex
-                    }),
-                    _react2.default.createElement(_ChannelRow2.default, {
-                        channel: 3,
-                        tracks: state.channels[3],
-                        addTrackAtIndex: this.addTrackAtIndex,
-                        removeTrackAtIndex: this.removeTrackAtIndex,
-                        moveTrackToIndex: this.moveTrackToIndex
-                    })
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'channel-titles' },
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'channel-title' },
+                            _react2.default.createElement(
+                                'span',
+                                null,
+                                _react2.default.createElement('i', { className: 'fa fa-music', 'aria-hidden': 'true' })
+                            ),
+                            _react2.default.createElement(
+                                'span',
+                                null,
+                                'CH 0'
+                            )
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'channel-title' },
+                            _react2.default.createElement(
+                                'span',
+                                null,
+                                _react2.default.createElement('i', { className: 'fa fa-music', 'aria-hidden': 'true' })
+                            ),
+                            _react2.default.createElement(
+                                'span',
+                                null,
+                                'CH 1'
+                            )
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'channel-title' },
+                            _react2.default.createElement(
+                                'span',
+                                null,
+                                _react2.default.createElement('i', { className: 'fa fa-music', 'aria-hidden': 'true' })
+                            ),
+                            _react2.default.createElement(
+                                'span',
+                                null,
+                                'CH 2'
+                            )
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'channel-title' },
+                            _react2.default.createElement(
+                                'span',
+                                null,
+                                _react2.default.createElement('i', { className: 'fa fa-superpowers', 'aria-hidden': 'true' })
+                            ),
+                            _react2.default.createElement(
+                                'span',
+                                null,
+                                'CH 3'
+                            )
+                        )
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'channel-tracks' },
+                        _react2.default.createElement(
+                            'div',
+                            null,
+                            _react2.default.createElement(_ChannelRow2.default, {
+                                channel: 0,
+                                tracks: state.channels[0],
+                                addTrackAtIndex: this.addTrackAtIndex,
+                                removeTrackAtIndex: this.removeTrackAtIndex,
+                                moveTrackToIndex: this.moveTrackToIndex
+                            }),
+                            _react2.default.createElement(_ChannelRow2.default, {
+                                channel: 1,
+                                tracks: state.channels[1],
+                                addTrackAtIndex: this.addTrackAtIndex,
+                                removeTrackAtIndex: this.removeTrackAtIndex,
+                                moveTrackToIndex: this.moveTrackToIndex
+                            }),
+                            _react2.default.createElement(_ChannelRow2.default, {
+                                channel: 2,
+                                tracks: state.channels[2],
+                                addTrackAtIndex: this.addTrackAtIndex,
+                                removeTrackAtIndex: this.removeTrackAtIndex,
+                                moveTrackToIndex: this.moveTrackToIndex
+                            }),
+                            _react2.default.createElement(_ChannelRow2.default, {
+                                channel: 3,
+                                tracks: state.channels[3],
+                                addTrackAtIndex: this.addTrackAtIndex,
+                                removeTrackAtIndex: this.removeTrackAtIndex,
+                                moveTrackToIndex: this.moveTrackToIndex
+                            })
+                        )
+                    )
                 ),
                 state.showString ? _react2.default.createElement(
                     'pre',
