@@ -314,7 +314,7 @@ function SquawkStream(sampleRate) {
                 break;
               case 93: // SET tempo
                 tickRate = readByte();
-                synth.setTick(sampleRate / tickRate);
+                synth.setTick((sampleRate / tickRate).toFixed(0));
                 break;
               case 94: // Goto advanced
                 //track(0) = readByte();
