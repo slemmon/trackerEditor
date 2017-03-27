@@ -37051,7 +37051,7 @@ function atmifyChannel(tracks, channel, addTempo, index, tempo) {
                 count++;
                 channelTrack.pop();
                 channelTrack.push("0xFD, " + count + ", " + tracks[track.id].index + ",\t\t// REPEAT: count = " + count + " + 1 / track = " + tracks[track.id].index);
-                totalBytes++; // we remove a line with 2 bytes (GOTO = 2 bytes) and we add 3 bytes (REPEAT = 3 bytes)
+                if (count === 1) totalBytes++; // we remove a line with 2 bytes (GOTO = 2 bytes) and we add 3 bytes (REPEAT = 3 bytes)
             } else {
 
                 count = 0;
@@ -37279,7 +37279,7 @@ function concatAllChannels(bytesOffset, tracksOffset, channels) {
     for (var x = 0; x < 4; x++) {
         channel = channels[x];
         hexified = hexify(totalBytes);
-        channelAddresses += "0x" + hexified.slice(-2) + ", 0x" + (hexified.slice(-4, -3) || 0) + (hexified.slice(-3, -2) || 0) + "\t\t// Address of track " + (totalTracks + x) + "\n";
+        channelAddresses += "0x" + hexified.slice(-2) + ", 0x" + (hexified.slice(-4, -3) || 0) + (hexified.slice(-3, -2) || 0) + ",\t\t// Address of track " + (totalTracks + x) + "\n";
         channelString += channel.notes.join('\n') + "\n";
         channelEntryTracks += "0x" + hexify(totalTracks + x) + ",\t\t\t// Channel " + x + " entry track\n";
         totalBytes += channel.bytes;
