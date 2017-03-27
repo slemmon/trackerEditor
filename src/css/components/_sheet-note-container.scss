@@ -1,0 +1,83 @@
+
+.sheet-note-container {
+    margin-top: 10px;
+    width: 694px;
+    font-family: initial;
+
+    .sheet-note-row {
+        display: flex;
+        font-size: 6pt;
+        position: relative;
+
+        .sheet-note {
+            flex: 1;
+            height: 16px;
+            border: 1px solid;
+            border-right: none;
+            display: flex;
+        }
+
+        .sheet-note-low {
+            align-items: flex-end;
+        }
+
+        .sheet-note-high {
+            align-items: flex-start;
+
+            .sheet-note-key-black {
+                position: absolute;
+                background-color: #584d4c;
+                border-bottom-left-radius: 2.5px;
+                border-bottom-right-radius: 2.5px;
+                width: 12px;
+                height: 15px;
+                top: 18px;
+                transform: translateX(-1px);
+            }
+
+        }
+
+        > :last-child {
+            border-right: 1px solid;
+        }
+
+    }
+
+    .sheet-note-key-row {
+        > :last-child {
+            border-right: 1px solid;
+        }
+        display: flex;
+
+        .sheet-note-key {
+            height: 30px;
+            border-left: 1px solid;
+            border-bottom: 1px solid;
+            border-bottom-right-radius: 2.5px;
+            border-bottom-left-radius: 2.5px;
+            &.key-1 {
+                flex: 17;
+            }
+            &.key-2 {
+                flex: 19.5;
+            }
+            &.key-3 {
+                flex: 17;
+            }
+            &.key-4 {
+                flex: 17;
+            }
+            &.key-5 {
+                flex: 19.5;
+            }
+            &.key-6 {
+                flex: 19.5;
+            }
+            &.key-7 {
+                flex: 17;
+            }
+        }
+
+    }
+
+}

@@ -1,0 +1,54 @@
+
+#track-list-container {
+    margin-bottom: 10px;
+
+    .track-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #4e999c;
+        .track-list-item {
+            height: 23px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #bfe4e4;
+            &.track-list-item-last {
+                border-bottom: none;
+            }
+            .track-list-item-icon {
+                flex: 0;
+                padding: 0 5px;
+            }
+            .track-list-item-text {
+                font-weight: 600;
+                flex: 1;
+            }
+            .track-list-item-tickbar {
+                flex: 2;
+                display: flex;
+                height: 15px;
+                .track-list-item-tickbar-bar {
+                    border-radius: 2px;
+                    border: 1px solid;
+                    box-sizing: border-box;
+                }
+            }
+            .track-list-item-buttons {
+                flex: 0 0 50px;
+                margin-right: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                > * {
+                    cursor: pointer;
+                }
+                .track-list-item-buttons-color-button {
+                    width: 15px;
+                    height: 15px;
+                    border-radius: 3px;
+                }
+            }
+        }
+    }
+
+}

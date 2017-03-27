@@ -1,0 +1,35 @@
+
+.drum-selector-container {
+    display: flex;
+    flex-flow: column;
+    .drum-selector {
+        margin-top: 5px;
+        min-height: 20px;
+        display: flex;
+        align-items: center;
+        .effect-text {
+            flex: 0 0 18%;
+        }
+        .effect-preview {
+            border-radius: 2px;
+            height: 14px;
+            background-color: #584d4c;
+            cursor: pointer;
+            &.snare {
+                width: 31px;
+            }
+            &.shake {
+                width: 65px;
+            }
+            &.crash {
+                width: 269px;
+            }
+            &.tick {
+                width: 14px;
+            }
+            &.short_crash {
+                width: 133px;
+            }
+        }
+    }
+}

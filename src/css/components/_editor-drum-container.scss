@@ -1,0 +1,90 @@
+
+.editor-drum-container {
+    display: flex;
+    align-items: flex-end;
+    height: 50px;
+    overflow-x: scroll;
+    position: relative;
+    .editor-drum-row {
+        display: flex;
+        .editor-drum-block {
+            position: relative;
+            &.editor-drum-highlighted {
+                background-color: #ececec;
+            }
+            .editor-drum-number {
+                top: -12px;
+                font-size: 8pt;
+                position: relative;
+            }
+            &:last-child {
+                border-right: 1px solid #00969c;
+            }
+            border: 1px solid #00969c;
+            border-right: none;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            .editor-drum-block-note {
+                z-index: 1;
+                border-radius: 2px;
+                position: absolute;
+                margin: 1px;
+                height: 14px;
+                background-color: #584d4c;
+                &.editor-drum-block-note-snare {
+                    width: 31px;
+                }
+                &.editor-drum-block-note-shake {
+                    width: 65px;
+                }
+                &.editor-drum-block-note-crash {
+                    width: 269px;
+                }
+                &.editor-drum-block-note-tick {
+                    width: 14px;
+                }
+                &.editor-drum-block-note-short_crash {
+                    width: 133px;
+                }
+            }
+        }
+    }
+
+    .play-position-drum {
+        z-index: 2;
+        position: absolute;
+        color: red;
+        pointer-events: none;
+        border-left: 1px solid red;
+        height: 18px;
+
+        .play-position-drum-caret {
+            top: -11px;
+            left: -6px;
+            position: relative;
+        }
+
+    }
+
+    .play-position {
+        position: absolute;
+        width: 100%;
+        color: red;
+        pointer-events: none;
+
+        .play-position-caret {
+            top: -9px;
+            position: relative;
+        }
+
+        .play-position-line {
+            position: absolute;
+            border-bottom: 1px solid red;
+            width: calc(100% - 5px);
+            right: 0;
+        }
+
+    }
+
+}
