@@ -129,6 +129,7 @@ function atmifyChannel (tracks, channel, addTempo, index, tempo) {
             count++
             channelTrack.pop()
             channelTrack.push(`0xFD, ${count}, ${tracks[track.id].index},\t\t// REPEAT: count = ${count} + 1 / track = ${tracks[track.id].index}`)
+            totalBytes++ // we remove a line with 2 bytes (GOTO = 2 bytes) and we add 3 bytes (REPEAT = 3 bytes)
 
         } else {
 
@@ -143,7 +144,7 @@ function atmifyChannel (tracks, channel, addTempo, index, tempo) {
 
     if ( channelTrack.slice(-1)[0] !== '0x40, 0,\t\t// FX: SET VOLUME: volume = 0' ) {
         channelTrack.push('0x40, 0,\t\t// FX: SET VOLUME: volume = 0')
-        totalBytes++
+        totalBytes += 2
     }
 
     channelTrack.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL')                                             // end of channel
@@ -268,14 +269,16 @@ function concatAllTracks (tracks) {
     let trackAddresses = '',
         trackString = '',
         totalBytes = 0,
-        track
+        track,
+        hexified
 
     const sorted = []
     for ( const key in tracks )
         sorted[tracks[key].index] = tracks[key]
 
     for ( const track of sorted ) {
-        trackAddresses += `0x${hexify(totalBytes)}, 0x00,\t\t// Address of track ${track.index}\n`
+        hexified = hexify(totalBytes)
+        trackAddresses += `0x${hexified.slice(-2)}, 0x${hexified.slice(-4, -3) || 0}${hexified.slice(-3, -2) || 0},\t\t// Address of track ${track.index}\n`
         trackString += `${track.atm.notes.join('\n')}\n`
         totalBytes += track.atm.bytes
     }
@@ -298,11 +301,13 @@ function concatAllChannels (bytesOffset, tracksOffset, channels) {
         totalBytes = bytesOffset,
         totalTracks = tracksOffset,
         channelEntryTracks = '',
-        channel
+        channel,
+        hexified
 
     for ( let x = 0; x < 4; x++ ) {
         channel = channels[x]
-        channelAddresses += `0x${hexify(totalBytes)}, 0x00,\t\t// Address of track ${totalTracks + x}\n`
+        hexified = hexify(totalBytes)
+        channelAddresses += `0x${hexified.slice(-2)}, 0x${hexified.slice(-4, -3) || 0}${hexified.slice(-3, -2) || 0}\t\t// Address of track ${totalTracks + x}\n`
         channelString += `${channel.notes.join('\n')}\n`
         channelEntryTracks += `0x${hexify(totalTracks + x)},\t\t\t// Channel ${x} entry track\n`
         totalBytes += channel.bytes

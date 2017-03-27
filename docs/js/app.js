@@ -37051,6 +37051,7 @@ function atmifyChannel(tracks, channel, addTempo, index, tempo) {
                 count++;
                 channelTrack.pop();
                 channelTrack.push("0xFD, " + count + ", " + tracks[track.id].index + ",\t\t// REPEAT: count = " + count + " + 1 / track = " + tracks[track.id].index);
+                totalBytes++; // we remove a line with 2 bytes (GOTO = 2 bytes) and we add 3 bytes (REPEAT = 3 bytes)
             } else {
 
                 count = 0;
@@ -37077,7 +37078,7 @@ function atmifyChannel(tracks, channel, addTempo, index, tempo) {
 
     if (channelTrack.slice(-1)[0] !== '0x40, 0,\t\t// FX: SET VOLUME: volume = 0') {
         channelTrack.push('0x40, 0,\t\t// FX: SET VOLUME: volume = 0');
-        totalBytes++;
+        totalBytes += 2;
     }
 
     channelTrack.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL'); // end of channel
@@ -37220,7 +37221,8 @@ function concatAllTracks(tracks) {
     var trackAddresses = '',
         trackString = '',
         totalBytes = 0,
-        track = void 0;
+        track = void 0,
+        hexified = void 0;
 
     var sorted = [];
     for (var key in tracks) {
@@ -37233,7 +37235,8 @@ function concatAllTracks(tracks) {
         for (var _iterator3 = sorted[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
             var _track = _step3.value;
 
-            trackAddresses += "0x" + hexify(totalBytes) + ", 0x00,\t\t// Address of track " + _track.index + "\n";
+            hexified = hexify(totalBytes);
+            trackAddresses += "0x" + hexified.slice(-2) + ", 0x" + (hexified.slice(-4, -3) || 0) + (hexified.slice(-3, -2) || 0) + ",\t\t// Address of track " + _track.index + "\n";
             trackString += _track.atm.notes.join('\n') + "\n";
             totalBytes += _track.atm.bytes;
         }
@@ -37270,11 +37273,13 @@ function concatAllChannels(bytesOffset, tracksOffset, channels) {
         totalBytes = bytesOffset,
         totalTracks = tracksOffset,
         channelEntryTracks = '',
-        channel = void 0;
+        channel = void 0,
+        hexified = void 0;
 
     for (var x = 0; x < 4; x++) {
         channel = channels[x];
-        channelAddresses += "0x" + hexify(totalBytes) + ", 0x00,\t\t// Address of track " + (totalTracks + x) + "\n";
+        hexified = hexify(totalBytes);
+        channelAddresses += "0x" + hexified.slice(-2) + ", 0x" + (hexified.slice(-4, -3) || 0) + (hexified.slice(-3, -2) || 0) + "\t\t// Address of track " + (totalTracks + x) + "\n";
         channelString += channel.notes.join('\n') + "\n";
         channelEntryTracks += "0x" + hexify(totalTracks + x) + ",\t\t\t// Channel " + x + " entry track\n";
         totalBytes += channel.bytes;
