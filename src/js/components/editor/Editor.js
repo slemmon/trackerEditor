@@ -17,7 +17,9 @@ class Editor extends Component {
             autoplay: false,
             songIsMuted: false,
             activeTrackPlayable: [1,0,0,0,0,0,0,"Track 0",64,0,159],
-            channel: 0
+            channel: 0,
+            forceChannels: null,
+            forceFx: null
         }
 
         this.tempo = 25
@@ -48,6 +50,10 @@ class Editor extends Component {
         this.setNewTrackColor = this.setNewTrackColor.bind(this)
         this.playSongAndRepeat = this.playSongAndRepeat.bind(this)
         this.setTempo = this.setTempo.bind(this)
+        this.save = this.save.bind(this)
+        this.load = this.load.bind(this)
+        this.handleFileChange = this.handleFileChange.bind(this)
+        this.clearForcedData = this.clearForcedData.bind(this)
     }
 
     getNewTrackColor (id) {
@@ -372,6 +378,97 @@ class Editor extends Component {
         })
     }
 
+    save (data) {
+        // json stringify data + tracks
+        // download json
+        const songData = {
+            tracks: this.state.tracks,
+            fx: data.fx,
+            channels: data.channels
+        }
+
+        // make the browser download the file
+        const download = document.createElement('a')
+        download.href = `data:text/plain;charset=utf-8;base64,${btoa(JSON.stringify(songData))}`
+        download.download = 'song.atm'
+
+        document.body.appendChild(download)
+        download.click()
+        document.body.removeChild(download)
+
+    }
+
+    load () {
+        this.fileInput.click()
+    }
+
+    handleFileChange (e) {
+        const file = e.target.files[0]
+
+        const reader = new FileReader()
+
+        let result
+        reader.onloadend = () => {
+            try {
+                result = JSON.parse(reader.result)
+            }
+            catch (error) {
+                return alert('invalid file')
+            }
+
+            if ( this.validateFile(result) ) {
+                const tracks = result.tracks
+                this.setState({
+                    tracks: tracks,
+                    activeTrack: tracks[0],
+                    activeTrackPlayable: this.createTheSongArray(tracks[0]),
+                    forceChannels: result.channels,
+                    forceFx: result.fx
+                })
+                this.nextId = result.tracks.slice(-1)[0].id + 1
+            } else {
+                return alert('invalid file')
+            }
+
+        }
+
+        reader.readAsText(file)
+
+        e.target.value = ''
+
+    }
+
+    validateFile (file) {
+
+        let truths = 0
+
+        const names = Object.getOwnPropertyNames(file)
+
+        if ( names.length === 3 ) truths++
+
+        for ( const name of names ) {
+
+            switch (name) {
+                case 'channels':
+                case 'fx':
+                case 'tracks':
+                truths++
+                if ( Array.isArray(file[name]) ) truths++
+            }
+
+        }
+
+        return truths === 7
+
+    }
+
+    clearForcedData () {
+        this.setState({
+            forceChannels: null,
+            forceFx: null
+        })
+    }
+
     render () {
         const state = this.state
         const activeTrack = state.activeTrack
@@ -382,6 +479,11 @@ class Editor extends Component {
                     playSong={ this.playSong }
                     stopSong={ this.stopSong }
                     setTempo={ this.setTempo }
+                    save={ this.save }
+                    load={ this.load }
+                    forceChannels={ state.forceChannels }
+                    forceFx={ state.forceFx }
+                    clearForcedData={ this.clearForcedData }
                 />
                 <TrackList
                     tracks = { state.tracks }
@@ -392,7 +494,7 @@ class Editor extends Component {
                 />
                 { activeTrack.type === 'tune' ?
                     <TrackEditor
-                        activeTrack = { state.activeTrack }
+                        activeTrack = { activeTrack }
                         toggleNote = { this.toggleNote }
                         updateTrack = { this.updateTrack }
                         playSong = { () => this.playSong(undefined, true) }
@@ -405,7 +507,7 @@ class Editor extends Component {
                     />
                 : activeTrack.type === 'drum' ?
                     <DrumEditor
-                        activeTrack = { state.activeTrack }
+                        activeTrack = { activeTrack }
                         updateTrack = { this.updateTrack }
                         playSong = { () => this.playSong(undefined, true) }
                         playSongAndRepeat = { this.playSongAndRepeat }
@@ -417,6 +519,12 @@ class Editor extends Component {
                     />
                     :null
                 }
+                <input
+                    className="hidden-file-input"
+                    type="file"
+                    ref={ el => this.fileInput = el }
+                    onChange={ this.handleFileChange }
+                />
             </div>
         )
     }

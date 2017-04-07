@@ -23,6 +23,8 @@ class SongEditor extends Component {
         this.removeTrackAtIndex = this.removeTrackAtIndex.bind(this)
         this.toggleShowCode = this.toggleShowCode.bind(this)
         this.validateTempo = this.validateTempo.bind(this)
+        this.saveJSON = this.saveJSON.bind(this)
+        this.loadJSON = this.loadJSON.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -57,6 +59,20 @@ class SongEditor extends Component {
                 return this.updateTrackInAllChannels(this.props.tracks[changed], newTicks[changed], 'ticks')
 
         }
+
+        const newState = {}
+        let forceData = false
+        if ( nextProps.forceChannels && !this.props.forceChannels ) {
+            forceData = true
+            newState.channels = nextProps.forceChannels
+        }
+        if ( nextProps.forceFx && !this.props.forceFx ) {
+            forceData = true
+            newState.channelsFx = nextProps.forceChannels
+        }
+        if ( forceData )
+            this.setState(newState, this.props.clearForcedData )
+
     }
 
     deleteRemovedTrackFromAllChannels (newTracks) {
@@ -184,6 +200,17 @@ class SongEditor extends Component {
         this.props.setTempo(newTempo)
     }
 
+    saveJSON () {
+        this.props.save({
+            fx: this.state.channelsFx,
+            channels: this.state.channels
+        })
+    }
+
+    loadJSON () {
+        this.props.load()
+    }
+
     render () {
         const state = this.state
         return (
@@ -193,6 +220,8 @@ class SongEditor extends Component {
                 {/*<button>Pause</button>*/}
                 {/*<button onClick={ this.props.stopSong }>Stop</button>*/}
                 <button onClick={ this.exportSong }>Export song</button>
+                <button onClick={ this.saveJSON }>save</button>
+                <button onClick={ this.loadJSON }>load</button>
                 <button onClick={ this.toggleShowCode }>{ `${state.showString ? 'Hide' : 'Show'} code` }</button>
 
                 <label htmlFor="tempo">
