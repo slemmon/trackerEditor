@@ -20,7 +20,6 @@ class SongEditor extends Component {
         this.exportSong = this.exportSong.bind(this)
         this.addTrackAtIndex = this.addTrackAtIndex.bind(this)
         this.moveTrackToIndex = this.moveTrackToIndex.bind(this)
-        this.removeTrackAtIndex = this.removeTrackAtIndex.bind(this)
         this.toggleShowCode = this.toggleShowCode.bind(this)
         this.validateTempo = this.validateTempo.bind(this)
         this.saveJSON = this.saveJSON.bind(this)
@@ -156,37 +155,56 @@ class SongEditor extends Component {
 
     }
 
-    addTrackAtIndex (channel, index, trackId) {
-        const tracks = this.state.channels[channel]
-        const pos = ~index ? index : tracks.length
-        const newTracks = [].concat( tracks.slice(0, pos), this.props.tracks.find(t => t.id === trackId), tracks.slice(pos) )
-        const newChannels = this.state.channels.slice()
-        newChannels[channel] = newTracks
+    addTrackAtIndex (channel, trackId, position) {
+        const channels = this.state.channels.slice()
+        const tracks = channels[channel]
+        const pos = ~position ? position : tracks.length
+        const newTrack = Object.assign({}, this.props.tracks.find(t => t.id === trackId), {editorId: this.editorIdCounter++})
+        const newTracks = [].concat( tracks.slice(0, pos), newTrack, tracks.slice(pos) )
+        channels[channel] = newTracks
         this.setState({
-            channels: newChannels
+            channels
         })
     }
 
-    moveTrackToIndex (channel, fromIndex, toIndex) {
-        const tracks = this.state.channels[channel]
-        const track = tracks[fromIndex]
-        let newTracks = [].concat( tracks.slice(0, fromIndex), tracks.slice(fromIndex + 1) )
-        newTracks = [].concat( newTracks.slice(0, toIndex), track, newTracks.slice(toIndex) )
-        const newChannels = this.state.channels.slice()
-        newChannels[channel] = newTracks
+    moveTrackToIndex (channel, editorId, position) {
+
+        const original = this.findTrackByEditorId(editorId)
+
+        // remove from original channel
+        const channels = this.state.channels.slice()
+        channels[original.channel] = channels[original.channel].filter(t => t.editorId !== editorId)
+
+        // add to new channel (even if channel ===)
+        // track position in array changes
+        const pos = ~position ? position : channels[channel].length
+        channels[channel] = [].concat( channels[channel].slice(0, pos), original.track, channels[channel].slice(pos) )
+
         this.setState({
-            channels: newChannels
+            channels
         })
     }
 
-    removeTrackAtIndex (channel, index) {
-        const tracks = this.state.channels[channel]
-        const newTracks = [].concat( tracks.slice(0, index), tracks.slice(index + 1) )
-        const newChannels = this.state.channels.slice()
-        newChannels[channel] = newTracks
-        this.setState({
-            channels: newChannels
-        })
+    findTrackByEditorId (editorId) {
+        const channels = this.state.channels
+
+        let result
+
+        let channel
+        for ( let i = 0; i < 4; i++ ) {
+            channel = channels[i]
+            for ( let j = 0, l = channel.length; j < l; j++ )
+                if ( channel[j].editorId === editorId ) {
+                    result = {
+                        track: channel[j],
+                        channel: i
+                    }
+                    break
+                }
+        }
+
+        return result
+
     }
 
     validateTempo (e) {
@@ -264,28 +282,24 @@ class SongEditor extends Component {
                                 channel={0}
                                 tracks={state.channels[0]}
                                 addTrackAtIndex={this.addTrackAtIndex}
-                                removeTrackAtIndex={this.removeTrackAtIndex}
                                 moveTrackToIndex={this.moveTrackToIndex}
                             />
                             <ChannelRow
                                 channel={1}
                                 tracks={state.channels[1]}
                                 addTrackAtIndex={this.addTrackAtIndex}
-                                removeTrackAtIndex={this.removeTrackAtIndex}
                                 moveTrackToIndex={this.moveTrackToIndex}
                             />
                             <ChannelRow
                                 channel={2}
                                 tracks={state.channels[2]}
                                 addTrackAtIndex={this.addTrackAtIndex}
-                                removeTrackAtIndex={this.removeTrackAtIndex}
                                 moveTrackToIndex={this.moveTrackToIndex}
                             />
                             <ChannelRow
                                 channel={3}
                                 tracks={state.channels[3]}
                                 addTrackAtIndex={this.addTrackAtIndex}
-                                removeTrackAtIndex={this.removeTrackAtIndex}
                                 moveTrackToIndex={this.moveTrackToIndex}
                             />
                         </div>
@@ -293,36 +307,6 @@ class SongEditor extends Component {
 
                 </div>
 
-                {/*<ul className="song-editor-channels2">
-                    <ChannelRow2
-                        channel={0}
-                        tracks={state.channels[0]}
-                        addTrackAtIndex={this.addTrackAtIndex}
-                        removeTrackAtIndex={this.removeTrackAtIndex}
-                        moveTrackToIndex={this.moveTrackToIndex}
-                    />
-                    <ChannelRow2
-                        channel={1}
-                        tracks={state.channels[1]}
-                        addTrackAtIndex={this.addTrackAtIndex}
-                        removeTrackAtIndex={this.removeTrackAtIndex}
-                        moveTrackToIndex={this.moveTrackToIndex}
-                    />
-                    <ChannelRow2
-                        channel={2}
-                        tracks={state.channels[2]}
-                        addTrackAtIndex={this.addTrackAtIndex}
-                        removeTrackAtIndex={this.removeTrackAtIndex}
-                        moveTrackToIndex={this.moveTrackToIndex}
-                    />
-                    <ChannelRow2
-                        channel={3}
-                        tracks={state.channels[3]}
-                        addTrackAtIndex={this.addTrackAtIndex}
-                        removeTrackAtIndex={this.removeTrackAtIndex}
-                        moveTrackToIndex={this.moveTrackToIndex}
-                    />
-                </ul>*/}
 
                 { state.showString ?
                     <pre style={{

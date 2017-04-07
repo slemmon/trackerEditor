@@ -10,30 +10,9 @@ class ListOfTracks extends Component {
             originalPos: null
         }
 
-        this.handleEnter = this.handleEnter.bind(this)
-        this.handleLeave = this.handleLeave.bind(this)
-        this.confirmDrag = this.confirmDrag.bind(this)
         this.handleDrop = this.handleDrop.bind(this)
 
         this.iAmTheDrumChannel = props.channel === 3
-    }
-
-    handleEnter (e) {
-        if ( e.target.classList.contains('draggable') ) {
-            this.setState({
-                target: parseInt(e.target.dataset.position)
-            })
-        } else if ( e.target.classList.contains('droppable') ) {
-            this.setState({
-                target: -1
-            })
-        }
-    }
-
-    handleLeave (e) {
-        if ( e.target.classList.contains('droppable') && this.state.target === -1 ) {
-            this.setState({target: null})
-        }
     }
 
     handleDragover (e) {
@@ -45,32 +24,20 @@ class ListOfTracks extends Component {
     handleDrop (e) {
         if ( this.iAmTheDrumChannel !== (e.dataTransfer.getData('type') === 'drum') ) return
 
-        const state = this.state
-        if ( state.originalPos !== null ) {
-            this.props.moveTrackToIndex( this.props.channel, state.originalPos, state.target )
-        }
-        else {
-            this.props.addTrackAtIndex( this.props.channel, state.target, parseInt(e.dataTransfer.getData('trackId')) )
-        }
-    }
+        const editorId = e.dataTransfer.getData('editorId')
+        if ( editorId )
+            //move
+            this.props.moveTrackToIndex( this.props.channel, parseInt(editorId), parseInt(e.target.dataset.position||-1) )
+        else
+            //add
+            this.props.addTrackAtIndex( this.props.channel, parseInt(e.dataTransfer.getData('trackId')), parseInt(e.target.dataset.position||-1) )
 
-    confirmDrag (track) {
-        if ( this.state.target === null ) {
-            this.props.removeTrackAtIndex(this.props.channel, this.state.originalPos)
-        }
-
-        this.setState({
-            target: null,
-            originalPos: null
-        })
     }
 
     render () {
         const tracks = this.props.tracks
         return (
             <div
-                onDragLeave = { this.handleLeave }
-                onDragEnter = { this.handleEnter }
                 onDragOver = { this.handleDragover }
                 onDrop = { this.handleDrop }
                 className = "droppable"
@@ -78,7 +45,6 @@ class ListOfTracks extends Component {
                 {tracks.map( (t, i) =>
                     <Track
                         key = {i}
-                        confirmDrag = {this.confirmDrag}
                         setOriginalPosition = { () => this.setState({originalPos: i, target: null}) }
                         position = {i}
                         track = {t}
@@ -106,6 +72,7 @@ class Track extends Component {
     handleDragStart (e) {
         e.dataTransfer.setData('trackId', this.props.track.id)
         e.dataTransfer.setData('type', this.props.track.type)
+        e.dataTransfer.setData('editorId', this.props.track.editorId)
         setTimeout(
             () => {
                 this.setState({imBeingDragged: true})
@@ -117,7 +84,6 @@ class Track extends Component {
 
     handleDragEnd (e) {
         this.setState({imBeingDragged: false})
-        this.props.confirmDrag(this.props.track)
     }
 
     render () {
