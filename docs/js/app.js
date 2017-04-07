@@ -35259,7 +35259,9 @@ var Editor = function (_Component) {
             autoplay: false,
             songIsMuted: false,
             activeTrackPlayable: [1, 0, 0, 0, 0, 0, 0, "Track 0", 64, 0, 159],
-            channel: 0
+            channel: 0,
+            forceChannels: null,
+            forceFx: null
         };
 
         _this.tempo = 25;
@@ -35289,6 +35291,10 @@ var Editor = function (_Component) {
         _this.setNewTrackColor = _this.setNewTrackColor.bind(_this);
         _this.playSongAndRepeat = _this.playSongAndRepeat.bind(_this);
         _this.setTempo = _this.setTempo.bind(_this);
+        _this.save = _this.save.bind(_this);
+        _this.load = _this.load.bind(_this);
+        _this.handleFileChange = _this.handleFileChange.bind(_this);
+        _this.clearForcedData = _this.clearForcedData.bind(_this);
         return _this;
     }
 
@@ -35633,9 +35639,122 @@ var Editor = function (_Component) {
             });
         }
     }, {
+        key: 'save',
+        value: function save(data) {
+            // json stringify data + tracks
+            // download json
+            var songData = {
+                tracks: this.state.tracks,
+                fx: data.fx,
+                channels: data.channels
+            };
+
+            // make the browser download the file
+            var download = document.createElement('a');
+            download.href = 'data:text/plain;charset=utf-8;base64,' + btoa(JSON.stringify(songData));
+            download.download = 'song.atm';
+
+            document.body.appendChild(download);
+            download.click();
+            document.body.removeChild(download);
+        }
+    }, {
+        key: 'load',
+        value: function load() {
+            this.fileInput.click();
+        }
+    }, {
+        key: 'handleFileChange',
+        value: function handleFileChange(e) {
+            var _this4 = this;
+
+            var file = e.target.files[0];
+
+            var reader = new FileReader();
+
+            var result = void 0;
+            reader.onloadend = function () {
+                try {
+                    result = JSON.parse(reader.result);
+                } catch (error) {
+                    return alert('invalid file');
+                }
+
+                if (_this4.validateFile(result)) {
+                    var tracks = result.tracks;
+                    _this4.setState({
+                        tracks: tracks,
+                        activeTrack: tracks[0],
+                        activeTrackPlayable: _this4.createTheSongArray(tracks[0]),
+                        forceChannels: result.channels,
+                        forceFx: result.fx
+                    });
+                    _this4.nextId = result.tracks.slice(-1)[0].id + 1;
+                } else {
+                    return alert('invalid file');
+                }
+            };
+
+            reader.readAsText(file);
+
+            e.target.value = '';
+        }
+    }, {
+        key: 'validateFile',
+        value: function validateFile(file) {
+
+            var truths = 0;
+
+            var names = Object.getOwnPropertyNames(file);
+
+            if (names.length === 3) truths++;
+
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = names[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var name = _step.value;
+
+
+                    switch (name) {
+                        case 'channels':
+                        case 'fx':
+                        case 'tracks':
+                            truths++;
+                            if (Array.isArray(file[name])) truths++;
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
+
+            return truths === 7;
+        }
+    }, {
+        key: 'clearForcedData',
+        value: function clearForcedData() {
+            this.setState({
+                forceChannels: null,
+                forceFx: null
+            });
+        }
+    }, {
         key: 'render',
         value: function render() {
-            var _this4 = this;
+            var _this5 = this;
 
             var state = this.state;
             var activeTrack = state.activeTrack;
@@ -35646,7 +35765,12 @@ var Editor = function (_Component) {
                     tracks: state.tracks,
                     playSong: this.playSong,
                     stopSong: this.stopSong,
-                    setTempo: this.setTempo
+                    setTempo: this.setTempo,
+                    save: this.save,
+                    load: this.load,
+                    forceChannels: state.forceChannels,
+                    forceFx: state.forceFx,
+                    clearForcedData: this.clearForcedData
                 }),
                 _react2.default.createElement(_TrackList2.default, {
                     tracks: state.tracks,
@@ -35656,11 +35780,11 @@ var Editor = function (_Component) {
                     setTrackColor: this.setNewTrackColor
                 }),
                 activeTrack.type === 'tune' ? _react2.default.createElement(_TrackEditor2.default, {
-                    activeTrack: state.activeTrack,
+                    activeTrack: activeTrack,
                     toggleNote: this.toggleNote,
                     updateTrack: this.updateTrack,
                     playSong: function playSong() {
-                        return _this4.playSong(undefined, true);
+                        return _this5.playSong(undefined, true);
                     },
                     togglePauseSong: this.togglePauseSong,
                     toggleMuteSong: this.toggleMuteSong,
@@ -35669,10 +35793,10 @@ var Editor = function (_Component) {
                     autoplayIsOn: state.autoplay,
                     isMuted: state.songIsMuted
                 }) : activeTrack.type === 'drum' ? _react2.default.createElement(_DrumEditor2.default, {
-                    activeTrack: state.activeTrack,
+                    activeTrack: activeTrack,
                     updateTrack: this.updateTrack,
                     playSong: function playSong() {
-                        return _this4.playSong(undefined, true);
+                        return _this5.playSong(undefined, true);
                     },
                     playSongAndRepeat: this.playSongAndRepeat,
                     togglePauseSong: this.togglePauseSong,
@@ -35680,7 +35804,15 @@ var Editor = function (_Component) {
                     autoplayIsOn: state.autoplay,
                     isMuted: state.songIsMuted,
                     repeatIsOn: state.repeatIsOn
-                }) : null
+                }) : null,
+                _react2.default.createElement('input', {
+                    className: 'hidden-file-input',
+                    type: 'file',
+                    ref: function ref(el) {
+                        return _this5.fileInput = el;
+                    },
+                    onChange: this.handleFileChange
+                })
             );
         }
     }]);
@@ -36338,9 +36470,6 @@ var ListOfTracks = function (_Component) {
             originalPos: null
         };
 
-        _this.handleEnter = _this.handleEnter.bind(_this);
-        _this.handleLeave = _this.handleLeave.bind(_this);
-        _this.confirmDrag = _this.confirmDrag.bind(_this);
         _this.handleDrop = _this.handleDrop.bind(_this);
 
         _this.iAmTheDrumChannel = props.channel === 3;
@@ -36348,26 +36477,6 @@ var ListOfTracks = function (_Component) {
     }
 
     _createClass(ListOfTracks, [{
-        key: 'handleEnter',
-        value: function handleEnter(e) {
-            if (e.target.classList.contains('draggable')) {
-                this.setState({
-                    target: parseInt(e.target.dataset.position)
-                });
-            } else if (e.target.classList.contains('droppable')) {
-                this.setState({
-                    target: -1
-                });
-            }
-        }
-    }, {
-        key: 'handleLeave',
-        value: function handleLeave(e) {
-            if (e.target.classList.contains('droppable') && this.state.target === -1) {
-                this.setState({ target: null });
-            }
-        }
-    }, {
         key: 'handleDragover',
         value: function handleDragover(e) {
             e.preventDefault();
@@ -36379,24 +36488,12 @@ var ListOfTracks = function (_Component) {
         value: function handleDrop(e) {
             if (this.iAmTheDrumChannel !== (e.dataTransfer.getData('type') === 'drum')) return;
 
-            var state = this.state;
-            if (state.originalPos !== null) {
-                this.props.moveTrackToIndex(this.props.channel, state.originalPos, state.target);
-            } else {
-                this.props.addTrackAtIndex(this.props.channel, state.target, parseInt(e.dataTransfer.getData('trackId')));
-            }
-        }
-    }, {
-        key: 'confirmDrag',
-        value: function confirmDrag(track) {
-            if (this.state.target === null) {
-                this.props.removeTrackAtIndex(this.props.channel, this.state.originalPos);
-            }
-
-            this.setState({
-                target: null,
-                originalPos: null
-            });
+            var editorId = e.dataTransfer.getData('editorId');
+            if (editorId)
+                //move
+                this.props.moveTrackToIndex(this.props.channel, parseInt(editorId), parseInt(e.target.dataset.position || -1));else
+                //add
+                this.props.addTrackAtIndex(this.props.channel, parseInt(e.dataTransfer.getData('trackId')), parseInt(e.target.dataset.position || -1));
         }
     }, {
         key: 'render',
@@ -36407,8 +36504,6 @@ var ListOfTracks = function (_Component) {
             return _react2.default.createElement(
                 'div',
                 {
-                    onDragLeave: this.handleLeave,
-                    onDragEnter: this.handleEnter,
                     onDragOver: this.handleDragover,
                     onDrop: this.handleDrop,
                     className: 'droppable'
@@ -36416,7 +36511,6 @@ var ListOfTracks = function (_Component) {
                 tracks.map(function (t, i) {
                     return _react2.default.createElement(Track, {
                         key: i,
-                        confirmDrag: _this2.confirmDrag,
                         setOriginalPosition: function setOriginalPosition() {
                             return _this2.setState({ originalPos: i, target: null });
                         },
@@ -36457,6 +36551,7 @@ var Track = function (_Component2) {
 
             e.dataTransfer.setData('trackId', this.props.track.id);
             e.dataTransfer.setData('type', this.props.track.type);
+            e.dataTransfer.setData('editorId', this.props.track.editorId);
             setTimeout(function () {
                 _this4.setState({ imBeingDragged: true });
                 _this4.props.setOriginalPosition();
@@ -36466,7 +36561,6 @@ var Track = function (_Component2) {
         key: 'handleDragEnd',
         value: function handleDragEnd(e) {
             this.setState({ imBeingDragged: false });
-            this.props.confirmDrag(this.props.track);
         }
     }, {
         key: 'render',
@@ -36533,9 +36627,10 @@ var SongEditor = function (_Component) {
         _this.exportSong = _this.exportSong.bind(_this);
         _this.addTrackAtIndex = _this.addTrackAtIndex.bind(_this);
         _this.moveTrackToIndex = _this.moveTrackToIndex.bind(_this);
-        _this.removeTrackAtIndex = _this.removeTrackAtIndex.bind(_this);
         _this.toggleShowCode = _this.toggleShowCode.bind(_this);
         _this.validateTempo = _this.validateTempo.bind(_this);
+        _this.saveJSON = _this.saveJSON.bind(_this);
+        _this.loadJSON = _this.loadJSON.bind(_this);
         return _this;
     }
 
@@ -36571,6 +36666,18 @@ var SongEditor = function (_Component) {
 
                 if (changed !== undefined) return this.updateTrackInAllChannels(this.props.tracks[changed], newTicks[changed], 'ticks');
             }
+
+            var newState = {};
+            var forceData = false;
+            if (nextProps.forceChannels && !this.props.forceChannels) {
+                forceData = true;
+                newState.channels = nextProps.forceChannels;
+            }
+            if (nextProps.forceFx && !this.props.forceFx) {
+                forceData = true;
+                newState.channelsFx = nextProps.forceChannels;
+            }
+            if (forceData) this.setState(newState, this.props.clearForcedData);
         }
     }, {
         key: 'deleteRemovedTrackFromAllChannels',
@@ -36727,41 +36834,62 @@ var SongEditor = function (_Component) {
         }
     }, {
         key: 'addTrackAtIndex',
-        value: function addTrackAtIndex(channel, index, trackId) {
-            var tracks = this.state.channels[channel];
-            var pos = ~index ? index : tracks.length;
-            var newTracks = [].concat(tracks.slice(0, pos), this.props.tracks.find(function (t) {
+        value: function addTrackAtIndex(channel, trackId, position) {
+            var channels = this.state.channels.slice();
+            var tracks = channels[channel];
+            var pos = ~position ? position : tracks.length;
+            var newTrack = Object.assign({}, this.props.tracks.find(function (t) {
                 return t.id === trackId;
-            }), tracks.slice(pos));
-            var newChannels = this.state.channels.slice();
-            newChannels[channel] = newTracks;
+            }), { editorId: this.editorIdCounter++ });
+            var newTracks = [].concat(tracks.slice(0, pos), newTrack, tracks.slice(pos));
+            channels[channel] = newTracks;
             this.setState({
-                channels: newChannels
+                channels: channels
             });
         }
     }, {
         key: 'moveTrackToIndex',
-        value: function moveTrackToIndex(channel, fromIndex, toIndex) {
-            var tracks = this.state.channels[channel];
-            var track = tracks[fromIndex];
-            var newTracks = [].concat(tracks.slice(0, fromIndex), tracks.slice(fromIndex + 1));
-            newTracks = [].concat(newTracks.slice(0, toIndex), track, newTracks.slice(toIndex));
-            var newChannels = this.state.channels.slice();
-            newChannels[channel] = newTracks;
+        value: function moveTrackToIndex(channel, editorId, position) {
+
+            var original = this.findTrackByEditorId(editorId);
+
+            // remove from original channel
+            var channels = this.state.channels.slice();
+            channels[original.channel] = channels[original.channel].filter(function (t) {
+                return t.editorId !== editorId;
+            });
+
+            // add to new channel (even if channel ===)
+            // track position in array changes
+            var pos = ~position ? position : channels[channel].length;
+            channels[channel] = [].concat(channels[channel].slice(0, pos), original.track, channels[channel].slice(pos));
+
             this.setState({
-                channels: newChannels
+                channels: channels
             });
         }
     }, {
-        key: 'removeTrackAtIndex',
-        value: function removeTrackAtIndex(channel, index) {
-            var tracks = this.state.channels[channel];
-            var newTracks = [].concat(tracks.slice(0, index), tracks.slice(index + 1));
-            var newChannels = this.state.channels.slice();
-            newChannels[channel] = newTracks;
-            this.setState({
-                channels: newChannels
-            });
+        key: 'findTrackByEditorId',
+        value: function findTrackByEditorId(editorId) {
+            var channels = this.state.channels;
+
+            var result = void 0;
+
+            var channel = void 0;
+            for (var i = 0; i < 4; i++) {
+                channel = channels[i];
+                for (var j = 0, l = channel.length; j < l; j++) {
+                    if (channel[j].editorId === editorId) {
+                        result = {
+                            track: channel[j],
+                            channel: i
+                        };
+                        break;
+                    }
+                }
+            }
+
+            return result;
         }
     }, {
         key: 'validateTempo',
@@ -36774,6 +36902,19 @@ var SongEditor = function (_Component) {
                 this.setState({ tempo: newTempo });
             }
             this.props.setTempo(newTempo);
+        }
+    }, {
+        key: 'saveJSON',
+        value: function saveJSON() {
+            this.props.save({
+                fx: this.state.channelsFx,
+                channels: this.state.channels
+            });
+        }
+    }, {
+        key: 'loadJSON',
+        value: function loadJSON() {
+            this.props.load();
         }
     }, {
         key: 'render',
@@ -36793,6 +36934,16 @@ var SongEditor = function (_Component) {
                     'button',
                     { onClick: this.exportSong },
                     'Export song'
+                ),
+                _react2.default.createElement(
+                    'button',
+                    { onClick: this.saveJSON },
+                    'save'
+                ),
+                _react2.default.createElement(
+                    'button',
+                    { onClick: this.loadJSON },
+                    'load'
                 ),
                 _react2.default.createElement(
                     'button',
@@ -36888,28 +37039,24 @@ var SongEditor = function (_Component) {
                                 channel: 0,
                                 tracks: state.channels[0],
                                 addTrackAtIndex: this.addTrackAtIndex,
-                                removeTrackAtIndex: this.removeTrackAtIndex,
                                 moveTrackToIndex: this.moveTrackToIndex
                             }),
                             _react2.default.createElement(_ChannelRow2.default, {
                                 channel: 1,
                                 tracks: state.channels[1],
                                 addTrackAtIndex: this.addTrackAtIndex,
-                                removeTrackAtIndex: this.removeTrackAtIndex,
                                 moveTrackToIndex: this.moveTrackToIndex
                             }),
                             _react2.default.createElement(_ChannelRow2.default, {
                                 channel: 2,
                                 tracks: state.channels[2],
                                 addTrackAtIndex: this.addTrackAtIndex,
-                                removeTrackAtIndex: this.removeTrackAtIndex,
                                 moveTrackToIndex: this.moveTrackToIndex
                             }),
                             _react2.default.createElement(_ChannelRow2.default, {
                                 channel: 3,
                                 tracks: state.channels[3],
                                 addTrackAtIndex: this.addTrackAtIndex,
-                                removeTrackAtIndex: this.removeTrackAtIndex,
                                 moveTrackToIndex: this.moveTrackToIndex
                             })
                         )
@@ -37450,7 +37597,7 @@ var NewNotesTable = function (_Component) {
         var _this = _possibleConstructorReturn(this, (NewNotesTable.__proto__ || Object.getPrototypeOf(NewNotesTable)).call(this, props));
 
         _this.state = {
-            rows: _this.createRows(props.notes, true)
+            rows: _this.createRows(props.notes.slice().reverse(), true)
         };
 
         _this.last = Date.now();

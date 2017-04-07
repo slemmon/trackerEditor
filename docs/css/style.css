@@ -448,3 +448,6 @@ button, input[type="submit"] {
   position: relative;
   top: 18px;
   left: -10px; }
+
+.hidden-file-input {
+  display: none; }
