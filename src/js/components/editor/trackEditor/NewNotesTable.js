@@ -9,7 +9,7 @@ class NewNotesTable extends Component {
         super(props)
 
         this.state = {
-            rows: this.createRows(props.notes, true)
+            rows: this.createRows(props.notes.slice().reverse(), true)
         }
 
         this.last = Date.now()
