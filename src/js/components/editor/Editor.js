@@ -413,7 +413,7 @@ class Editor extends Component {
                 result = JSON.parse(reader.result)
             }
             catch (error) {
-                return alert('invalid file')
+                return alert('invalid file (1)')
             }
 
             if ( this.validateFile(result) ) {
@@ -427,7 +427,7 @@ class Editor extends Component {
                 })
                 this.nextId = result.tracks.slice(-1)[0].id + 1
             } else {
-                return alert('invalid file')
+                return alert('invalid file (2)')
             }
 
         }
@@ -444,13 +444,14 @@ class Editor extends Component {
 
         const names = Object.getOwnPropertyNames(file)
 
-        if ( names.length === 3 ) truths++
+        if ( names.length === 2 ) truths++
+        // if ( names.length === 3 ) truths++ // use this line when fx are implemented
 
         for ( const name of names ) {
 
             switch (name) {
                 case 'channels':
-                case 'fx':
+                // case 'fx': // use this line when fx are implemented
                 case 'tracks':
                 truths++
                 if ( Array.isArray(file[name]) ) truths++
@@ -458,7 +459,8 @@ class Editor extends Component {
 
         }
 
-        return truths === 7
+        return truths === 5
+        // return truths === 7 // use this line when fx are implemented
 
     }
 
