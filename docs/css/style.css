@@ -349,9 +349,20 @@
     .fx-editor-container .fx-lists .fx-container .fx-bordered-div {
       border: 1px solid #00969c;
       height: 200px;
-      overflow: auto; }
+      overflow: auto;
+      padding: 4px; }
       .fx-editor-container .fx-lists .fx-container .fx-bordered-div .fx-item {
-        background-color: #eee; }
+        font-size: 10pt;
+        font-weight: 600;
+        display: flex; }
+        .fx-editor-container .fx-lists .fx-container .fx-bordered-div .fx-item .fx-item-name {
+          flex: 1; }
+        .fx-editor-container .fx-lists .fx-container .fx-bordered-div .fx-item .fx-item-buttons {
+          flex: 0 0 30px;
+          display: flex;
+          justify-content: space-around;
+          right: 10px;
+          cursor: pointer; }
 
 body {
   margin: 0;

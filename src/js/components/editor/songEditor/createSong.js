@@ -59,7 +59,7 @@ const drumTracks = {
     }
 }
 
-function createSongFromChannels (tracks, channels, tempo) {
+function createSongFromChannels (tracks, channels, tempo, fx) {
 
     const trackAtm = {}
     let totalTracks = 0
@@ -89,7 +89,14 @@ function createSongFromChannels (tracks, channels, tempo) {
 
     const channelTracks = []
     for ( let i = 0; i < 4; i++ )
-        channelTracks.push(atmifyChannel(trackAtm, channels[i], i===0, i, tempo))
+        channelTracks.push(atmifyChannel({
+            tracks: trackAtm,
+            channel: channels[i],
+            // addTempo: i===0,
+            index: i,
+            // tempo,
+            effects: fx[i]
+        }))
 
     const { channelAddresses, channelString, channelEntryTracks, totalBytes } = concatAllChannels(/*totalTracks, */channelTracks)
     const { trackAddresses, trackString/*, totalBytes*/ } = concatAllTracks(totalBytes, trackAtm)
@@ -108,17 +115,237 @@ function createSongFromChannels (tracks, channels, tempo) {
 
 }
 
-function atmifyChannel (tracks, channel, addTempo, index, tempo) {
-    const channelTrack = []
-    let totalBytes = 0
-    if ( addTempo ) {
-        channelTrack.push(`0x9D, ${tempo},\t\t// SET song tempo: value = ${tempo}`)                                     // add song tempo
-        totalBytes += 2
+const startFx = {
+    1: {
+        name: 'set volume',
+        values: 1,
+        // comment: 'set volume'
+        address: '40'
+    },
+    2: {
+        name: 'slide volume on',
+        values: 1,
+        address: '41'
+    },
+    4: {
+        name: 'slide volume advanced',
+        values: 2,
+        address: '42'
+    },
+    16: {
+        name: 'slide frequency on',
+        values: 1,
+        address: '44'
+    },
+    32: {
+        name: 'slide frequency advanced',
+        values: 2,
+        address: '45'
+    },
+    128: {
+        name: 'set arpeggio',
+        values: 2,
+        address: '47'
+    },
+    512: {
+        name: 'set transposition',
+        values: 1,
+        address: '4C'
+    },
+    1024: {
+        name: 'add transposition',
+        values: 1,
+        address: '4B'
+    },
+    4096: {
+        name: 'set tremolo',
+        values: 2,
+        address: '4E'
+    },
+    16384: {
+        name: 'set vibrato',
+        values: 2,
+        address: '50'
+    },
+    65536: {
+        name: 'set glissando',
+        values: 1,
+        address: '52'
+    },
+    262144: {
+        name: 'set note cut',
+        values: 1,
+        address: '54'
+    },
+    1048576: {
+        name: 'set tempo',
+        values: 1,
+        address: '9D'
+    },
+    2097152: {
+        name: 'add tempo',
+        values: 1,
+        address: '9C'
+    }
+}
+
+const endFx = {
+    8: {
+        name: 'slide volume off',
+        values: 0,
+        address: '43'
+    },
+    64: {
+        name: 'slide frequency off',
+        values: 0,
+        address: '46'
+    },
+    256: {
+        name: 'arpeggio off',
+        values: 0,
+        address: '48'
+    },
+    2048: {
+        name: 'transposition off',
+        values: 0,
+        address: '4D'
+    },
+    8192: {
+        name: 'tremolo off',
+        values: 0,
+        address: '4F'
+    },
+    32768: {
+        name: 'vibrato off',
+        values: 0,
+        address: '51'
+    },
+    131072: {
+        name: 'glissando off',
+        values: 0,
+        address: '53'
+    },
+    524288: {
+        name: 'note cut off',
+        values: 0,
+        address: '55'
+    }
+}
+
+function getFxList (effects, type) {
+    const active = [],
+          activeFx = effects.flags
+
+    const startFxList = [
+        1,
+        2,
+        4,
+        16,
+        32,
+        128,
+        512,
+        1024,
+        4096,
+        16384,
+        65536,
+        262144,
+        1048576,
+        2097152
+    ]
+    const lastFxList = [
+        8,
+        64,
+        256,
+        2048,
+        8192,
+        32768,
+        131072,
+        524288
+    ]
+    const activeList = type === 'first' ? startFxList : lastFxList
+
+    for ( let i = 0; i < 14; i++ ) {
+        if ( activeList[i] & activeFx )
+            active.push(activeList[i])
     }
 
-    const channelVolume = channel.length && index !== 3 ? 48 : 0
-    channelTrack.push(`0x40, ${channelVolume},\t\t// FX: SET VOLUME: volume = ${channelVolume}`)
-    totalBytes += 2
+    return active
+}
+
+function createFxArray (fxToAdd, type, effects) {
+    const result = {
+        fx: [],
+        bytes: 0
+    }
+
+    const fxList = type === 'start' ? startFx : endFx
+
+    let fxInfo,
+        fxData
+    for ( let i = 0, l = fxToAdd.length; i < l; i++ ) {
+        fxInfo = fxList[fxToAdd[i]]
+        fxData = effects.fx[fxToAdd[i]]
+
+        let params = ','
+        if ( fxInfo.values >= 1 )
+            params += ` ${fxData.val},`
+        if ( fxInfo.values === 2 )
+            params += ` ${fxData.val_b},`
+
+        result.fx.push(`0x${fxInfo.address}${params}\t\t// ${fxInfo.name}`)
+
+        result.bytes += fxInfo.values + 1
+    }
+
+// console.log(result)
+    return result
+}
+
+function atmifyChannel ({tracks, channel, /*addTempo,*/ index, /*tempo, */effects}) {
+    let channelTrack = []
+    let totalBytes = 0
+    // if ( addTempo ) {
+    //     channelTrack.push(`0x9D, ${tempo},\t\t// SET song tempo: value = ${tempo}`)                                     // add song tempo
+    //     totalBytes += 2
+    // }
+
+    // const channelVolume = channel.length && index !== 3 ? 48 : 0
+    // channelTrack.push(`0x40, ${channelVolume},\t\t// FX: SET VOLUME: volume = ${channelVolume}`)
+    // totalBytes += 2
+
+
+    // filter fx by start and end fx
+    // add startfx before anyhting else
+    // add endfx after everything except 0x9F (end channel)
+    // console.log(effects)
+    // const first = getFxList(effects, 'first')
+    // const last = getFxList(effects, 'last')
+    // console.log(first)
+    // console.log(last)
+
+    const newFxStart = createFxArray(getFxList(effects, 'first'), 'start', effects)
+    channelTrack = channelTrack.concat(newFxStart.fx)
+    totalBytes += newFxStart.bytes
+
+    // let fxInfo,
+    //     fxData
+    // for ( let i = 0, l = first.length; i < l; i++ ) {
+    //     fxInfo = startFx[first[i]]
+    //     fxData = effects.fx[first[i]]
+
+    //     let params = ','
+    //     if ( fxInfo.values >= 1 )
+    //         params += ` ${fxData.val},`
+    //     if ( fxInfo.values === 2 )
+    //         params += ` ${fxData.val_b},`
+
+    //     channelTrack.push(`0x${fxInfo.address}${params}\t\t// ${fxInfo.name}`)
+
+    //     totalBytes += fxInfo.values
+    // }
+
+// console.log(channelTrack)
+
 
     let previousTrackId = -1,
         count = 0
@@ -142,6 +369,11 @@ function atmifyChannel (tracks, channel, addTempo, index, tempo) {
         }
 
     }
+
+    // add fx after channel
+    const newFxEnd = createFxArray(getFxList(effects, 'last'), 'end', effects)
+    channelTrack = channelTrack.concat(newFxEnd.fx)
+    totalBytes += newFxEnd.bytes
 
     if ( channelTrack.slice(-1)[0] !== '0x40, 0,\t\t// FX: SET VOLUME: volume = 0' ) {
         channelTrack.push('0x40, 0,\t\t// FX: SET VOLUME: volume = 0')

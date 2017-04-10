@@ -35824,7 +35824,7 @@ var Editor = function (_Component) {
 
 exports.default = Editor;
 
-},{"./drumEditor/DrumEditor":421,"./songEditor/SongEditor":427,"./songEditor/createSong":428,"./trackEditor/TrackEditor":433,"./trackList/TrackList":435,"react":404}],421:[function(require,module,exports){
+},{"./drumEditor/DrumEditor":421,"./songEditor/SongEditor":427,"./songEditor/createSong":428,"./trackEditor/TrackEditor":434,"./trackList/TrackList":436,"react":404}],421:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -36582,7 +36582,7 @@ var Track = function (_Component2) {
     return Track;
 }(_react.Component);
 
-},{"../../../stringifyColor":438,"react":404}],427:[function(require,module,exports){
+},{"../../../stringifyColor":439,"react":404}],427:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -36600,6 +36600,10 @@ var _createSong = require('./createSong');
 var _ChannelRow = require('./ChannelRow');
 
 var _ChannelRow2 = _interopRequireDefault(_ChannelRow);
+
+var _FxEditor = require('./fxEditor/FxEditor');
+
+var _FxEditor2 = _interopRequireDefault(_FxEditor);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36622,15 +36626,41 @@ var SongEditor = function (_Component) {
             songString: '',
             showString: false,
             channels: [[], [], [], []],
-            tempo: 25
+            channelsFx: [{
+                flags: 1048577,
+                fx: {
+                    1: { val: 48 },
+                    1048576: { val: 25 }
+                }
+            }, {
+                flags: 1,
+                fx: {
+                    1: { val: 48 }
+                }
+            }, {
+                flags: 1,
+                fx: {
+                    1: { val: 48 }
+                }
+            }, {
+                flags: 1,
+                fx: {
+                    1: { val: 48 }
+                }
+            }],
+            editFx: null
         };
+
+        _this.editorIdCounter = 0;
 
         _this.playSong = _this.playSong.bind(_this);
         _this.exportSong = _this.exportSong.bind(_this);
         _this.addTrackAtIndex = _this.addTrackAtIndex.bind(_this);
         _this.moveTrackToIndex = _this.moveTrackToIndex.bind(_this);
         _this.toggleShowCode = _this.toggleShowCode.bind(_this);
-        _this.validateTempo = _this.validateTempo.bind(_this);
+        _this.openChannelFx = _this.openChannelFx.bind(_this);
+        _this.updateFlags = _this.updateFlags.bind(_this);
+        _this.updateFxValue = _this.updateFxValue.bind(_this);
         _this.saveJSON = _this.saveJSON.bind(_this);
         _this.loadJSON = _this.loadJSON.bind(_this);
         return _this;
@@ -36811,7 +36841,8 @@ var SongEditor = function (_Component) {
     }, {
         key: 'exportSong',
         value: function exportSong() {
-            var songString = (0, _createSong.createSongFromChannels)(this.props.tracks, this.state.channels, this.state.tempo);
+            var state = this.state;
+            var songString = (0, _createSong.createSongFromChannels)(this.props.tracks, state.channels, state.tempo, state.channelsFx);
             this.setState({
                 songString: songString
             });
@@ -36829,8 +36860,9 @@ var SongEditor = function (_Component) {
         key: 'toggleShowCode',
         value: function toggleShowCode() {
 
+            var state = this.state;
             this.setState({
-                songString: (0, _createSong.createSongFromChannels)(this.props.tracks, this.state.channels, this.state.tempo),
+                songString: (0, _createSong.createSongFromChannels)(this.props.tracks, state.channels, state.tempo, state.channelsFx),
                 showString: !this.state.showString
             });
         }
@@ -36894,16 +36926,43 @@ var SongEditor = function (_Component) {
             return result;
         }
     }, {
-        key: 'validateTempo',
-        value: function validateTempo(e) {
-            var tempo = parseInt(this.state.tempo, 10);
-            var newTempo = tempo;
-            if (tempo < 0) newTempo = 0;
-            if (tempo > 127) newTempo = 127;
-            if (tempo !== newTempo) {
-                this.setState({ tempo: newTempo });
+        key: 'openChannelFx',
+        value: function openChannelFx(channel) {
+            // set fx window status to shown
+            // set fx window owner (which channel or track)
+            this.setState({
+                editFx: channel
+            });
+        }
+    }, {
+        key: 'updateFlags',
+        value: function updateFlags(channel, fx, action) {
+            var channelsFx = this.state.channelsFx.slice();
+            var thisChannelFx = Object.assign({}, channelsFx[channel]);
+            if (action === 'add') thisChannelFx.flags = thisChannelFx.flags | fx;else if (action === 'remove') {
+                thisChannelFx.flags = thisChannelFx.flags ^ fx;
+                delete thisChannelFx.fx[fx];
             }
-            this.props.setTempo(newTempo);
+
+            channelsFx[channel] = thisChannelFx;
+            this.setState({
+                channelsFx: channelsFx
+            });
+        }
+    }, {
+        key: 'updateFxValue',
+        value: function updateFxValue(channel, fx, key, value) {
+            var channelsFx = this.state.channelsFx.slice();
+            var thisChannelFx = Object.assign({}, channelsFx[channel]);
+
+            thisChannelFx.fx[fx] = thisChannelFx.fx[fx] || {};
+            thisChannelFx.fx[fx][key] = value;
+
+            channelsFx[channel] = thisChannelFx;
+
+            this.setState({
+                channelsFx: channelsFx
+            });
         }
     }, {
         key: 'saveJSON',
@@ -36952,22 +37011,6 @@ var SongEditor = function (_Component) {
                     { onClick: this.toggleShowCode },
                     (state.showString ? 'Hide' : 'Show') + ' code'
                 ),
-                _react2.default.createElement(
-                    'label',
-                    { htmlFor: 'tempo' },
-                    'Tempo\xA0'
-                ),
-                _react2.default.createElement('input', {
-                    id: 'tempo',
-                    type: 'number',
-                    min: '0',
-                    max: '127',
-                    value: state.tempo,
-                    onChange: function onChange(e) {
-                        return _this2.setState({ tempo: e.target.value });
-                    },
-                    onBlur: this.validateTempo
-                }),
                 _react2.default.createElement(
                     'div',
                     { className: 'song-editor-channels' },
@@ -37062,6 +37105,38 @@ var SongEditor = function (_Component) {
                                 moveTrackToIndex: this.moveTrackToIndex
                             })
                         )
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'channel-fx-box' },
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'channel-fx', onClick: function onClick() {
+                                    return _this2.openChannelFx(0);
+                                } },
+                            'FX'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'channel-fx', onClick: function onClick() {
+                                    return _this2.openChannelFx(1);
+                                } },
+                            'FX'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'channel-fx', onClick: function onClick() {
+                                    return _this2.openChannelFx(2);
+                                } },
+                            'FX'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'channel-fx', onClick: function onClick() {
+                                    return _this2.openChannelFx(3);
+                                } },
+                            'FX'
+                        )
                     )
                 ),
                 state.showString ? _react2.default.createElement(
@@ -37073,7 +37148,14 @@ var SongEditor = function (_Component) {
                             backgroundColor: '#f3f3f3'
                         } },
                     this.state.songString || "Nothing to show yet."
-                ) : null
+                ) : null,
+                state.editFx !== null ? _react2.default.createElement(_FxEditor2.default, {
+                    channel: state.editFx,
+                    openChannelFx: this.openChannelFx,
+                    channelFx: this.state.channelsFx[state.editFx],
+                    updateFlags: this.updateFlags,
+                    updateFxValue: this.updateFxValue
+                }) : null
             );
         }
     }]);
@@ -37083,7 +37165,7 @@ var SongEditor = function (_Component) {
 
 exports.default = SongEditor;
 
-},{"./ChannelRow":425,"./createSong":428,"react":404}],428:[function(require,module,exports){
+},{"./ChannelRow":425,"./createSong":428,"./fxEditor/FxEditor":429,"react":404}],428:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -37116,7 +37198,7 @@ var drumTracks = {
     }
 };
 
-function createSongFromChannels(tracks, channels, tempo) {
+function createSongFromChannels(tracks, channels, tempo, fx) {
 
     var trackAtm = {};
     var totalTracks = 0;
@@ -37146,7 +37228,14 @@ function createSongFromChannels(tracks, channels, tempo) {
 
     var channelTracks = [];
     for (var i = 0; i < 4; i++) {
-        channelTracks.push(atmifyChannel(trackAtm, channels[i], i === 0, i, tempo));
+        channelTracks.push(atmifyChannel({
+            tracks: trackAtm,
+            channel: channels[i],
+            // addTempo: i===0,
+            index: i,
+            // tempo,
+            effects: fx[i]
+        }));
     }
     var _concatAllChannels = concatAllChannels( /*totalTracks, */channelTracks),
         channelAddresses = _concatAllChannels.channelAddresses,
@@ -37172,17 +37261,215 @@ function createSongFromChannels(tracks, channels, tempo) {
     return completeSong;
 }
 
-function atmifyChannel(tracks, channel, addTempo, index, tempo) {
-    var channelTrack = [];
-    var totalBytes = 0;
-    if (addTempo) {
-        channelTrack.push("0x9D, " + tempo + ",\t\t// SET song tempo: value = " + tempo); // add song tempo
-        totalBytes += 2;
+var startFx = {
+    1: {
+        name: 'set volume',
+        values: 1,
+        // comment: 'set volume'
+        address: '40'
+    },
+    2: {
+        name: 'slide volume on',
+        values: 1,
+        address: '41'
+    },
+    4: {
+        name: 'slide volume advanced',
+        values: 2,
+        address: '42'
+    },
+    16: {
+        name: 'slide frequency on',
+        values: 1,
+        address: '44'
+    },
+    32: {
+        name: 'slide frequency advanced',
+        values: 2,
+        address: '45'
+    },
+    128: {
+        name: 'set arpeggio',
+        values: 2,
+        address: '47'
+    },
+    512: {
+        name: 'set transposition',
+        values: 1,
+        address: '4C'
+    },
+    1024: {
+        name: 'add transposition',
+        values: 1,
+        address: '4B'
+    },
+    4096: {
+        name: 'set tremolo',
+        values: 2,
+        address: '4E'
+    },
+    16384: {
+        name: 'set vibrato',
+        values: 2,
+        address: '50'
+    },
+    65536: {
+        name: 'set glissando',
+        values: 1,
+        address: '52'
+    },
+    262144: {
+        name: 'set note cut',
+        values: 1,
+        address: '54'
+    },
+    1048576: {
+        name: 'set tempo',
+        values: 1,
+        address: '9D'
+    },
+    2097152: {
+        name: 'add tempo',
+        values: 1,
+        address: '9C'
+    }
+};
+
+var endFx = {
+    8: {
+        name: 'slide volume off',
+        values: 0,
+        address: '43'
+    },
+    64: {
+        name: 'slide frequency off',
+        values: 0,
+        address: '46'
+    },
+    256: {
+        name: 'arpeggio off',
+        values: 0,
+        address: '48'
+    },
+    2048: {
+        name: 'transposition off',
+        values: 0,
+        address: '4D'
+    },
+    8192: {
+        name: 'tremolo off',
+        values: 0,
+        address: '4F'
+    },
+    32768: {
+        name: 'vibrato off',
+        values: 0,
+        address: '51'
+    },
+    131072: {
+        name: 'glissando off',
+        values: 0,
+        address: '53'
+    },
+    524288: {
+        name: 'note cut off',
+        values: 0,
+        address: '55'
+    }
+};
+
+function getFxList(effects, type) {
+    var active = [],
+        activeFx = effects.flags;
+
+    var startFxList = [1, 2, 4, 16, 32, 128, 512, 1024, 4096, 16384, 65536, 262144, 1048576, 2097152];
+    var lastFxList = [8, 64, 256, 2048, 8192, 32768, 131072, 524288];
+    var activeList = type === 'first' ? startFxList : lastFxList;
+
+    for (var i = 0; i < 14; i++) {
+        if (activeList[i] & activeFx) active.push(activeList[i]);
     }
 
-    var channelVolume = channel.length && index !== 3 ? 48 : 0;
-    channelTrack.push("0x40, " + channelVolume + ",\t\t// FX: SET VOLUME: volume = " + channelVolume);
-    totalBytes += 2;
+    return active;
+}
+
+function createFxArray(fxToAdd, type, effects) {
+    var result = {
+        fx: [],
+        bytes: 0
+    };
+
+    var fxList = type === 'start' ? startFx : endFx;
+
+    var fxInfo = void 0,
+        fxData = void 0;
+    for (var i = 0, l = fxToAdd.length; i < l; i++) {
+        fxInfo = fxList[fxToAdd[i]];
+        fxData = effects.fx[fxToAdd[i]];
+
+        var params = ',';
+        if (fxInfo.values >= 1) params += " " + fxData.val + ",";
+        if (fxInfo.values === 2) params += " " + fxData.val_b + ",";
+
+        result.fx.push("0x" + fxInfo.address + params + "\t\t// " + fxInfo.name);
+
+        result.bytes += fxInfo.values + 1;
+    }
+
+    // console.log(result)
+    return result;
+}
+
+function atmifyChannel(_ref) {
+    var tracks = _ref.tracks,
+        channel = _ref.channel,
+        index = _ref.index,
+        effects = _ref.effects;
+
+    var channelTrack = [];
+    var totalBytes = 0;
+    // if ( addTempo ) {
+    //     channelTrack.push(`0x9D, ${tempo},\t\t// SET song tempo: value = ${tempo}`)                                     // add song tempo
+    //     totalBytes += 2
+    // }
+
+    // const channelVolume = channel.length && index !== 3 ? 48 : 0
+    // channelTrack.push(`0x40, ${channelVolume},\t\t// FX: SET VOLUME: volume = ${channelVolume}`)
+    // totalBytes += 2
+
+
+    // filter fx by start and end fx
+    // add startfx before anyhting else
+    // add endfx after everything except 0x9F (end channel)
+    // console.log(effects)
+    // const first = getFxList(effects, 'first')
+    // const last = getFxList(effects, 'last')
+    // console.log(first)
+    // console.log(last)
+
+    var newFxStart = createFxArray(getFxList(effects, 'first'), 'start', effects);
+    channelTrack = channelTrack.concat(newFxStart.fx);
+    totalBytes += newFxStart.bytes;
+
+    // let fxInfo,
+    //     fxData
+    // for ( let i = 0, l = first.length; i < l; i++ ) {
+    //     fxInfo = startFx[first[i]]
+    //     fxData = effects.fx[first[i]]
+
+    //     let params = ','
+    //     if ( fxInfo.values >= 1 )
+    //         params += ` ${fxData.val},`
+    //     if ( fxInfo.values === 2 )
+    //         params += ` ${fxData.val_b},`
+
+    //     channelTrack.push(`0x${fxInfo.address}${params}\t\t// ${fxInfo.name}`)
+
+    //     totalBytes += fxInfo.values
+    // }
+
+    // console.log(channelTrack)
+
 
     var previousTrackId = -1,
         count = 0;
@@ -37210,6 +37497,8 @@ function atmifyChannel(tracks, channel, addTempo, index, tempo) {
                 previousTrackId = track.id;
             }
         }
+
+        // add fx after channel
     } catch (err) {
         _didIteratorError = true;
         _iteratorError = err;
@@ -37224,6 +37513,10 @@ function atmifyChannel(tracks, channel, addTempo, index, tempo) {
             }
         }
     }
+
+    var newFxEnd = createFxArray(getFxList(effects, 'last'), 'end', effects);
+    channelTrack = channelTrack.concat(newFxEnd.fx);
+    totalBytes += newFxEnd.bytes;
 
     if (channelTrack.slice(-1)[0] !== '0x40, 0,\t\t// FX: SET VOLUME: volume = 0') {
         channelTrack.push('0x40, 0,\t\t// FX: SET VOLUME: volume = 0');
@@ -37572,6 +37865,496 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FxEditor = function (_Component) {
+    _inherits(FxEditor, _Component);
+
+    function FxEditor(props) {
+        _classCallCheck(this, FxEditor);
+
+        var _this = _possibleConstructorReturn(this, (FxEditor.__proto__ || Object.getPrototypeOf(FxEditor)).call(this, props));
+
+        var sortedFx = _this.getSortedFx(props.channelFx);
+
+        _this.state = {
+            channel: props.channel,
+            activeFx: sortedFx.active,
+            availableFx: sortedFx.available,
+            selected: sortedFx.active[0]
+        };
+
+        _this.addToUsed = _this.addToUsed.bind(_this);
+        _this.removeFromUsed = _this.removeFromUsed.bind(_this);
+        _this.setActiveEdit = _this.setActiveEdit.bind(_this);
+        _this.updateValue = _this.updateValue.bind(_this);
+        return _this;
+    }
+
+    _createClass(FxEditor, [{
+        key: 'componentWillReceiveProps',
+        value: function componentWillReceiveProps(nextProps) {
+            var sortedFx = this.getSortedFx(nextProps.channelFx);
+            var newSelection = void 0;
+            if (nextProps.channel !== this.props.channel) newSelection = sortedFx.active[0];else newSelection = this.state.selected || sortedFx.active[0];
+            this.setState({
+                channel: nextProps.channel,
+                activeFx: sortedFx.active,
+                availableFx: sortedFx.available,
+                selected: newSelection
+            });
+        }
+    }, {
+        key: 'getSortedFx',
+        value: function getSortedFx(fx) {
+            var activeEffects = fx.flags,
+                active = [],
+                available = [];
+
+            for (var i = 1; i <= 2097152; i *= 2) {
+                if (activeEffects & i) active.push(i);else available.push(i);
+            }
+
+            return {
+                active: active, available: available
+            };
+        }
+    }, {
+        key: 'addToUsed',
+        value: function addToUsed(fx) {
+            this.props.updateFlags(this.props.channel, fx, 'add');
+        }
+    }, {
+        key: 'removeFromUsed',
+        value: function removeFromUsed(fx) {
+            var _this2 = this;
+
+            if (fx === this.state.selected) this.setState({ selected: 0 }, function () {
+                return _this2.props.updateFlags(_this2.props.channel, fx, 'remove');
+            });else this.props.updateFlags(this.props.channel, fx, 'remove');
+        }
+    }, {
+        key: 'setActiveEdit',
+        value: function setActiveEdit(fx) {
+            this.setState({
+                selected: fx
+            });
+        }
+    }, {
+        key: 'updateValue',
+        value: function updateValue(key, value) {
+            this.props.updateFxValue(this.props.channel, this.state.selected, key, value);
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this3 = this;
+
+            var state = this.state;
+            return _react2.default.createElement(
+                'div',
+                { className: 'fx-editor-container' },
+                _react2.default.createElement(
+                    'h5',
+                    null,
+                    'Channel Fx Editor'
+                ),
+                _react2.default.createElement(
+                    'div',
+                    null,
+                    _react2.default.createElement(
+                        'label',
+                        null,
+                        'Channel'
+                    ),
+                    _react2.default.createElement('input', {
+                        type: 'number',
+                        min: '0',
+                        max: '3',
+                        value: this.state.channel,
+                        onChange: function onChange(e) {
+                            return _this3.setState({ channel: e.target.value });
+                        },
+                        onBlur: function onBlur(e) {
+                            return _this3.props.openChannelFx(parseInt(_this3.state.channel));
+                        }
+                    })
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'fx-lists' },
+                    _react2.default.createElement(Available, {
+                        fx: state.availableFx,
+                        addToUsed: this.addToUsed,
+                        removeFromUsed: this.removeFromUsed,
+                        setActiveEdit: this.setActiveEdit
+                    }),
+                    _react2.default.createElement(Used, {
+                        fx: state.activeFx,
+                        addToUsed: this.addToUsed,
+                        removeFromUsed: this.removeFromUsed,
+                        setActiveEdit: this.setActiveEdit
+                    }),
+                    _react2.default.createElement(ActiveEdit, {
+                        fx: state.selected,
+                        data: this.props.channelFx.fx[state.selected],
+                        passNewValue: this.updateValue
+                    })
+                )
+            );
+        }
+    }]);
+
+    return FxEditor;
+}(_react.Component);
+
+exports.default = FxEditor;
+
+var Available = function (_Component2) {
+    _inherits(Available, _Component2);
+
+    function Available() {
+        _classCallCheck(this, Available);
+
+        return _possibleConstructorReturn(this, (Available.__proto__ || Object.getPrototypeOf(Available)).apply(this, arguments));
+    }
+
+    _createClass(Available, [{
+        key: 'listOfEffects',
+        value: function listOfEffects() {
+            var myFx = this.props.fx;
+            var fx = [];
+            for (var i = 0, l = myFx.length; i < l; i++) {
+                fx.push(_react2.default.createElement(FxItem, {
+                    fx: myFx[i],
+                    key: i,
+                    addToUsed: this.props.addToUsed,
+                    removeFromUsed: this.props.removeFromUsed,
+                    setActiveEdit: this.props.setActiveEdit
+                }));
+            }return fx;
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'fx-container' },
+                _react2.default.createElement(
+                    'span',
+                    { className: 'fx-title' },
+                    'Available fx'
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'fx-bordered-div' },
+                    this.listOfEffects()
+                )
+            );
+        }
+    }]);
+
+    return Available;
+}(_react.Component);
+
+var fxInfo = {
+    1: {
+        name: 'set volume',
+        values: 1
+    },
+    2: {
+        name: 'slide volume on',
+        values: 1
+    },
+    4: {
+        name: 'slide volume advanced',
+        values: 2
+    },
+    8: {
+        name: 'slide volume off',
+        values: 0
+    },
+    16: {
+        name: 'slide frequency on',
+        values: 1
+    },
+    32: {
+        name: 'slide frequency advanced',
+        values: 2
+    },
+    64: {
+        name: 'slide frequency off',
+        values: 0
+    },
+    128: {
+        name: 'set arpeggio',
+        values: 2
+    },
+    256: {
+        name: 'arpeggio off',
+        values: 0
+    },
+    512: {
+        name: 'set transposition',
+        values: 1
+    },
+    1024: {
+        name: 'add transposition',
+        values: 1
+    },
+    2048: {
+        name: 'transposition off',
+        values: 0
+    },
+    4096: {
+        name: 'set tremolo',
+        values: 2
+    },
+    8192: {
+        name: 'tremolo off',
+        values: 0
+    },
+    16384: {
+        name: 'set vibrato',
+        values: 2
+    },
+    32768: {
+        name: 'vibrato off',
+        values: 0
+    },
+    65536: {
+        name: 'set glissando',
+        values: 1
+    },
+    131072: {
+        name: 'glissando off',
+        values: 0
+    },
+    262144: {
+        name: 'set note cut',
+        values: 1
+    },
+    524288: {
+        name: 'note cut off',
+        values: 0
+    },
+    1048576: {
+        name: 'set tempo',
+        values: 1
+    },
+    2097152: {
+        name: 'add tempo',
+        values: 1
+    }
+};
+
+var FxItem = function (_Component3) {
+    _inherits(FxItem, _Component3);
+
+    function FxItem() {
+        _classCallCheck(this, FxItem);
+
+        var _this5 = _possibleConstructorReturn(this, (FxItem.__proto__ || Object.getPrototypeOf(FxItem)).call(this));
+
+        _this5.addToUsed = _this5.addToUsed.bind(_this5);
+        _this5.setActiveEdit = _this5.setActiveEdit.bind(_this5);
+        _this5.removeFromUsed = _this5.removeFromUsed.bind(_this5);
+        return _this5;
+    }
+
+    _createClass(FxItem, [{
+        key: 'getName',
+        value: function getName(fxId) {
+            return (fxInfo[fxId] || { name: 'ERROR: fx doesn\'t exist' }).name;
+        }
+    }, {
+        key: 'addToUsed',
+        value: function addToUsed() {
+            if (!this.props.edit) this.props.addToUsed(this.props.fx);
+        }
+    }, {
+        key: 'removeFromUsed',
+        value: function removeFromUsed() {
+            this.props.removeFromUsed(this.props.fx);
+        }
+    }, {
+        key: 'setActiveEdit',
+        value: function setActiveEdit() {
+            this.props.setActiveEdit(this.props.fx);
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'fx-item' },
+                _react2.default.createElement(
+                    'span',
+                    { className: 'fx-item-name', onClick: this.addToUsed },
+                    this.getName(this.props.fx)
+                ),
+                _react2.default.createElement(
+                    'span',
+                    { className: 'fx-item-buttons', style: { display: this.props.edit ? '' : 'none' } },
+                    _react2.default.createElement(
+                        'span',
+                        { onClick: this.removeFromUsed },
+                        _react2.default.createElement('i', { className: 'fa fa-trash-o', 'aria-hidden': 'true' })
+                    ),
+                    _react2.default.createElement(
+                        'span',
+                        { onClick: this.setActiveEdit },
+                        _react2.default.createElement('i', { className: 'fa fa-pencil', 'aria-hidden': 'true' })
+                    )
+                )
+            );
+        }
+    }]);
+
+    return FxItem;
+}(_react.Component);
+
+var Used = function (_Component4) {
+    _inherits(Used, _Component4);
+
+    function Used() {
+        _classCallCheck(this, Used);
+
+        return _possibleConstructorReturn(this, (Used.__proto__ || Object.getPrototypeOf(Used)).apply(this, arguments));
+    }
+
+    _createClass(Used, [{
+        key: 'listOfEffects',
+        value: function listOfEffects() {
+            var myFx = this.props.fx;
+            var fx = [];
+            for (var i = 0, l = myFx.length; i < l; i++) {
+                fx.push(_react2.default.createElement(FxItem, {
+                    fx: myFx[i],
+                    key: i,
+                    edit: true,
+                    addToUsed: this.props.addToUsed,
+                    removeFromUsed: this.props.removeFromUsed,
+                    setActiveEdit: this.props.setActiveEdit
+                }));
+            }return fx;
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            return _react2.default.createElement(
+                'div',
+                { className: 'fx-container' },
+                _react2.default.createElement(
+                    'span',
+                    { className: 'fx-title' },
+                    'Used fx'
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'fx-bordered-div' },
+                    this.listOfEffects()
+                )
+            );
+        }
+    }]);
+
+    return Used;
+}(_react.Component);
+
+var ActiveEdit = function ActiveEdit(_ref) {
+    var fxId = _ref.fx,
+        passNewValue = _ref.passNewValue,
+        data = _ref.data;
+
+    var fx = fxInfo[fxId] || {};
+
+    var options = void 0;
+    if (fx.values === 1) {
+        options = _react2.default.createElement(SingleOption, { handleValueChange: passNewValue, data: data });
+    } else if (fx.values === 2) {
+        options = _react2.default.createElement(DoubleOption, { handleValueChange: passNewValue, data: data });
+    }
+
+    return _react2.default.createElement(
+        'div',
+        { className: 'fx-container' },
+        _react2.default.createElement(
+            'span',
+            { className: 'fx-title' },
+            'Settings fx'
+        ),
+        _react2.default.createElement(
+            'div',
+            { className: 'fx-bordered-div' },
+            _react2.default.createElement(
+                'span',
+                null,
+                fx.name
+            ),
+            options
+        )
+    );
+};
+
+var SingleOption = function SingleOption(_ref2) {
+    var handleValueChange = _ref2.handleValueChange,
+        data = _ref2.data;
+    return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement('input', {
+            type: 'number',
+            onChange: function onChange(e) {
+                return handleValueChange('val', parseInt(e.target.value));
+            },
+            value: (data || {}).val || 0
+        })
+    );
+};
+
+var DoubleOption = function DoubleOption(_ref3) {
+    var handleValueChange = _ref3.handleValueChange,
+        data = _ref3.data;
+    return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement('input', {
+            type: 'number',
+            onChange: function onChange(e) {
+                return handleValueChange('val', parseInt(e.target.value));
+            },
+            value: (data || {}).val || 0
+        }),
+        _react2.default.createElement('input', {
+            type: 'number',
+            onChange: function onChange(e) {
+                return handleValueChange('val_b', parseInt(e.target.value));
+            },
+            value: (data || {}).val_b || 0
+        })
+    );
+};
+
+},{"react":404}],430:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
 var _lodash = require('lodash.uniq');
 
 var _lodash2 = _interopRequireDefault(_lodash);
@@ -37792,7 +38575,7 @@ var NewNotesTable = function (_Component) {
 
 exports.default = NewNotesTable;
 
-},{"./PlayPositionPointer":431,"./Row":432,"lodash.uniq":25,"react":404}],430:[function(require,module,exports){
+},{"./PlayPositionPointer":432,"./Row":433,"lodash.uniq":25,"react":404}],431:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -38304,7 +39087,7 @@ var NoteSheet = function NoteSheet() {
 
 exports.default = NoteSheet;
 
-},{"react":404}],431:[function(require,module,exports){
+},{"react":404}],432:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38412,7 +39195,7 @@ var PlayPositionPointer = function (_Component) {
 
 exports.default = PlayPositionPointer;
 
-},{"react":404}],432:[function(require,module,exports){
+},{"react":404}],433:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38585,7 +39368,7 @@ var Block = function Block(_ref2) {
     );
 };
 
-},{"react":404}],433:[function(require,module,exports){
+},{"react":404}],434:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38767,7 +39550,7 @@ var TrackEditor = function (_Component) {
 
 exports.default = TrackEditor;
 
-},{"./NewNotesTable":429,"./NoteSheet":430,"react":404}],434:[function(require,module,exports){
+},{"./NewNotesTable":430,"./NoteSheet":431,"react":404}],435:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38873,7 +39656,7 @@ exports.default = Color;
 
 // ['#ff7e00', '#ff69a8', '#00a8cc', '#00d2ae', '#584d4d', '#7171d8', '#df2020', '#24eb24', '#ffcc99', '#ffbdd8', '#85e9ff', '#75ffe8', '#aea2a2', '#b7b7eb', '#ef8f8f', '#98f598']
 
-},{"../../../stringifyColor":438,"react":404,"react-color":245}],435:[function(require,module,exports){
+},{"../../../stringifyColor":439,"react":404,"react-color":245}],436:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -38938,7 +39721,7 @@ var TrackList = function TrackList(_ref) {
 
 exports.default = TrackList;
 
-},{"./TrackRow":436,"react":404}],436:[function(require,module,exports){
+},{"./TrackRow":437,"react":404}],437:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -39032,7 +39815,7 @@ var TrackRow = function TrackRow(_ref) {
 
 exports.default = TrackRow;
 
-},{"../../../stringifyColor":438,"./Color":434,"react":404}],437:[function(require,module,exports){
+},{"../../../stringifyColor":439,"./Color":435,"react":404}],438:[function(require,module,exports){
 'use strict';
 
 var _react = require('react');
@@ -39049,7 +39832,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 (0, _reactDom.render)(_react2.default.createElement(_App2.default, null), document.getElementById('app'));
 
-},{"./components/App":418,"react":404,"react-dom":253}],438:[function(require,module,exports){
+},{"./components/App":418,"react":404,"react-dom":253}],439:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -39073,4 +39856,4 @@ function stringifyColor(color, type, custom) {
 
 exports.default = stringifyColor;
 
-},{}]},{},[437]);
+},{}]},{},[438]);

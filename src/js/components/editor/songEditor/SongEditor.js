@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import /*createSong, */{ createSongFromChannels } from './createSong'
 import ChannelRow from './ChannelRow'
+import FxEditor from './fxEditor/FxEditor'
 
 class SongEditor extends Component {
     constructor (props) {
@@ -13,15 +14,46 @@ class SongEditor extends Component {
             channels: [
                 [],[],[],[]
             ],
-            tempo: 25
+            channelsFx: [
+                {
+                    flags: 1048577,
+                    fx: {
+                        1: {val: 48},
+                        1048576: {val: 25}
+                    }
+                },
+                {
+                    flags: 1,
+                    fx: {
+                        1: {val: 48}
+                    }
+                },
+                {
+                    flags: 1,
+                    fx: {
+                        1: {val: 48}
+                    }
+                },
+                {
+                    flags: 1,
+                    fx: {
+                        1: {val: 48}
+                    }
+                }
+            ],
+            editFx: null
         }
+
+        this.editorIdCounter = 0
 
         this.playSong = this.playSong.bind(this)
         this.exportSong = this.exportSong.bind(this)
         this.addTrackAtIndex = this.addTrackAtIndex.bind(this)
         this.moveTrackToIndex = this.moveTrackToIndex.bind(this)
         this.toggleShowCode = this.toggleShowCode.bind(this)
-        this.validateTempo = this.validateTempo.bind(this)
+        this.openChannelFx = this.openChannelFx.bind(this)
+        this.updateFlags = this.updateFlags.bind(this)
+        this.updateFxValue = this.updateFxValue.bind(this)
         this.saveJSON = this.saveJSON.bind(this)
         this.loadJSON = this.loadJSON.bind(this)
     }
@@ -130,7 +162,8 @@ class SongEditor extends Component {
     }
 
     exportSong () {
-        const songString = createSongFromChannels(this.props.tracks, this.state.channels, this.state.tempo)
+        const state = this.state
+        const songString = createSongFromChannels(this.props.tracks, state.channels, state.tempo, state.channelsFx)
         this.setState({
             songString
         })
@@ -148,8 +181,9 @@ class SongEditor extends Component {
 
     toggleShowCode () {
 
+        const state = this.state
         this.setState({
-            songString: createSongFromChannels(this.props.tracks, this.state.channels, this.state.tempo),
+            songString: createSongFromChannels(this.props.tracks, state.channels, state.tempo, state.channelsFx),
             showString: !this.state.showString
         })
 
@@ -207,15 +241,42 @@ class SongEditor extends Component {
 
     }
 
-    validateTempo (e) {
-        const tempo = parseInt(this.state.tempo, 10)
-        let newTempo = tempo
-        if ( tempo < 0 ) newTempo = 0
-        if ( tempo > 127 ) newTempo = 127
-        if ( tempo !== newTempo ) {
-            this.setState({tempo: newTempo})
+    openChannelFx (channel) {
+        // set fx window status to shown
+        // set fx window owner (which channel or track)
+        this.setState({
+            editFx: channel
+        })
+    }
+
+    updateFlags (channel, fx, action) {
+        const channelsFx = this.state.channelsFx.slice()
+        const thisChannelFx = Object.assign({}, channelsFx[channel])
+        if ( action === 'add' )
+            thisChannelFx.flags = thisChannelFx.flags | fx
+        else if ( action === 'remove' ) {
+            thisChannelFx.flags = thisChannelFx.flags ^ fx
+            delete thisChannelFx.fx[fx]
         }
-        this.props.setTempo(newTempo)
+
+        channelsFx[channel] = thisChannelFx
+        this.setState({
+            channelsFx
+        })
+    }
+
+    updateFxValue (channel, fx, key, value) {
+        const channelsFx = this.state.channelsFx.slice()
+        const thisChannelFx = Object.assign({}, channelsFx[channel])
+
+        thisChannelFx.fx[fx] = thisChannelFx.fx[fx] || {}
+        thisChannelFx.fx[fx][key] = value
+
+        channelsFx[channel] = thisChannelFx
+
+        this.setState({
+            channelsFx
+        })
     }
 
     saveJSON () {
@@ -241,19 +302,6 @@ class SongEditor extends Component {
                 <button onClick={ this.saveJSON }>save</button>
                 <button onClick={ this.loadJSON }>load</button>
                 <button onClick={ this.toggleShowCode }>{ `${state.showString ? 'Hide' : 'Show'} code` }</button>
-
-                <label htmlFor="tempo">
-                    Tempo&nbsp;
-                </label>
-                <input
-                    id="tempo"
-                    type="number"
-                    min="0"
-                    max="127"
-                    value={state.tempo}
-                    onChange={ e => this.setState({tempo: e.target.value}) }
-                    onBlur={ this.validateTempo }
-                />
 
                 <div className="song-editor-channels">
 
@@ -305,8 +353,14 @@ class SongEditor extends Component {
                         </div>
                     </div>
 
-                </div>
+                    <div className="channel-fx-box">
+                        <div className="channel-fx" onClick={ () => this.openChannelFx(0) }>FX</div>
+                        <div className="channel-fx" onClick={ () => this.openChannelFx(1) }>FX</div>
+                        <div className="channel-fx" onClick={ () => this.openChannelFx(2) }>FX</div>
+                        <div className="channel-fx" onClick={ () => this.openChannelFx(3) }>FX</div>
+                    </div>
 
+                </div>
 
                 { state.showString ?
                     <pre style={{
@@ -317,6 +371,17 @@ class SongEditor extends Component {
                     }}>
                         {this.state.songString || "Nothing to show yet."}
                     </pre>
+                    :null
+                }
+
+                { state.editFx !== null ?
+                    <FxEditor
+                        channel={state.editFx}
+                        openChannelFx={this.openChannelFx}
+                        channelFx={this.state.channelsFx[state.editFx]}
+                        updateFlags={this.updateFlags}
+                        updateFxValue={this.updateFxValue}
+                    />
                     :null
                 }
             </div>
