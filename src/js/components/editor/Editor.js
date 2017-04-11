@@ -444,14 +444,13 @@ class Editor extends Component {
 
         const names = Object.getOwnPropertyNames(file)
 
-        if ( names.length === 2 ) truths++
-        // if ( names.length === 3 ) truths++ // use this line when fx are implemented
+        if ( names.length === 3 ) truths++
 
         for ( const name of names ) {
 
             switch (name) {
                 case 'channels':
-                // case 'fx': // use this line when fx are implemented
+                case 'fx':
                 case 'tracks':
                 truths++
                 if ( Array.isArray(file[name]) ) truths++
@@ -459,8 +458,7 @@ class Editor extends Component {
 
         }
 
-        return truths === 5
-        // return truths === 7 // use this line when fx are implemented
+        return truths === 7
 
     }
 

@@ -56,6 +56,7 @@ class SongEditor extends Component {
         this.updateFxValue = this.updateFxValue.bind(this)
         this.saveJSON = this.saveJSON.bind(this)
         this.loadJSON = this.loadJSON.bind(this)
+        this.deleteTrackFromChannel = this.deleteTrackFromChannel.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -290,6 +291,14 @@ class SongEditor extends Component {
         this.props.load()
     }
 
+    deleteTrackFromChannel (editorId, channel) {
+        const channels = this.state.channels.slice()
+        const tracks = channels[channel].filter( t => t.editorId !== editorId)
+        channels[channel] = tracks
+
+        this.setState({channels})
+    }
+
     render () {
         const state = this.state
         return (
@@ -331,24 +340,28 @@ class SongEditor extends Component {
                                 tracks={state.channels[0]}
                                 addTrackAtIndex={this.addTrackAtIndex}
                                 moveTrackToIndex={this.moveTrackToIndex}
+                                deleteTrackFromChannel={this.deleteTrackFromChannel}
                             />
                             <ChannelRow
                                 channel={1}
                                 tracks={state.channels[1]}
                                 addTrackAtIndex={this.addTrackAtIndex}
                                 moveTrackToIndex={this.moveTrackToIndex}
+                                deleteTrackFromChannel={this.deleteTrackFromChannel}
                             />
                             <ChannelRow
                                 channel={2}
                                 tracks={state.channels[2]}
                                 addTrackAtIndex={this.addTrackAtIndex}
                                 moveTrackToIndex={this.moveTrackToIndex}
+                                deleteTrackFromChannel={this.deleteTrackFromChannel}
                             />
                             <ChannelRow
                                 channel={3}
                                 tracks={state.channels[3]}
                                 addTrackAtIndex={this.addTrackAtIndex}
                                 moveTrackToIndex={this.moveTrackToIndex}
+                                deleteTrackFromChannel={this.deleteTrackFromChannel}
                             />
                         </div>
                     </div>

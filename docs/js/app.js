@@ -35707,8 +35707,7 @@ var Editor = function (_Component) {
 
             var names = Object.getOwnPropertyNames(file);
 
-            if (names.length === 2) truths++;
-            // if ( names.length === 3 ) truths++ // use this line when fx are implemented
+            if (names.length === 3) truths++;
 
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
@@ -35721,7 +35720,7 @@ var Editor = function (_Component) {
 
                     switch (name) {
                         case 'channels':
-                        // case 'fx': // use this line when fx are implemented
+                        case 'fx':
                         case 'tracks':
                             truths++;
                             if (Array.isArray(file[name])) truths++;
@@ -35742,8 +35741,7 @@ var Editor = function (_Component) {
                 }
             }
 
-            return truths === 5;
-            // return truths === 7 // use this line when fx are implemented
+            return truths === 7;
         }
     }, {
         key: 'clearForcedData',
@@ -36418,7 +36416,8 @@ var ChannelRow = function ChannelRow(_ref) {
         tracks = _ref.tracks,
         addTrackAtIndex = _ref.addTrackAtIndex,
         removeTrackAtIndex = _ref.removeTrackAtIndex,
-        moveTrackToIndex = _ref.moveTrackToIndex;
+        moveTrackToIndex = _ref.moveTrackToIndex,
+        deleteTrackFromChannel = _ref.deleteTrackFromChannel;
     return _react2.default.createElement(
         'div',
         { className: 'channel-track' },
@@ -36427,7 +36426,8 @@ var ChannelRow = function ChannelRow(_ref) {
             tracks: tracks,
             addTrackAtIndex: addTrackAtIndex,
             removeTrackAtIndex: removeTrackAtIndex,
-            moveTrackToIndex: moveTrackToIndex
+            moveTrackToIndex: moveTrackToIndex,
+            deleteTrackFromChannel: deleteTrackFromChannel
         })
     );
 };
@@ -36467,12 +36467,9 @@ var ListOfTracks = function (_Component) {
 
         var _this = _possibleConstructorReturn(this, (ListOfTracks.__proto__ || Object.getPrototypeOf(ListOfTracks)).call(this));
 
-        _this.state = {
-            target: null,
-            originalPos: null
-        };
-
         _this.handleDrop = _this.handleDrop.bind(_this);
+        _this.deleteTrack = _this.deleteTrack.bind(_this);
+        _this.handleDragover = _this.handleDragover.bind(_this);
 
         _this.iAmTheDrumChannel = props.channel === 3;
         return _this;
@@ -36498,6 +36495,11 @@ var ListOfTracks = function (_Component) {
                 this.props.addTrackAtIndex(this.props.channel, parseInt(e.dataTransfer.getData('trackId')), parseInt(e.target.dataset.position || -1));
         }
     }, {
+        key: 'deleteTrack',
+        value: function deleteTrack(editorId) {
+            this.props.deleteTrackFromChannel(editorId, this.props.channel);
+        }
+    }, {
         key: 'render',
         value: function render() {
             var _this2 = this;
@@ -36513,11 +36515,9 @@ var ListOfTracks = function (_Component) {
                 tracks.map(function (t, i) {
                     return _react2.default.createElement(Track, {
                         key: i,
-                        setOriginalPosition: function setOriginalPosition() {
-                            return _this2.setState({ originalPos: i, target: null });
-                        },
                         position: i,
-                        track: t
+                        track: t,
+                        deleteMe: _this2.deleteTrack
                     });
                 })
             );
@@ -36538,7 +36538,8 @@ var Track = function (_Component2) {
         var _this3 = _possibleConstructorReturn(this, (Track.__proto__ || Object.getPrototypeOf(Track)).call(this));
 
         _this3.state = {
-            imBeingDragged: false
+            imBeingDragged: false,
+            dragging: null
         };
 
         _this3.handleDragStart = _this3.handleDragStart.bind(_this3);
@@ -36555,14 +36556,21 @@ var Track = function (_Component2) {
             e.dataTransfer.setData('type', this.props.track.type);
             e.dataTransfer.setData('editorId', this.props.track.editorId);
             setTimeout(function () {
-                _this4.setState({ imBeingDragged: true });
-                _this4.props.setOriginalPosition();
+                _this4.setState({
+                    imBeingDragged: true,
+                    dragging: _this4.props.track.editorId
+                });
             }, 1);
         }
     }, {
         key: 'handleDragEnd',
         value: function handleDragEnd(e) {
-            this.setState({ imBeingDragged: false });
+            if (this.state.dragging === this.props.track.editorId) this.props.deleteMe(this.props.track.editorId);
+
+            this.setState({
+                imBeingDragged: false,
+                dragging: null
+            });
         }
     }, {
         key: 'render',
@@ -36663,6 +36671,7 @@ var SongEditor = function (_Component) {
         _this.updateFxValue = _this.updateFxValue.bind(_this);
         _this.saveJSON = _this.saveJSON.bind(_this);
         _this.loadJSON = _this.loadJSON.bind(_this);
+        _this.deleteTrackFromChannel = _this.deleteTrackFromChannel.bind(_this);
         return _this;
     }
 
@@ -36978,6 +36987,17 @@ var SongEditor = function (_Component) {
             this.props.load();
         }
     }, {
+        key: 'deleteTrackFromChannel',
+        value: function deleteTrackFromChannel(editorId, channel) {
+            var channels = this.state.channels.slice();
+            var tracks = channels[channel].filter(function (t) {
+                return t.editorId !== editorId;
+            });
+            channels[channel] = tracks;
+
+            this.setState({ channels: channels });
+        }
+    }, {
         key: 'render',
         value: function render() {
             var _this2 = this;
@@ -37084,25 +37104,29 @@ var SongEditor = function (_Component) {
                                 channel: 0,
                                 tracks: state.channels[0],
                                 addTrackAtIndex: this.addTrackAtIndex,
-                                moveTrackToIndex: this.moveTrackToIndex
+                                moveTrackToIndex: this.moveTrackToIndex,
+                                deleteTrackFromChannel: this.deleteTrackFromChannel
                             }),
                             _react2.default.createElement(_ChannelRow2.default, {
                                 channel: 1,
                                 tracks: state.channels[1],
                                 addTrackAtIndex: this.addTrackAtIndex,
-                                moveTrackToIndex: this.moveTrackToIndex
+                                moveTrackToIndex: this.moveTrackToIndex,
+                                deleteTrackFromChannel: this.deleteTrackFromChannel
                             }),
                             _react2.default.createElement(_ChannelRow2.default, {
                                 channel: 2,
                                 tracks: state.channels[2],
                                 addTrackAtIndex: this.addTrackAtIndex,
-                                moveTrackToIndex: this.moveTrackToIndex
+                                moveTrackToIndex: this.moveTrackToIndex,
+                                deleteTrackFromChannel: this.deleteTrackFromChannel
                             }),
                             _react2.default.createElement(_ChannelRow2.default, {
                                 channel: 3,
                                 tracks: state.channels[3],
                                 addTrackAtIndex: this.addTrackAtIndex,
-                                moveTrackToIndex: this.moveTrackToIndex
+                                moveTrackToIndex: this.moveTrackToIndex,
+                                deleteTrackFromChannel: this.deleteTrackFromChannel
                             })
                         )
                     ),

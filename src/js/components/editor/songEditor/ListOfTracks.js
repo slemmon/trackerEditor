@@ -5,12 +5,9 @@ class ListOfTracks extends Component {
     constructor (props) {
         super()
 
-        this.state = {
-            target: null,
-            originalPos: null
-        }
-
         this.handleDrop = this.handleDrop.bind(this)
+        this.deleteTrack = this.deleteTrack.bind(this)
+        this.handleDragover = this.handleDragover.bind(this)
 
         this.iAmTheDrumChannel = props.channel === 3
     }
@@ -31,7 +28,10 @@ class ListOfTracks extends Component {
         else
             //add
             this.props.addTrackAtIndex( this.props.channel, parseInt(e.dataTransfer.getData('trackId')), parseInt(e.target.dataset.position||-1) )
+    }
 
+    deleteTrack (editorId) {
+        this.props.deleteTrackFromChannel(editorId, this.props.channel)
     }
 
     render () {
@@ -45,9 +45,9 @@ class ListOfTracks extends Component {
                 {tracks.map( (t, i) =>
                     <Track
                         key = {i}
-                        setOriginalPosition = { () => this.setState({originalPos: i, target: null}) }
                         position = {i}
                         track = {t}
+                        deleteMe = {this.deleteTrack}
                     />
                 )}
             </div>
@@ -62,7 +62,8 @@ class Track extends Component {
         super()
 
         this.state = {
-            imBeingDragged: false
+            imBeingDragged: false,
+            dragging: null
         }
 
         this.handleDragStart = this.handleDragStart.bind(this)
@@ -75,15 +76,23 @@ class Track extends Component {
         e.dataTransfer.setData('editorId', this.props.track.editorId)
         setTimeout(
             () => {
-                this.setState({imBeingDragged: true})
-                this.props.setOriginalPosition()
+                this.setState({
+                    imBeingDragged: true,
+                    dragging: this.props.track.editorId
+                })
             },
             1
         )
     }
 
     handleDragEnd (e) {
-        this.setState({imBeingDragged: false})
+        if ( this.state.dragging === this.props.track.editorId )
+            this.props.deleteMe(this.props.track.editorId)
+
+        this.setState({
+            imBeingDragged: false,
+            dragging: null
+        })
     }
 
     render () {
