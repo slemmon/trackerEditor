@@ -36635,26 +36635,19 @@ var SongEditor = function (_Component) {
             showString: false,
             channels: [[], [], [], []],
             channelsFx: [{
-                flags: 1048577,
+                flags: 1048576,
                 fx: {
-                    1: { val: 48 },
                     1048576: { val: 25 }
                 }
             }, {
-                flags: 1,
-                fx: {
-                    1: { val: 48 }
-                }
+                flags: 0,
+                fx: {}
             }, {
-                flags: 1,
-                fx: {
-                    1: { val: 48 }
-                }
+                flags: 0,
+                fx: {}
             }, {
-                flags: 1,
-                fx: {
-                    1: { val: 48 }
-                }
+                flags: 0,
+                fx: {}
             }],
             editFx: null
         };
@@ -36876,6 +36869,23 @@ var SongEditor = function (_Component) {
             });
         }
     }, {
+        key: 'addDefaultVolumeFx',
+        value: function addDefaultVolumeFx(channel) {
+
+            var channelsFx = this.state.channelsFx;
+
+            var fxList = Object.assign({}, channelsFx[channel]);
+            fxList.fx = Object.assign({}, fxList.fx);
+            fxList.flags = fxList.flags | 1;
+            fxList.fx[1] = { val: 48 };
+
+            channelsFx[channel] = fxList;
+
+            this.setState({
+                channelsFx: channelsFx
+            });
+        }
+    }, {
         key: 'addTrackAtIndex',
         value: function addTrackAtIndex(channel, trackId, position) {
             var channels = this.state.channels.slice();
@@ -36886,6 +36896,12 @@ var SongEditor = function (_Component) {
             }), { editorId: this.editorIdCounter++ });
             var newTracks = [].concat(tracks.slice(0, pos), newTrack, tracks.slice(pos));
             channels[channel] = newTracks;
+
+            // if this is the first track in the channel, add sound fx with value 48
+            if (tracks.length === 0 && newTracks.length === 1) {
+                this.addDefaultVolumeFx(channel);
+            }
+
             this.setState({
                 channels: channels
             });
@@ -36905,7 +36921,14 @@ var SongEditor = function (_Component) {
             // add to new channel (even if channel ===)
             // track position in array changes
             var pos = ~position ? position : channels[channel].length;
+            var trackCountBefore = channels[channel].length;
             channels[channel] = [].concat(channels[channel].slice(0, pos), original.track, channels[channel].slice(pos));
+            var trackCountAfter = channels[channel].length;
+
+            // if this is the first track in the channel, add sound fx with value 48
+            if (trackCountBefore === 0 && trackCountAfter === 1) {
+                this.addDefaultVolumeFx(channel);
+            }
 
             this.setState({
                 channels: channels
@@ -36963,8 +36986,9 @@ var SongEditor = function (_Component) {
         value: function updateFxValue(channel, fx, key, value) {
             var channelsFx = this.state.channelsFx.slice();
             var thisChannelFx = Object.assign({}, channelsFx[channel]);
+            thisChannelFx.fx = Object.assign({}, thisChannelFx.fx);
 
-            thisChannelFx.fx[fx] = thisChannelFx.fx[fx] || {};
+            thisChannelFx.fx[fx] = Object.assign({}, thisChannelFx.fx[fx]);
             thisChannelFx.fx[fx][key] = value;
 
             channelsFx[channel] = thisChannelFx;
@@ -37541,11 +37565,6 @@ function atmifyChannel(_ref) {
     var newFxEnd = createFxArray(getFxList(effects, 'last'), 'end', effects);
     channelTrack = channelTrack.concat(newFxEnd.fx);
     totalBytes += newFxEnd.bytes;
-
-    if (channelTrack.slice(-1)[0] !== '0x40, 0,\t\t// FX: SET VOLUME: volume = 0') {
-        channelTrack.push('0x40, 0,\t\t// FX: SET VOLUME: volume = 0');
-        totalBytes += 2;
-    }
 
     channelTrack.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL'); // end of channel
     totalBytes++;

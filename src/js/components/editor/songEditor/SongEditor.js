@@ -16,29 +16,22 @@ class SongEditor extends Component {
             ],
             channelsFx: [
                 {
-                    flags: 1048577,
+                    flags: 1048576,
                     fx: {
-                        1: {val: 48},
                         1048576: {val: 25}
                     }
                 },
                 {
-                    flags: 1,
-                    fx: {
-                        1: {val: 48}
-                    }
+                    flags: 0,
+                    fx: {}
                 },
                 {
-                    flags: 1,
-                    fx: {
-                        1: {val: 48}
-                    }
+                    flags: 0,
+                    fx: {}
                 },
                 {
-                    flags: 1,
-                    fx: {
-                        1: {val: 48}
-                    }
+                    flags: 0,
+                    fx: {}
                 }
             ],
             editFx: null
@@ -190,6 +183,23 @@ class SongEditor extends Component {
 
     }
 
+    addDefaultVolumeFx (channel) {
+
+        const channelsFx = this.state.channelsFx
+
+        const fxList = Object.assign({}, channelsFx[channel])
+        fxList.fx = Object.assign({}, fxList.fx)
+        fxList.flags = fxList.flags | 1
+        fxList.fx[1] = { val: 48 }
+
+        channelsFx[channel] = fxList
+
+        this.setState({
+            channelsFx
+        })
+
+    }
+
     addTrackAtIndex (channel, trackId, position) {
         const channels = this.state.channels.slice()
         const tracks = channels[channel]
@@ -197,6 +207,12 @@ class SongEditor extends Component {
         const newTrack = Object.assign({}, this.props.tracks.find(t => t.id === trackId), {editorId: this.editorIdCounter++})
         const newTracks = [].concat( tracks.slice(0, pos), newTrack, tracks.slice(pos) )
         channels[channel] = newTracks
+
+        // if this is the first track in the channel, add sound fx with value 48
+        if ( tracks.length === 0 && newTracks.length === 1 ) {
+            this.addDefaultVolumeFx(channel)
+        }
+
         this.setState({
             channels
         })
@@ -213,7 +229,14 @@ class SongEditor extends Component {
         // add to new channel (even if channel ===)
         // track position in array changes
         const pos = ~position ? position : channels[channel].length
+        let trackCountBefore = channels[channel].length
         channels[channel] = [].concat( channels[channel].slice(0, pos), original.track, channels[channel].slice(pos) )
+        let trackCountAfter = channels[channel].length
+
+        // if this is the first track in the channel, add sound fx with value 48
+        if ( trackCountBefore === 0 && trackCountAfter === 1 ) {
+            this.addDefaultVolumeFx(channel)
+        }
 
         this.setState({
             channels
@@ -269,8 +292,9 @@ class SongEditor extends Component {
     updateFxValue (channel, fx, key, value) {
         const channelsFx = this.state.channelsFx.slice()
         const thisChannelFx = Object.assign({}, channelsFx[channel])
+        thisChannelFx.fx = Object.assign({}, thisChannelFx.fx)
 
-        thisChannelFx.fx[fx] = thisChannelFx.fx[fx] || {}
+        thisChannelFx.fx[fx] = Object.assign({}, thisChannelFx.fx[fx])
         thisChannelFx.fx[fx][key] = value
 
         channelsFx[channel] = thisChannelFx

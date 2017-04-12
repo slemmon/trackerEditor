@@ -29,12 +29,17 @@ var noteTable = [
   8372, 8870, 9397, 
 ];
 
+
+
+
 function SquawkStream(sampleRate) {
   var channelActiveMute = 0xF0;
+  var noRepeat = true;
+  var entryBase;
   var synth;
   var data;
   var tickCount = 0;
-  var tickRate    = 25;
+  var tickRate  = 25;
   
   // Oscillator DMEP-type testing (Destroy My Ears, Plz)
   var testIx = 0.0;
@@ -63,6 +68,7 @@ function SquawkStream(sampleRate) {
     var stackCounter = new Array();
     var stackTrack = new Array(); // note 1
     var stackIndex   = 0;
+    var repeatPoint = 0;
 
     // Looping
     var delay        = 0;
@@ -128,9 +134,6 @@ function SquawkStream(sampleRate) {
 
     // All hail "THE PLAYROUTINE"
     function _play() {
-
-      // run effects here
-
       // Noise retriggering
       if (reConfig != 0) {
         if (reCount >= (reConfig & 0x03)) {
@@ -209,7 +212,9 @@ function SquawkStream(sampleRate) {
       }
 
 
-      if(delay != 0) delay--;
+      if(delay != 0) { 
+        if(delay !== 0xFFFF) {delay--;}
+      }
       else {
         do {
           var cmd = readByte();
@@ -217,7 +222,7 @@ function SquawkStream(sampleRate) {
             // 0 … 63 : NOTE ON/OFF
             if ((note = cmd) != 0) note += transConfig;
             synth.setFrequency(id, noteTable[note]);
-            synth.setVolume(id, reCount);
+            if (volfreConfig == 0) synth.setVolume(id, reCount);
             if ((arpTiming & 0x20) != 0) arpCount = 0; // ARP retriggering
           } else if(cmd < 160) {
             // 64 … 159 : SETUP FX
@@ -304,10 +309,6 @@ function SquawkStream(sampleRate) {
               case 21: // Note Cut OFF
                 arpNotes = 0;
                 break;
-              case 91: // RESTART song
-                // tickCount = 0;
-
-                break;
               case 92: // ADD tempo
                 tickRate += readByte();
                 synth.setTick((sampleRate / tickRate).toFixed(0));
@@ -317,16 +318,18 @@ function SquawkStream(sampleRate) {
                 synth.setTick((sampleRate / tickRate).toFixed(0));
                 break;
               case 94: // Goto advanced
-                //track(0) = readByte();
-                //track(1) = readByte();
-                //track(2) = readByte();
-                //track(3) = readByte();
+                channel[0].repeatPoint = readByte();
+                channel[1].repeatPoint = readByte();
+                channel[2].repeatPoint = readByte();
+                channel[3].repeatPoint = readByte();
+                noRepeat = false;
                 break;
               case 95: // Stop channel
                 var mask = 0xF0;
                 mask = mask ^ (1<<(id+4))
                 channelActiveMute = channelActiveMute & mask;
-                delay = Infinity;
+                synth.setVolume(id, 0);
+                delay = 0xFFFF;
                 break;
               default :
                 break;
@@ -359,7 +362,7 @@ function SquawkStream(sampleRate) {
               // Check stack depth
               if(stackIndex == 0) {
                 // End-Of-File
-                delay = Infinity;
+                delay = 0xFFFF;
               } else {
                 // Stack POP
                 stackIndex--;
@@ -374,8 +377,31 @@ function SquawkStream(sampleRate) {
           }
         } while(delay == 0);
         // Apply volume slides
-        delay--;
+        if(delay != 0xFFFF) {delay--;}
+      }
+      // if all channels are inactive check for repeat
+      if ((channelActiveMute & 0xF0) == 0)
+      {
+        var repeatSong = 0;
+        repeatSong += channel[0].repeatPoint;
+        repeatSong += channel[1].repeatPoint;
+        repeatSong += channel[2].repeatPoint;
+        repeatSong += channel[3].repeatPoint;
 
+        if (repeatSong != 0)
+        {
+          tickCount = 0;
+          //channelActiveMute = 0xF0;
+          //channel[0].ptr = trackAddress((channel[0].repeatPoint)) - (entryBase + 4);
+          //channel[1].ptr = trackAddress((channel[1].repeatPoint)) - (entryBase + 4);
+          //channel[2].ptr = trackAddress((channel[2].repeatPoint)) - (entryBase + 4);
+          //channel[3].ptr = trackAddress((channel[3].repeatPoint)) - (entryBase + 4);
+
+          //channel[0].delay = 0;
+          //channel[1].delay = 0;
+          //channel[2].delay = 0;
+          //channel[3].delay = 0;
+        }
       }
     }
     
@@ -399,7 +425,7 @@ function SquawkStream(sampleRate) {
   // Provides reference to synthesizer
   function _setup(squawkSynth) {
     synth = squawkSynth;
-    synth.setTick(sampleRate / 50); // Default to 40 ticks per second 
+    synth.setTick(sampleRate / 25); // Default to 25 ticks per second 
   };
 
   // Retrieve tick counter
@@ -410,6 +436,11 @@ function SquawkStream(sampleRate) {
   // Retrieve Active and Muted channels
   function _getChannelActiveMute() {
     return (channelActiveMute & 0xF0);
+  }
+
+  // Retrieve noRepeat
+  function _getNoRepeat() {
+    return [noRepeat, entryBase, channel[0].repeatPoint, channel[1].repeatPoint, channel[2].repeatPoint, channel[3].repeatPoint];
   }
 
   // Called by synthesizer each tick
@@ -451,7 +482,7 @@ function SquawkStream(sampleRate) {
       for(var n = 0; n < b; n++) data[n] = temp[n];
 
       // Set up entry tracks for each channel
-      var entryBase = (readByte(0) << 1) + 1;
+      entryBase = (readByte(0) << 1) + 1;
       channel.forEach(function(e) { e.jumpTo(trackAddress(readByte(entryBase + e.id()))); });
     }
   }
@@ -459,7 +490,8 @@ function SquawkStream(sampleRate) {
   // References
   this.setup = _setup;
   this.getTickCount = _getTickCount;
-  this.getChannelActiveMute = _getChannelActiveMute
+  this.getChannelActiveMute = _getChannelActiveMute;
+  this.getNoRepeat = _getNoRepeat;
   this.tick = _tick;
   this.setSource = _setSource;
 }

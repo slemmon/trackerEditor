@@ -375,11 +375,6 @@ function atmifyChannel ({tracks, channel, /*addTempo,*/ index, /*tempo, */effect
     channelTrack = channelTrack.concat(newFxEnd.fx)
     totalBytes += newFxEnd.bytes
 
-    if ( channelTrack.slice(-1)[0] !== '0x40, 0,\t\t// FX: SET VOLUME: volume = 0' ) {
-        channelTrack.push('0x40, 0,\t\t// FX: SET VOLUME: volume = 0')
-        totalBytes += 2
-    }
-
     channelTrack.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL')                                             // end of channel
     totalBytes++
 

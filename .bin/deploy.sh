@@ -21,6 +21,6 @@ cp -r src/css/images docs/css/images
 cp -r src/images docs/images
 
 echo "starting browserify"
-node_modules/.bin/browserify -e src/js/index.js -o "docs/js/app.js" -t [ babelify ] &
+node_modules/.bin/browserify -e src/js/index.js -o "docs/js/app.js" -t [ babelify ]
 echo "starting node-sass"
 node_modules/.bin/node-sass src/css -o docs/css
