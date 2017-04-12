@@ -82,7 +82,7 @@ class FxEditor extends Component {
 
                 <h5>Channel Fx Editor</h5>
 
-                <div>
+                <div className="channel-selector">
                     <label>Channel</label>
                     <input
                         type="number"
@@ -340,23 +340,29 @@ const ActiveEdit = ({fx: fxId, passNewValue, data}) => {
 
 const SingleOption = ({handleValueChange, data}) =>
     <div>
-        <input
-            type="number"
-            onChange={e => handleValueChange('val', parseInt(e.target.value))}
-            value={(data||{}).val || 0}
-        />
+        <div className="input-group">
+            <input
+                type="number"
+                onChange={e => handleValueChange('val', parseInt(e.target.value))}
+                value={(data||{}).val || 0}
+            />
+        </div>
     </div>
 
 const DoubleOption = ({handleValueChange, data}) =>
     <div>
-        <input
-            type="number"
-            onChange={e => handleValueChange('val', parseInt(e.target.value))}
-            value={(data||{}).val || 0}
-        />
-        <input
-            type="number"
-            onChange={e => handleValueChange('val_b', parseInt(e.target.value))}
-            value={(data||{}).val_b || 0}
-        />
+        <div className="input-group">
+            <input
+                type="number"
+                onChange={e => handleValueChange('val', parseInt(e.target.value))}
+                value={(data||{}).val || 0}
+            />
+        </div>
+        <div className="input-group">
+            <input
+                type="number"
+                onChange={e => handleValueChange('val_b', parseInt(e.target.value))}
+                value={(data||{}).val_b || 0}
+            />
+        </div>
     </div>

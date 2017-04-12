@@ -37991,7 +37991,7 @@ var FxEditor = function (_Component) {
                 ),
                 _react2.default.createElement(
                     'div',
-                    null,
+                    { className: 'channel-selector' },
                     _react2.default.createElement(
                         'label',
                         null,
@@ -38333,13 +38333,17 @@ var SingleOption = function SingleOption(_ref2) {
     return _react2.default.createElement(
         'div',
         null,
-        _react2.default.createElement('input', {
-            type: 'number',
-            onChange: function onChange(e) {
-                return handleValueChange('val', parseInt(e.target.value));
-            },
-            value: (data || {}).val || 0
-        })
+        _react2.default.createElement(
+            'div',
+            { className: 'input-group' },
+            _react2.default.createElement('input', {
+                type: 'number',
+                onChange: function onChange(e) {
+                    return handleValueChange('val', parseInt(e.target.value));
+                },
+                value: (data || {}).val || 0
+            })
+        )
     );
 };
 
@@ -38349,20 +38353,28 @@ var DoubleOption = function DoubleOption(_ref3) {
     return _react2.default.createElement(
         'div',
         null,
-        _react2.default.createElement('input', {
-            type: 'number',
-            onChange: function onChange(e) {
-                return handleValueChange('val', parseInt(e.target.value));
-            },
-            value: (data || {}).val || 0
-        }),
-        _react2.default.createElement('input', {
-            type: 'number',
-            onChange: function onChange(e) {
-                return handleValueChange('val_b', parseInt(e.target.value));
-            },
-            value: (data || {}).val_b || 0
-        })
+        _react2.default.createElement(
+            'div',
+            { className: 'input-group' },
+            _react2.default.createElement('input', {
+                type: 'number',
+                onChange: function onChange(e) {
+                    return handleValueChange('val', parseInt(e.target.value));
+                },
+                value: (data || {}).val || 0
+            })
+        ),
+        _react2.default.createElement(
+            'div',
+            { className: 'input-group' },
+            _react2.default.createElement('input', {
+                type: 'number',
+                onChange: function onChange(e) {
+                    return handleValueChange('val_b', parseInt(e.target.value));
+                },
+                value: (data || {}).val_b || 0
+            })
+        )
     );
 };
 

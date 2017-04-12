@@ -1,4 +1,15 @@
 .fx-editor-container {
+    margin-top: 10px;
+
+    .channel-selector {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+
+        label {
+            flex: 0 0 15%;
+        }
+    }
 
     .fx-lists {
         display: flex;
@@ -20,6 +31,16 @@
                 height: 200px;
                 overflow: auto;
                 padding: 4px;
+
+                .input-group {
+                    display: flex;
+                    align-items: center;
+
+                    input {
+                        flex: 0 0 20%;
+                        min-width: 20px;
+                    }
+                }
 
                 .fx-item {
                     font-size: 10pt;
