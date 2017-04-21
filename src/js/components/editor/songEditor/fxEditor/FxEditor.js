@@ -53,7 +53,7 @@ class FxEditor extends Component {
     }
 
     addToUsed (fx) {
-        this.props.updateFlags(this.props.channel, fx, 'add')
+        this.props.updateFlags(this.props.channel, fx, 'add', fxInfo[fx].values)
     }
 
     removeFromUsed (fx) {

@@ -117,73 +117,73 @@ function createSongFromChannels (tracks, channels, tempo, fx) {
 
 const startFx = {
     1: {
-        name: 'set volume',
+        name: 'FX: SET VOLUME: volume = {val}',
         values: 1,
         // comment: 'set volume'
         address: '40'
     },
     2: {
-        name: 'slide volume on',
+        name: 'FX: SLIDE VOLUME ON: {val}',
         values: 1,
         address: '41'
     },
     4: {
-        name: 'slide volume advanced',
+        name: 'FX: SLIDE VOLUME ADVANCED: {val} {val_b}',
         values: 2,
         address: '42'
     },
     16: {
-        name: 'slide frequency on',
+        name: 'FX: SLIDE FREQUENCY ON: {val}',
         values: 1,
         address: '44'
     },
     32: {
-        name: 'slide frequency advanced',
+        name: 'FX: SLIDE FREQUENCY ADVANCED: {val} {val_b}',
         values: 2,
         address: '45'
     },
     128: {
-        name: 'set arpeggio',
+        name: 'FX: SET ARPEGGIO: {val} {val_b}',
         values: 2,
         address: '47'
     },
     512: {
-        name: 'set transposition',
+        name: 'FX: SET TRANSPOSITION: {val}',
         values: 1,
         address: '4C'
     },
     1024: {
-        name: 'add transposition',
+        name: 'FX: ADD TRANSPOSITION: {val}',
         values: 1,
         address: '4B'
     },
     4096: {
-        name: 'set tremolo',
+        name: 'FX: SET TREMOLO: {val} {val_b}',
         values: 2,
         address: '4E'
     },
     16384: {
-        name: 'set vibrato',
+        name: 'FX: SET VIBRATO: {val} {val_b}',
         values: 2,
         address: '50'
     },
     65536: {
-        name: 'set glissando',
+        name: 'FX: SET GLISSANDO: {val}',
         values: 1,
         address: '52'
     },
     262144: {
-        name: 'set note cut',
+        name: 'FX: SET NOTE CUT: {val}',
         values: 1,
         address: '54'
     },
     1048576: {
-        name: 'set tempo',
+        name: 'FX: SET TEMPO: tempo = {val}',
         values: 1,
         address: '9D'
     },
     2097152: {
-        name: 'add tempo',
+        name: 'FX: ADD TEMPO: {val}',
         values: 1,
         address: '9C'
     }
@@ -191,44 +191,52 @@ const startFx = {
 
 const endFx = {
     8: {
-        name: 'slide volume off',
+        name: 'FX: SLIDE VOLUME OFF',
         values: 0,
-        address: '43'
+        address: '43',
+        extraTab: true
     },
     64: {
-        name: 'slide frequency off',
+        name: 'FX: SLIDE FREQUENCY OFF',
         values: 0,
-        address: '46'
+        address: '46',
+        extraTab: true
     },
     256: {
-        name: 'arpeggio off',
+        name: 'FX: ARPEGGIO OFF',
         values: 0,
-        address: '48'
+        address: '48',
+        extraTab: true
     },
     2048: {
-        name: 'transposition off',
+        name: 'FX: TRANSPOSITION OFF',
         values: 0,
-        address: '4D'
+        address: '4D',
+        extraTab: true
     },
     8192: {
-        name: 'tremolo off',
+        name: 'FX: TREMOLO OFF',
         values: 0,
-        address: '4F'
+        address: '4F',
+        extraTab: true
     },
     32768: {
-        name: 'vibrato off',
+        name: 'FX: VIBRATO OFF',
         values: 0,
-        address: '51'
+        address: '51',
+        extraTab: true
     },
     131072: {
-        name: 'glissando off',
+        name: 'FX: GLISSANDO OFF',
         values: 0,
-        address: '53'
+        address: '53',
+        extraTab: true
     },
     524288: {
-        name: 'note cut off',
+        name: 'FX: NOTE CUT OFF',
         values: 0,
-        address: '55'
+        address: '55',
+        extraTab: true
     }
 }
 
@@ -284,20 +292,27 @@ function createFxArray (fxToAdd, type, effects) {
         fxData
     for ( let i = 0, l = fxToAdd.length; i < l; i++ ) {
         fxInfo = fxList[fxToAdd[i]]
-        fxData = effects.fx[fxToAdd[i]]
+        fxData = effects.fx[fxToAdd[i]] || {}
 
         let params = ','
         if ( fxInfo.values >= 1 )
-            params += ` ${fxData.val},`
+            params += ` ${fxData.val||0},`
         if ( fxInfo.values === 2 )
-            params += ` ${fxData.val_b},`
+            params += ` ${fxData.val_b||0},`
 
-        result.fx.push(`0x${fxInfo.address}${params}\t\t// ${fxInfo.name}`)
+        result.fx.push(`0x${fxInfo.address}${params}\t\t${fxInfo.extraTab?'\t':''}// ${createInfoComment(fxInfo.name, fxData)}`)
 
         result.bytes += fxInfo.values + 1
     }
 
-// console.log(result)
+    return result
+}
+
+function createInfoComment (template, values) {
+    let result = template
+    for ( const v in values ) {
+        result = result.replace(`{${v}}`, values[v]||0)
+    }
     return result
 }
 

@@ -268,17 +268,22 @@ class SongEditor extends Component {
     openChannelFx (channel) {
         // set fx window status to shown
         // set fx window owner (which channel or track)
+        const newChannel = this.state.editFx === channel ? null : channel
         this.setState({
-            editFx: channel
+            editFx: newChannel
         })
     }
 
-    updateFlags (channel, fx, action) {
+    updateFlags (channel, fx, action, values) {
         const channelsFx = this.state.channelsFx.slice()
         const thisChannelFx = Object.assign({}, channelsFx[channel])
-        if ( action === 'add' )
+        if ( action === 'add' ) {
             thisChannelFx.flags = thisChannelFx.flags | fx
-        else if ( action === 'remove' ) {
+            if ( values === 1 )
+                thisChannelFx.fx[fx] = {val: 0}
+            else if ( values === 2 )
+                thisChannelFx.fx[fx] = {val: 0, val_b: 0}
+        } else if ( action === 'remove' ) {
             thisChannelFx.flags = thisChannelFx.flags ^ fx
             delete thisChannelFx.fx[fx]
         }
