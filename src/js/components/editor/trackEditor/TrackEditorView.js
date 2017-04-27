@@ -19,10 +19,10 @@ class TrackEditor extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps)
-        this.setState({
-            currentTicks: nextProps.track.ticks
-        })
+        if ( this.state.currentTicks !== nextProps.track.ticks )
+            this.setState({
+                currentTicks: nextProps.track.ticks
+            })
     }
 
     toggleNote (note, row) {
@@ -103,9 +103,9 @@ class TrackEditor extends Component {
                 </div>
 
                 <div className="editor-play-buttons">
-                    <button onClick={this.props.playSong}>play once</button>
-                    <button onClick={this.props.togglePauseSong}>{ `autoplay ${this.props.autoplayIsOn ? 'off' : 'on'}` }</button>
-                    <button onClick={this.props.toggleMuteSong}>{ `${this.props.isMuted ? 'un' : ''}mute` }</button>
+                    <button onClick={this.props.playOnce}>play once</button>
+                    <button onClick={this.props.togglePause}>{ `autoplay ${this.props.autoplayIsOn ? 'off' : 'on'}` }</button>
+                    <button onClick={this.props.toggleMute}>{ `${this.props.isMuted ? 'un' : ''}mute` }</button>
                 </div>
 
                 <NewNotesTable notes={activeTrack.notes} toggleNote={this.toggleNote} />

@@ -22,21 +22,21 @@ class Editor extends Component {
             forceFx: null
         }
 
-        this.tempo = 25
         this.nextId = 0
-        this.synth = new SquawkSynth()
-        try {
-            this.output = new WebAudioStream()
-        }
-        catch (error) {
-            console.log('WebAudioStream not supported')
-        }
-        this.emulateSampleRate = 16000.0    // Emulation sample rate
-        this.converter = new SampleRateConverter(this.emulateSampleRate, this.output.getSampleRate())
-        // this.playSong()
+        // this.tempo = 25
+        // this.synth = new SquawkSynth()
+        // try {
+        //     this.output = new WebAudioStream()
+        // }
+        // catch (error) {
+        //     console.log('WebAudioStream not supported')
+        // }
+        // this.emulateSampleRate = 16000.0    // Emulation sample rate
+        // this.converter = new SampleRateConverter(this.emulateSampleRate, this.output.getSampleRate())
+        // // this.playSong()
 
-        this.toggleNote = this.toggleNote.bind(this)
-        this.updateTrack = this.updateTrack.bind(this)
+        // this.toggleNote = this.toggleNote.bind(this)
+        // this.updateTrack = this.updateTrack.bind(this)
         this.createTheSongArray = this.createTheSongArray.bind(this)
         this.playSong = this.playSong.bind(this)
         this.listenForSongEnd = this.listenForSongEnd.bind(this)
@@ -52,67 +52,67 @@ class Editor extends Component {
         this.clearForcedData = this.clearForcedData.bind(this)
     }
 
-    toggleNote (trackId, note, row) {
-        const tracks = this.state.tracks
-        let track,
-            trackIndex
-        for ( let x = 0, l = tracks.length; x < l; x++ ) {
-            track = tracks[x]
-            if ( track.id === trackId ) {
-                trackIndex = x
-                track = Object.assign({}, track)
-                track.notes = track.notes.slice()
-                break
-            }
-        }
+    // toggleNote (trackId, note, row) {
+    //     const tracks = this.state.tracks
+    //     let track,
+    //         trackIndex
+    //     for ( let x = 0, l = tracks.length; x < l; x++ ) {
+    //         track = tracks[x]
+    //         if ( track.id === trackId ) {
+    //             trackIndex = x
+    //             track = Object.assign({}, track)
+    //             track.notes = track.notes.slice()
+    //             break
+    //         }
+    //     }
 
-        track.notes[track.ticks - 1 - row] = { active: note }
-        const newTracks = this.state.tracks.slice()
-        newTracks[trackIndex] = track
+    //     track.notes[track.ticks - 1 - row] = { active: note }
+    //     const newTracks = this.state.tracks.slice()
+    //     newTracks[trackIndex] = track
 
-        let activeTrack = this.state.activeTrack
-        if ( this.state.activeTrack.id === trackId )
-            activeTrack = track
+    //     let activeTrack = this.state.activeTrack
+    //     if ( this.state.activeTrack.id === trackId )
+    //         activeTrack = track
 
-        const newPlayable = this.createTheSongArray(activeTrack)
-        if ( this.state.autoplay )
-            this.playSong(newPlayable)
+    //     const newPlayable = this.createTheSongArray(activeTrack)
+    //     if ( this.state.autoplay )
+    //         this.playSong(newPlayable)
 
-        this.setState({
-            tracks: newTracks,
-            activeTrack,
-            activeTrackPlayable: newPlayable
-        })
-    }
+    //     this.setState({
+    //         tracks: newTracks,
+    //         activeTrack,
+    //         activeTrackPlayable: newPlayable
+    //     })
+    // }
 
-    updateTrack (id, newTrack) {
-        const tracks = this.state.tracks
-        let track,
-            trackIndex
-        for ( let x = 0, l = tracks.length; x < l; x++ ) {
-            track = tracks[x]
-            if ( track.id === id ) {
-                trackIndex = x
-                break
-            }
-        }
-        const newTracks = tracks.slice()
-        newTracks[trackIndex] = newTrack
+    // updateTrack (id, newTrack) {
+    //     const tracks = this.state.tracks
+    //     let track,
+    //         trackIndex
+    //     for ( let x = 0, l = tracks.length; x < l; x++ ) {
+    //         track = tracks[x]
+    //         if ( track.id === id ) {
+    //             trackIndex = x
+    //             break
+    //         }
+    //     }
+    //     const newTracks = tracks.slice()
+    //     newTracks[trackIndex] = newTrack
 
-        let activeTrack = this.state.activeTrack
-        if ( this.state.activeTrack.id === id )
-            activeTrack = newTrack
+    //     let activeTrack = this.state.activeTrack
+    //     if ( this.state.activeTrack.id === id )
+    //         activeTrack = newTrack
 
-        const newPlayable = this.createTheSongArray(activeTrack)
-        if ( this.state.autoplay )
-            this.playSong(newPlayable)
+    //     const newPlayable = this.createTheSongArray(activeTrack)
+    //     if ( this.state.autoplay )
+    //         this.playSong(newPlayable)
 
-        this.setState({
-            tracks: newTracks,
-            activeTrack,
-            activeTrackPlayable: newPlayable
-        })
-    }
+    //     this.setState({
+    //         tracks: newTracks,
+    //         activeTrack,
+    //         activeTrackPlayable: newPlayable
+    //     })
+    // }
 
     createTheSongArray (track = this.state.activeTrack, channel = this.state.channel) {
         const notes = track.notes

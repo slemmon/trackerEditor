@@ -14,25 +14,27 @@ const mapDispatchToProps = (dispatch) => {
                 track
             })
         },
-        // deleteTrack (trackId) {
-        //     dispatch({
-        //         type: 'DELETE_TRACK',
-        //         trackId
-        //     })
-        // },
-        // setTrackColor (trackId, color) {
-        //     dispatch({
-        //         type: 'SET_TRACK_COLOR',
-        //         trackId,
-        //         color
-        //     })
-        // },
-        // setActiveTrack (track) {
-        //     dispatch({
-        //         type: 'SET_ACTIVE_TRACK',
-        //         track
-        //     })
-        // }
+        setPlayableSong (array) {
+            dispatch({
+                type: 'PLAYER_SET_SONG',
+                array
+            })
+        },
+        playOnce () {
+            dispatch({
+                type: 'PLAYER_PLAY_ONCE'
+            })
+        },
+        toggleMute () {
+            dispatch({
+                type: 'PLAYER_TOGGLE_MUTE'
+            })
+        },
+        togglePause () {
+            dispatch({
+                type: 'PLAYER_TOGGLE_AUTOPLAY'
+            })
+        }
     }
 }
 
