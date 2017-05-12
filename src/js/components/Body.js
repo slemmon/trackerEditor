@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Editor from './editor/Editor'
-import Player from './player/Player'
+import Player from './player/PlayerView'
 
 class Body extends Component {
     render () {
