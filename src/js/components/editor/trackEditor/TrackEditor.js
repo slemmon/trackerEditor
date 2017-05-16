@@ -1,6 +1,13 @@
 import { connect } from 'react-redux'
 import TrackEditorView from './TrackEditorView'
 
+const mapStateToProps = (state) => {
+    const activeTrackId = state.activeTrack.id
+    return {
+        track: state.tracks.find( t => t.id === activeTrackId )
+    }
+}
+
 const mapDispatchToProps = (dispatch) => {
     return {
         updateTrack (trackId, track) {
@@ -18,7 +25,7 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 const TrackEditor = connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(TrackEditorView)
 

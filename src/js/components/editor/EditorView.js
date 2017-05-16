@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import SongEditor from './songEditor/SongEditor'
+import SongEditor from './songEditor/SongEditorView'
+// import SongEditor from './songEditor/SongEditor'
 import TrackList from './trackList/TrackList'
 import TrackEditor from './trackEditor/TrackEditor'
 import DrumEditor from './drumEditor/DrumEditor'
@@ -147,13 +148,9 @@ class Editor extends Component {
                 />
                 <TrackList />
                 { activeTrack.type === 'tune' ?
-                    <TrackEditor
-                        track = { activeTrack }
-                    />
+                    <TrackEditor />
                 : activeTrack.type === 'drum' ?
-                    <DrumEditor
-                        track = { activeTrack }
-                    />
+                    <DrumEditor />
                     :null
                 }
                 <input
