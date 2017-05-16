@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import SongEditor from './songEditor/SongEditorView'
-// import SongEditor from './songEditor/SongEditor'
+import SongEditor from './songEditor/SongEditor'
 import TrackList from './trackList/TrackList'
 import TrackEditor from './trackEditor/TrackEditor'
 import DrumEditor from './drumEditor/DrumEditor'
+import FxEditor from './fxEditor/FxEditor'
 import { createNoteSequence } from './songEditor/createSong'
 
 class Editor extends Component {
@@ -153,6 +153,7 @@ class Editor extends Component {
                     <DrumEditor />
                     :null
                 }
+                <FxEditor />
                 <input
                     className="hidden-file-input"
                     type="file"

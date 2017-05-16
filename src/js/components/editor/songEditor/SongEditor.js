@@ -1,16 +1,21 @@
-// import { connect } from 'react-redux'
-// import SongEditorView from './SongEditorView'
+import { connect } from 'react-redux'
+import SongEditorView from './SongEditorView'
 
-// const mapStateToProps = (state) => {
-//     return {
-//         channels: state.channels,
-//         channelsFx: state.fx,
-//         song: state.song
-//     }
-// }
+const mapDispatchToProps = (dispatch) => {
+    return {
+        toggleFxEditor (channel) {
+            dispatch({
+                type: "FX_SET_VIEW",
+                fxType: 'channel',
+                id: channel
+            })
+        }
+    }
+}
 
-// const SongEditor = connect(
-//     mapStateToProps
-// )(SongEditorView)
+const SongEditor = connect(
+    null,
+    mapDispatchToProps
+)(SongEditorView)
 
-// export default SongEditor
+export default SongEditor

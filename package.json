@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "lodash.isequal": "^4.5.0",
+    "lodash.merge": "^4.6.0",
     "lodash.uniq": "^4.5.0",
     "react": "^15.4.2",
     "react-color": "^2.11.1",
