@@ -33,13 +33,20 @@ const defaultState = {
 export default function fx (state = defaultState, action) {
     switch (action.type) {
 
-        case "FX_SET_VIEW": return setView(state, action)
+        case "FX_SET_VIEW":
+        return setView(state, action)
 
-        case "FX_ADD_FX": return addFx(state, action)
+        case "FX_ADD_FX":
+        return addFx(state, action)
 
-        case "FX_REMOVE_FX": return removeFx(state, action)
+        case "FX_REMOVE_FX":
+        return removeFx(state, action)
 
-        case "FX_UPDATE_FX": return updateFx(state, action)
+        case "FX_UPDATE_FX":
+        return updateFx(state, action)
+
+        case "FX_SET_DATA":
+        return action.fx
 
         default: return state
 

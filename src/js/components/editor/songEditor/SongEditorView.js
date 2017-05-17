@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import /*createSong, */{ createSongFromChannels } from './createSong'
 import ChannelRow from './ChannelRow'
+import customEventEmitter from '../../../customEventEmitter'
 
 class SongEditor extends Component {
     constructor (props) {
@@ -315,14 +316,11 @@ class SongEditor extends Component {
     // }
 
     saveJSON () {
-        this.props.save({
-            fx: this.state.channelsFx,
-            channels: this.state.channels
-        })
+        customEventEmitter('saveJSON')
     }
 
     loadJSON () {
-        this.props.load()
+        customEventEmitter('loadJSON')
     }
 
     // deleteTrackFromChannel (editorId, channel) {

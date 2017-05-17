@@ -19,6 +19,9 @@ export default function tracks (state = defaultState, action) {
         case 'UPDATE_TRACK':
         return updateTrack(state, action)
 
+        case 'TRACK_SET_DATA':
+        return action.tracks
+
         default:
         return state
     }

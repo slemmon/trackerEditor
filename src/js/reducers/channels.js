@@ -7,13 +7,20 @@ let editorIdCounter = 0
 export default function song (state = defaultState, action) {
     switch (action.type) {
 
-        case 'CHANNEL_ADD_TRACK': return addTrack(state, action)
+        case 'CHANNEL_ADD_TRACK':
+        return addTrack(state, action)
 
-        case 'CHANNEL_MOVE_TRACK': return moveTrack(state, action)
+        case 'CHANNEL_MOVE_TRACK':
+        return moveTrack(state, action)
 
-        case 'CHANNEL_REMOVE_TRACK': return removeTrack(state, action)
+        case 'CHANNEL_REMOVE_TRACK':
+        return removeTrack(state, action)
 
-        case 'CHANNEL_REMOVE_TRACKS_BY_ID': return removeTracksById(state, action)
+        case 'CHANNEL_REMOVE_TRACKS_BY_ID':
+        return removeTracksById(state, action)
+
+        case 'CHANNEL_SET_DATA':
+        return action.channels
 
         default: return state
     }
