@@ -28,7 +28,7 @@ class ChannelRowView extends Component {
     }
 
     render () {
-        const channel = this.props.channelTracks
+        const channelTracks = this.props.channelTracks
         const tracks = this.props.tracks
         return (
             <div
@@ -36,12 +36,12 @@ class ChannelRowView extends Component {
                 onDrop = { this.handleDrop }
                 className = "channel-track droppable"
             >
-                {channel.map( (t, i) =>
+                {channelTracks.map( (track, i) =>
                     <Track
-                        key = {t.editorId}
+                        key = {track.editorId}
                         position = {i}
-                        track = {t}
-                        detail = {tracks.find( t => t.id === t.id )}
+                        track = {track}
+                        detail = {tracks.find( t => t.id === track.id )}
                         removeTrack = {this.props.removeTrack}
                         channel = {this.props.channel}
                     />
