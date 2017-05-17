@@ -8,7 +8,7 @@ class DrumEditor extends Component {
         super(props)
 
         this.state = {
-            currentTicks: this.props.track.ticks,
+            currentTicks: props.track.ticks,
             selectedEffect: 'snare',
             repeatIsOn: false,
             autoplayIsOn: false,
