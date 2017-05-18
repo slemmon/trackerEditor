@@ -147,7 +147,7 @@ class NewNotesTable extends Component {
                     {rows}
                 </div>
 
-                <PlayPositionPointer ticks={rows.length}/>
+                <PlayPositionPointer ticks={rows.length} repeatIsOn={this.props.repeatIsOn} />
             </div>
         )
     }

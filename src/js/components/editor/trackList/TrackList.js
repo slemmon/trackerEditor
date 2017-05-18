@@ -1,24 +1,49 @@
-import React from 'react'
-import TrackRow from './TrackRow'
+import { connect } from 'react-redux'
+import TrackListView from './TrackListView'
 
-const TrackList = ({tracks, createNewTrack, deleteTrack, setActiveTrack, setTrackColor}) =>
-    <div id="track-list-container">
-        <h5>Track list</h5>
-        <button className="button" onClick = { () => createNewTrack('tune') }>New tune track</button>
-        <button className="button" onClick = { () => createNewTrack('drum') }>New drum track</button>
-        <ul className = "track-list">
-        {tracks.map( (track, i) =>
-            <TrackRow
-                key = {i}
-                index = {i}
-                last = {tracks.length}
-                track = {track}
-                deleteTrack = {deleteTrack}
-                setActiveTrack = {setActiveTrack}
-                setTrackColor = {setTrackColor}
-            />
-        )}
-        </ul>
-    </div>
+const mapDispatchToProps = (dispatch) => {
+    return {
+        createNewTrack (trackType) {
+            dispatch({
+                type: 'ADD_TRACK',
+                trackType
+            })
+        },
+        deleteTrack (trackId) {
+            dispatch({
+                type: 'DELETE_TRACK',
+                trackId
+            })
+            dispatch({
+                type: 'CHANNEL_REMOVE_TRACKS_BY_ID',
+                trackId
+            })
+        },
+        setTrackColor (trackId, color) {
+            dispatch({
+                type: 'SET_TRACK_COLOR',
+                trackId,
+                color
+            })
+        },
+        setActiveTrack (track) {
+            dispatch({
+                type: 'SET_ACTIVE_TRACK',
+                track
+            })
+        }
+    }
+}
+
+const mapStateToProps = (state) => {
+    return {
+        tracks: state.tracks
+    }
+}
+
+const TrackList = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TrackListView)
 
 export default TrackList

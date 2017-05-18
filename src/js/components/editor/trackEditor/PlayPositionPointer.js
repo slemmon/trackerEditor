@@ -23,9 +23,15 @@ class PlayPositionPointer extends Component {
     }
 
     updatePosition (e) {
-        const ticks = e.detail.ticks
+        const ticks = e.detail.ticks,
+              repeatIsOn = this.props.repeatIsOn
+
         if ( ticks <= this.props.ticks ) {
-            const newPosition = this.parentHeight - (ticks * this.tickStep)
+            const newPosition = this.parentHeight - ( ticks * this.tickStep )
+            this.el.style.top = `${newPosition}px`
+            this.scrollable.scrollTop = newPosition - 40
+        } else if ( repeatIsOn ) {
+            const newPosition = this.parentHeight - ( ( ticks * this.tickStep ) % this.parentHeight )
             this.el.style.top = `${newPosition}px`
             this.scrollable.scrollTop = newPosition - 40
         }

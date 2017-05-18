@@ -31,7 +31,7 @@ class Pointer extends Component {
             this.el.style.left = `${newPosition}px`
             this.scrollable.scrollLeft = newPosition - 400
         } else if ( repeatIsOn ) {
-            const newPosition = ticks * this.tickStep % this.parentWidth
+            const newPosition = ( ticks * this.tickStep ) % this.parentWidth
             this.el.style.left = `${newPosition}px`
             this.scrollable.scrollLeft = newPosition - 400
         }

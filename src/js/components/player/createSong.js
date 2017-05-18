@@ -59,7 +59,7 @@ const drumTracks = {
     }
 }
 
-function createSongFromChannels (tracks, channels, tempo, fx) {
+function createSongFromChannels (tracks, channels, fx) {
 
     const trackAtm = {}
     let totalTracks = 0
@@ -92,10 +92,8 @@ function createSongFromChannels (tracks, channels, tempo, fx) {
         channelTracks.push(atmifyChannel({
             tracks: trackAtm,
             channel: channels[i],
-            // addTempo: i===0,
             index: i,
-            // tempo,
-            effects: fx[i]
+            effects: fx.channel[i]
         }))
 
     const { channelAddresses, channelString, channelEntryTracks, totalBytes } = concatAllChannels(/*totalTracks, */channelTracks)
@@ -117,73 +115,73 @@ function createSongFromChannels (tracks, channels, tempo, fx) {
 
 const startFx = {
     1: {
-        name: 'FX: SET VOLUME: volume = {val}',
+        name: 'FX: SET VOLUME: volume = {val_0}',
         values: 1,
         // comment: 'set volume'
         address: '40'
     },
     2: {
-        name: 'FX: SLIDE VOLUME ON: {val}',
+        name: 'FX: SLIDE VOLUME ON: {val_0}',
         values: 1,
         address: '41'
     },
     4: {
-        name: 'FX: SLIDE VOLUME ADVANCED: {val} {val_b}',
+        name: 'FX: SLIDE VOLUME ADVANCED: {val_0} {val_1}',
         values: 2,
         address: '42'
     },
     16: {
-        name: 'FX: SLIDE FREQUENCY ON: {val}',
+        name: 'FX: SLIDE FREQUENCY ON: {val_0}',
         values: 1,
         address: '44'
     },
     32: {
-        name: 'FX: SLIDE FREQUENCY ADVANCED: {val} {val_b}',
+        name: 'FX: SLIDE FREQUENCY ADVANCED: {val_0} {val_1}',
         values: 2,
         address: '45'
     },
     128: {
-        name: 'FX: SET ARPEGGIO: {val} {val_b}',
+        name: 'FX: SET ARPEGGIO: {val_0} {val_1}',
         values: 2,
         address: '47'
     },
     512: {
-        name: 'FX: SET TRANSPOSITION: {val}',
+        name: 'FX: SET TRANSPOSITION: {val_0}',
         values: 1,
         address: '4C'
     },
     1024: {
-        name: 'FX: ADD TRANSPOSITION: {val}',
+        name: 'FX: ADD TRANSPOSITION: {val_0}',
         values: 1,
         address: '4B'
     },
     4096: {
-        name: 'FX: SET TREMOLO: {val} {val_b}',
+        name: 'FX: SET TREMOLO: {val_0} {val_1}',
         values: 2,
         address: '4E'
     },
     16384: {
-        name: 'FX: SET VIBRATO: {val} {val_b}',
+        name: 'FX: SET VIBRATO: {val_0} {val_1}',
         values: 2,
         address: '50'
     },
     65536: {
-        name: 'FX: SET GLISSANDO: {val}',
+        name: 'FX: SET GLISSANDO: {val_0}',
         values: 1,
         address: '52'
     },
     262144: {
-        name: 'FX: SET NOTE CUT: {val}',
+        name: 'FX: SET NOTE CUT: {val_0}',
         values: 1,
         address: '54'
     },
     1048576: {
-        name: 'FX: SET TEMPO: tempo = {val}',
+        name: 'FX: SET TEMPO: tempo = {val_0}',
         values: 1,
         address: '9D'
     },
     2097152: {
-        name: 'FX: ADD TEMPO: {val}',
+        name: 'FX: ADD TEMPO: {val_0}',
         values: 1,
         address: '9C'
     }
@@ -296,9 +294,9 @@ function createFxArray (fxToAdd, type, effects) {
 
         let params = ','
         if ( fxInfo.values >= 1 )
-            params += ` ${fxData.val||0},`
+            params += ` ${fxData.val_0||0},`
         if ( fxInfo.values === 2 )
-            params += ` ${fxData.val_b||0},`
+            params += ` ${fxData.val_1||0},`
 
         result.fx.push(`0x${fxInfo.address}${params}\t\t${fxInfo.extraTab?'\t':''}// ${createInfoComment(fxInfo.name, fxData)}`)
 
@@ -350,9 +348,9 @@ function atmifyChannel ({tracks, channel, /*addTempo,*/ index, /*tempo, */effect
 
     //     let params = ','
     //     if ( fxInfo.values >= 1 )
-    //         params += ` ${fxData.val},`
+    //         params += ` ${fxData.val_0},`
     //     if ( fxInfo.values === 2 )
-    //         params += ` ${fxData.val_b},`
+    //         params += ` ${fxData.val_1},`
 
     //     channelTrack.push(`0x${fxInfo.address}${params}\t\t// ${fxInfo.name}`)
 
