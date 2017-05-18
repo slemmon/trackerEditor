@@ -8,6 +8,7 @@ import FxEditor from './fxEditor/FxEditor'
 const Editor = ({activeTrack}) =>
     <div>
         <SongEditor />
+        <FxEditor />
         <TrackList />
         { activeTrack.type === 'tune' ?
             <TrackEditor />
@@ -15,7 +16,6 @@ const Editor = ({activeTrack}) =>
             <DrumEditor />
             :null
         }
-        <FxEditor />
     </div>
 
 export default Editor
