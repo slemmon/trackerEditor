@@ -57,6 +57,10 @@ class SongEditor extends Component {
         customEventEmitter('loadJSON')
     }
 
+    openChannelFx (channel) {
+        this.props.toggleFxEditor(channel)
+    }
+
     render () {
         const state = this.state
         return (
