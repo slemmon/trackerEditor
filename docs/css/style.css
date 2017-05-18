@@ -337,41 +337,41 @@
         width: calc(100% - 5px);
         right: 0; }
 
-.fx-editor-container {
+#fx-editor-container {
   margin-top: 10px; }
-  .fx-editor-container .channel-selector {
+  #fx-editor-container .fx-editor-channel .channel-selector {
     margin-bottom: 10px;
     display: flex;
     align-items: center; }
-    .fx-editor-container .channel-selector label {
+    #fx-editor-container .fx-editor-channel .channel-selector label {
       flex: 0 0 15%; }
-  .fx-editor-container .fx-lists {
+  #fx-editor-container .fx-editor-channel .fx-lists {
     display: flex; }
-    .fx-editor-container .fx-lists .fx-container {
+    #fx-editor-container .fx-editor-channel .fx-lists .fx-container {
       flex: 1;
       margin-left: 1px; }
-      .fx-editor-container .fx-lists .fx-container:first-child {
+      #fx-editor-container .fx-editor-channel .fx-lists .fx-container:first-child {
         margin-left: 0; }
-      .fx-editor-container .fx-lists .fx-container .fx-title {
+      #fx-editor-container .fx-editor-channel .fx-lists .fx-container .fx-title {
         font-weight: 800; }
-      .fx-editor-container .fx-lists .fx-container .fx-bordered-div {
+      #fx-editor-container .fx-editor-channel .fx-lists .fx-container .fx-bordered-div {
         border: 1px solid #00969c;
         height: 200px;
         overflow: auto;
         padding: 4px; }
-        .fx-editor-container .fx-lists .fx-container .fx-bordered-div .input-group {
+        #fx-editor-container .fx-editor-channel .fx-lists .fx-container .fx-bordered-div .input-group {
           display: flex;
           align-items: center; }
-          .fx-editor-container .fx-lists .fx-container .fx-bordered-div .input-group input {
+          #fx-editor-container .fx-editor-channel .fx-lists .fx-container .fx-bordered-div .input-group input {
             flex: 0 0 20%;
             min-width: 20px; }
-        .fx-editor-container .fx-lists .fx-container .fx-bordered-div .fx-item {
+        #fx-editor-container .fx-editor-channel .fx-lists .fx-container .fx-bordered-div .fx-item {
           font-size: 10pt;
           font-weight: 600;
           display: flex; }
-          .fx-editor-container .fx-lists .fx-container .fx-bordered-div .fx-item .fx-item-name {
+          #fx-editor-container .fx-editor-channel .fx-lists .fx-container .fx-bordered-div .fx-item .fx-item-name {
             flex: 1; }
-          .fx-editor-container .fx-lists .fx-container .fx-bordered-div .fx-item .fx-item-buttons {
+          #fx-editor-container .fx-editor-channel .fx-lists .fx-container .fx-bordered-div .fx-item .fx-item-buttons {
             flex: 0 0 30px;
             display: flex;
             justify-content: space-around;
