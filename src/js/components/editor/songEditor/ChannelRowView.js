@@ -34,7 +34,7 @@ class ChannelRowView extends Component {
             <div
                 onDragOver = { this.handleDragover }
                 onDrop = { this.handleDrop }
-                className = "channel-track droppable"
+                className = {`channel-track droppable ${ this.props.editingFx ? 'active' : '' }`}
             >
                 {channelTracks.map( (track, i) =>
                     <Track

@@ -52,27 +52,23 @@
                 &:last-child {
                     border-bottom: none;
                 }
+
+                &.active {
+                    background-color: #fafbf9;
+                }
             }
         }
 
         .channel-fx-box {
             flex: 0 0 6%;
-            border: 1px solid #00969c;
             margin-left: 1px;
 
             .channel-fx {
-                height: 25px;
-                border-bottom: 1px solid #bfe4e4;
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                margin: 0;
 
-                font-weight: 800;
-
-                &:last-child {
-                    border-bottom: none;
+                &.active {
+                    background-color: #dedede;
                 }
-
             }
 
         }

@@ -8,7 +8,8 @@ class SongEditor extends Component {
         super(props)
 
         this.state = {
-            showCode: false
+            showCode: false,
+            activeFx: null
         }
 
         this.toggleShowCode = this.toggleShowCode.bind(this)
@@ -58,11 +59,23 @@ class SongEditor extends Component {
     }
 
     openChannelFx (channel) {
-        this.props.toggleFxEditor(channel)
+        const current = this.state.activeFx
+        if ( current === channel ) {
+            this.setState({
+                activeFx: null
+            })
+            this.props.hideFxEditor()
+        } else {
+            this.setState({
+                activeFx: channel
+            })
+            this.props.toggleFxEditor(channel)
+        }
     }
 
     render () {
         const state = this.state
+        const activeFx = state.activeFx
         return (
             <div id="song-editor-container">
                 <h5>Song editor</h5>
@@ -99,24 +112,28 @@ class SongEditor extends Component {
                         <div>
                             <ChannelRow
                                 channel={0}
+                                editingFx={activeFx===0}
                             />
                             <ChannelRow
                                 channel={1}
+                                editingFx={activeFx===1}
                             />
                             <ChannelRow
                                 channel={2}
+                                editingFx={activeFx===2}
                             />
                             <ChannelRow
                                 channel={3}
+                                editingFx={activeFx===3}
                             />
                         </div>
                     </div>
 
                     <div className="channel-fx-box">
-                        <div className="channel-fx" onClick={ () => this.openChannelFx(0) }>FX</div>
-                        <div className="channel-fx" onClick={ () => this.openChannelFx(1) }>FX</div>
-                        <div className="channel-fx" onClick={ () => this.openChannelFx(2) }>FX</div>
-                        <div className="channel-fx" onClick={ () => this.openChannelFx(3) }>FX</div>
+                        <button className={`channel-fx ${ activeFx === 0 ? 'active' : '' }`} onClick={ () => this.openChannelFx(0) }>FX</button>
+                        <button className={`channel-fx ${ activeFx === 1 ? 'active' : '' }`} onClick={ () => this.openChannelFx(1) }>FX</button>
+                        <button className={`channel-fx ${ activeFx === 2 ? 'active' : '' }`} onClick={ () => this.openChannelFx(2) }>FX</button>
+                        <button className={`channel-fx ${ activeFx === 3 ? 'active' : '' }`} onClick={ () => this.openChannelFx(3) }>FX</button>
                     </div>
 
                 </div>

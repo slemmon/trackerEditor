@@ -48,6 +48,9 @@ export default function fx (state = defaultState, action) {
         case "FX_SET_DATA":
         return action.fx
 
+        case "FX_HIDE_VIEW":
+        return Object.assign({}, state, {enabled: false})
+
         default: return state
 
     }

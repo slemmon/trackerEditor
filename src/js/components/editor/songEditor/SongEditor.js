@@ -9,6 +9,11 @@ const mapDispatchToProps = (dispatch) => {
                 fxType: 'channel',
                 id: channel
             })
+        },
+        hideFxEditor () {
+            dispatch({
+                type: "FX_HIDE_VIEW"
+            })
         }
     }
 }
