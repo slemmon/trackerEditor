@@ -40024,6 +40024,17 @@ var LoaderView = function (_Component) {
                 }
 
                 if (_this2.validateFile(result)) {
+
+                    // backwards compatibility with older saved files
+                    if (Array.isArray(result.fx)) result.fx = {
+                        "enabled": false,
+                        "status": {
+                            "fxType": "",
+                            "id": 0
+                        },
+                        "channel": JSON.parse(JSON.stringify(result.fx).replace(/val_b/g, 'val_1').replace(/val"/g, 'val_0"')),
+                        "track": []
+                    };
                     _this2.props.setLoadedData(result);
                 } else {
                     return alert('invalid file (2)');
@@ -40079,6 +40090,8 @@ var LoaderView = function (_Component) {
                     }
                 }
             }
+
+            if (truths === 6 && Array.isArray(file.fx)) return true;
 
             return truths === 7;
         }
