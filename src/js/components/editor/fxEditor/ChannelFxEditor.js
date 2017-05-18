@@ -76,19 +76,6 @@ class ChannelFxEditor extends Component {
         return (
             <div className="fx-editor-channel">
                 <h5>Channel Fx Editor</h5>
-
-                {/*<div className="channel-selector">
-                    <label>Channel</label>
-                    <input
-                        type="number"
-                        min="0"
-                        max="3"
-                        value={state.channel}
-                        onChange={ e => this.setState({channel: e.target.value}) }
-                        onBlur={ e => props.openChannelFx(parseInt(state.channel)) }
-                    />
-                </div>*/}
-
                 <div className="fx-lists">
                     <Available
                         fx={state.availableFx}

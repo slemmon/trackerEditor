@@ -55,15 +55,6 @@ class LoaderView extends Component {
 
             if ( this.validateFile(result) ) {
                 this.props.setLoadedData(result)
-                // const tracks = result.tracks
-                // this.setState({
-                //     tracks: tracks,
-                //     activeTrack: tracks[0],
-                //     activeTrackPlayable: this.createTheSongArray(tracks[0]),
-                //     forceChannels: result.channels,
-                //     forceFx: result.fx
-                // })
-                // this.nextId = result.tracks.slice(-1)[0].id + 1
             } else {
                 return alert('invalid file (2)')
             }

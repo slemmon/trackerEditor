@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Body from './Body'
-import Player from './player/PlayerView'
+import Player from './player/Player'
 import Loader from './Loader'
 
 class App extends Component {

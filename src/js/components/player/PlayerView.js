@@ -1,6 +1,6 @@
 // TODO change tempo
 import React, { Component } from 'react'
-import { createNoteSequence } from '../editor/songEditor/createSong'
+import { createSongFromChannels } from './createSong'
 
 class Player extends Component {
     constructor () {
@@ -29,6 +29,8 @@ class Player extends Component {
         this.toggleMute = this.toggleMute.bind(this)
         this.toggleRepeat = this.toggleRepeat.bind(this)
         this.changeChannel = this.changeChannel.bind(this)
+        this.exportSong = this.exportSong.bind(this)
+        this.createSongCode = this.createSongCode.bind(this)
 
     }
 
@@ -37,6 +39,9 @@ class Player extends Component {
         document.addEventListener('toggleRepeat', this.toggleRepeat)
         document.addEventListener('toggleMute', this.toggleMute)
         document.addEventListener('changeChannel', this.changeChannel)
+
+        document.addEventListener('exportSong', this.exportSong)
+        document.addEventListener('createSongCode', this.createSongCode)
     }
 
     componentWillUnmount() {
@@ -44,6 +49,9 @@ class Player extends Component {
         document.removeEventListener('toggleRepeat', this.toggleRepeat)
         document.removeEventListener('toggleMute', this.toggleMute)
         document.removeEventListener('changeChannel', this.changeChannel)
+
+        document.addEventListener('exportSong', this.exportSong)
+        document.addEventListener('createSongCode', this.createSongCode)
     }
 
     playOnce (e) {
@@ -212,6 +220,29 @@ class Player extends Component {
         this.setState({
             channel: e.detail.channel
         })
+    }
+
+    exportSong () {
+        const props = this.props
+        const songString = createSongFromChannels(props.tracks, props.channels, props.fx)
+
+        this.props.saveSongCode(songString)
+
+        // make the browser download the file
+        const download = document.createElement('a')
+        download.href = `data:text/plain;charset=utf-8;base64,${btoa(songString)}`
+        download.download = 'song_export.h'
+
+        document.body.appendChild(download)
+        download.click()
+        document.body.removeChild(download)
+
+
+    }
+
+    createSongCode () {
+        const props = this.props
+        props.saveSongCode(createSongFromChannels(props.tracks, props.channels, props.fx))
     }
 
     render () {
