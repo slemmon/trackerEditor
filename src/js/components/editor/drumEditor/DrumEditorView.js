@@ -26,9 +26,14 @@ class DrumEditor extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({
-            currentTicks: nextProps.track.ticks
-        })
+        if ( nextProps.status === 0 )
+            this.setState({
+                currentTicks: nextProps.track.ticks
+            })
+    }
+
+    shouldComponentUpdate (nextProps, nextState) {
+        return nextProps.status === 0
     }
 
     changeTrackName (e) {

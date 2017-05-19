@@ -3,6 +3,7 @@ import ChannelRowView from './ChannelRowView'
 
 const mapStateToProps = (state, props) => {
     return {
+        status: state.status,
         tracks: state.tracks,
         channelTracks: state.channels[props.channel]
     }

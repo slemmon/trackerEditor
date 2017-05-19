@@ -134,6 +134,14 @@ const mapDispatchToProps = (dispatch) => {
     return {
         setLoadedData ({channels, tracks, fx} = data) {
             dispatch({
+                type: 'STATUS_SET',
+                status: 1
+            })
+            dispatch({
+                type: 'SET_ACTIVE_TRACK',
+                track: {notes: []}
+            })
+            dispatch({
                 type: 'TRACK_SET_DATA',
                 tracks
             })
@@ -144,6 +152,10 @@ const mapDispatchToProps = (dispatch) => {
             dispatch({
                 type: 'CHANNEL_SET_DATA',
                 channels
+            })
+            dispatch({
+                type: 'STATUS_SET',
+                status: 0
             })
         }
     }

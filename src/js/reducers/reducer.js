@@ -4,19 +4,13 @@ import activeTrack from './activeTrack'
 import song from './song'
 import channels from './channels'
 import fx from './fx'
+import status from './status'
 
 export default combineReducers({
     tracks,
     activeTrack,
     song,
     channels,
-    fx
+    fx,
+    status
 });
-
-
-// activetrack
-// tracks
-// channels
-// channelfx
-// trackfx
-// 

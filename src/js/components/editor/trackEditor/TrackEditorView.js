@@ -39,6 +39,10 @@ class TrackEditor extends Component {
             })
     }
 
+    shouldComponentUpdate (nextProps, nextState) {
+        return nextProps.status === 0
+    }
+
     toggleNote (note, row) {
 
         const track = Object.assign({}, this.props.track)

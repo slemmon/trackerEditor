@@ -4,6 +4,7 @@ import DrumEditorView from './DrumEditorView'
 const mapStateToProps = (state) => {
     const activeTrackId = state.activeTrack.id
     return {
+        status: state.status,
         track: state.tracks.find( t => t.id === activeTrackId )
     }
 }

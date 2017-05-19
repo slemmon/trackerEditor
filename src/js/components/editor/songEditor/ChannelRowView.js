@@ -11,6 +11,10 @@ class ChannelRowView extends Component {
         this.iAmTheDrumChannel = props.channel === 3
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextProps.status === 0
+    }
+
     handleDragover (e) {
         e.preventDefault()
     }
@@ -29,6 +33,7 @@ class ChannelRowView extends Component {
 
     render () {
         const channelTracks = this.props.channelTracks
+        // const channelTracks = this.props.status === 0 ? this.props.channelTracks : []
         const tracks = this.props.tracks
         return (
             <div
