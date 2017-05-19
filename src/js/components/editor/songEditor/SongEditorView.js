@@ -73,19 +73,23 @@ class SongEditor extends Component {
         }
     }
 
+    playSong () {
+        customEventEmitter('playCompleteSong')
+    }
+
     render () {
         const state = this.state
         const activeFx = state.activeFx
         return (
             <div id="song-editor-container">
                 <h5>Song editor</h5>
-                {/*<button onClick={ this.playSong }>Play</button>*/}
                 {/*<button>Pause</button>*/}
                 {/*<button onClick={ this.props.stopSong }>Stop</button>*/}
                 <button onClick={ this.exportSong }>Export song</button>
                 <button onClick={ this.saveJSON }>save</button>
                 <button onClick={ this.loadJSON }>load</button>
                 <button onClick={ this.toggleShowCode }>{ `${state.showString ? 'Hide' : 'Show'} code` }</button>
+                <button onClick={ this.playSong }>Play Song</button>
 
                 <div className="song-editor-channels">
 

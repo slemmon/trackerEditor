@@ -31,6 +31,7 @@ class Player extends Component {
         this.changeChannel = this.changeChannel.bind(this)
         this.exportSong = this.exportSong.bind(this)
         this.createSongCode = this.createSongCode.bind(this)
+        this.createAndPlaySong = this.createAndPlaySong.bind(this)
 
     }
 
@@ -42,6 +43,8 @@ class Player extends Component {
 
         document.addEventListener('exportSong', this.exportSong)
         document.addEventListener('createSongCode', this.createSongCode)
+
+        document.addEventListener('playCompleteSong', this.createAndPlaySong)
     }
 
     componentWillUnmount() {
@@ -52,6 +55,8 @@ class Player extends Component {
 
         document.addEventListener('exportSong', this.exportSong)
         document.addEventListener('createSongCode', this.createSongCode)
+
+        document.removeEventListener('playCompleteSong', this.createAndPlaySong)
     }
 
     playOnce (e) {
@@ -126,7 +131,7 @@ class Player extends Component {
 
     }
 
-    playSong (song, type) {
+    playSong (song) {
         // Initialize player
         this.player = new SquawkStream(this.emulateSampleRate)
         this.player.setSource(song)
@@ -238,6 +243,40 @@ class Player extends Component {
         document.body.removeChild(download)
 
 
+    }
+
+    createAndPlaySong () {
+        const props = this.props
+
+        let music = createSongFromChannels(props.tracks, props.channels, props.fx)
+
+        music = music.replace(/\/\/"Track.*"/g, 'Track,')
+        music = music.replace(/, /g, ',\n')
+        music = music.replace(/,\t*.*\n/g, ',')
+        music = music.slice(84, -15)
+
+        music = music.split(',')
+
+        let number
+        let trackCounter = 0
+        let item
+        let splitItem
+        for ( let i = 0, l = music.length; i < l; i++ ) {
+            item = music[i]
+            if ( item.indexOf('0x') === 0 ) {
+                splitItem = item.split('+')
+                if ( splitItem.length === 2 )
+                    number = parseInt(splitItem[0], 16) + parseInt(splitItem[1], 10)
+                else
+                    number = parseInt(splitItem[0], 16)
+                music[i] = number
+            } else {
+                number = parseInt(item, 10)
+                music[i] = isNaN(number) ? `${item} ${trackCounter++}` : number
+            }
+        }
+
+        this.playSong(music)
     }
 
     createSongCode () {
