@@ -40131,6 +40131,14 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
                 fx = _ref.fx;
 
             dispatch({
+                type: 'STATUS_SET',
+                status: 1
+            });
+            dispatch({
+                type: 'SET_ACTIVE_TRACK',
+                track: { notes: [] }
+            });
+            dispatch({
                 type: 'TRACK_SET_DATA',
                 tracks: tracks
             });
@@ -40141,6 +40149,10 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
             dispatch({
                 type: 'CHANNEL_SET_DATA',
                 channels: channels
+            });
+            dispatch({
+                type: 'STATUS_SET',
+                status: 0
             });
         }
     };
@@ -40240,6 +40252,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var mapStateToProps = function mapStateToProps(state) {
     var activeTrackId = state.activeTrack.id;
     return {
+        status: state.status,
         track: state.tracks.find(function (t) {
             return t.id === activeTrackId;
         })
@@ -40329,9 +40342,14 @@ var DrumEditor = function (_Component) {
     _createClass(DrumEditor, [{
         key: 'componentWillReceiveProps',
         value: function componentWillReceiveProps(nextProps) {
-            this.setState({
+            if (nextProps.status === 0) this.setState({
                 currentTicks: nextProps.track.ticks
             });
+        }
+    }, {
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            return nextProps.status === 0;
         }
     }, {
         key: 'changeTrackName',
@@ -41609,6 +41627,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var mapStateToProps = function mapStateToProps(state, props) {
     return {
+        status: state.status,
         tracks: state.tracks,
         channelTracks: state.channels[props.channel]
     };
@@ -41688,6 +41707,11 @@ var ChannelRowView = function (_Component) {
     }
 
     _createClass(ChannelRowView, [{
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            return nextProps.status === 0;
+        }
+    }, {
         key: 'handleDragover',
         value: function handleDragover(e) {
             e.preventDefault();
@@ -41712,13 +41736,14 @@ var ChannelRowView = function (_Component) {
             var _this2 = this;
 
             var channelTracks = this.props.channelTracks;
+            // const channelTracks = this.props.status === 0 ? this.props.channelTracks : []
             var tracks = this.props.tracks;
             return _react2.default.createElement(
                 'div',
                 {
                     onDragOver: this.handleDragover,
                     onDrop: this.handleDrop,
-                    className: 'channel-track droppable'
+                    className: 'channel-track droppable ' + (this.props.editingFx ? 'active' : '')
                 },
                 channelTracks.map(function (track, i) {
                     return _react2.default.createElement(_Track2.default, {
@@ -41805,6 +41830,11 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
                 fxType: 'channel',
                 id: channel
             });
+        },
+        hideFxEditor: function hideFxEditor() {
+            dispatch({
+                type: "FX_HIDE_VIEW"
+            });
         }
     };
 };
@@ -41855,7 +41885,8 @@ var SongEditor = function (_Component) {
         var _this = _possibleConstructorReturn(this, (SongEditor.__proto__ || Object.getPrototypeOf(SongEditor)).call(this, props));
 
         _this.state = {
-            showCode: false
+            showCode: false,
+            activeFx: null
         };
 
         _this.toggleShowCode = _this.toggleShowCode.bind(_this);
@@ -41910,7 +41941,23 @@ var SongEditor = function (_Component) {
     }, {
         key: 'openChannelFx',
         value: function openChannelFx(channel) {
-            this.props.toggleFxEditor(channel);
+            var current = this.state.activeFx;
+            if (current === channel) {
+                this.setState({
+                    activeFx: null
+                });
+                this.props.hideFxEditor();
+            } else {
+                this.setState({
+                    activeFx: channel
+                });
+                this.props.toggleFxEditor(channel);
+            }
+        }
+    }, {
+        key: 'playSong',
+        value: function playSong() {
+            (0, _customEventEmitter2.default)('playCompleteSong');
         }
     }, {
         key: 'render',
@@ -41918,6 +41965,7 @@ var SongEditor = function (_Component) {
             var _this2 = this;
 
             var state = this.state;
+            var activeFx = state.activeFx;
             return _react2.default.createElement(
                 'div',
                 { id: 'song-editor-container' },
@@ -41945,6 +41993,11 @@ var SongEditor = function (_Component) {
                     'button',
                     { onClick: this.toggleShowCode },
                     (state.showString ? 'Hide' : 'Show') + ' code'
+                ),
+                _react2.default.createElement(
+                    'button',
+                    { onClick: this.playSong },
+                    'Play Song'
                 ),
                 _react2.default.createElement(
                     'div',
@@ -42016,16 +42069,20 @@ var SongEditor = function (_Component) {
                             'div',
                             null,
                             _react2.default.createElement(_ChannelRow2.default, {
-                                channel: 0
+                                channel: 0,
+                                editingFx: activeFx === 0
                             }),
                             _react2.default.createElement(_ChannelRow2.default, {
-                                channel: 1
+                                channel: 1,
+                                editingFx: activeFx === 1
                             }),
                             _react2.default.createElement(_ChannelRow2.default, {
-                                channel: 2
+                                channel: 2,
+                                editingFx: activeFx === 2
                             }),
                             _react2.default.createElement(_ChannelRow2.default, {
-                                channel: 3
+                                channel: 3,
+                                editingFx: activeFx === 3
                             })
                         )
                     ),
@@ -42033,29 +42090,29 @@ var SongEditor = function (_Component) {
                         'div',
                         { className: 'channel-fx-box' },
                         _react2.default.createElement(
-                            'div',
-                            { className: 'channel-fx', onClick: function onClick() {
+                            'button',
+                            { className: 'channel-fx ' + (activeFx === 0 ? 'active' : ''), onClick: function onClick() {
                                     return _this2.openChannelFx(0);
                                 } },
                             'FX'
                         ),
                         _react2.default.createElement(
-                            'div',
-                            { className: 'channel-fx', onClick: function onClick() {
+                            'button',
+                            { className: 'channel-fx ' + (activeFx === 1 ? 'active' : ''), onClick: function onClick() {
                                     return _this2.openChannelFx(1);
                                 } },
                             'FX'
                         ),
                         _react2.default.createElement(
-                            'div',
-                            { className: 'channel-fx', onClick: function onClick() {
+                            'button',
+                            { className: 'channel-fx ' + (activeFx === 2 ? 'active' : ''), onClick: function onClick() {
                                     return _this2.openChannelFx(2);
                                 } },
                             'FX'
                         ),
                         _react2.default.createElement(
-                            'div',
-                            { className: 'channel-fx', onClick: function onClick() {
+                            'button',
+                            { className: 'channel-fx ' + (activeFx === 3 ? 'active' : ''), onClick: function onClick() {
                                     return _this2.openChannelFx(3);
                                 } },
                             'FX'
@@ -42177,7 +42234,7 @@ var Track = function (_Component) {
 
 exports.default = Track;
 
-},{"../../../stringifyColor":508,"react":434}],483:[function(require,module,exports){
+},{"../../../stringifyColor":509,"react":434}],483:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -43227,6 +43284,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var mapStateToProps = function mapStateToProps(state) {
     var activeTrackId = state.activeTrack.id;
     return {
+        status: state.status,
         track: state.tracks.find(function (t) {
             return t.id === activeTrackId;
         })
@@ -43324,6 +43382,11 @@ var TrackEditor = function (_Component) {
             if (this.state.bufferedNotes.length !== nextProps.track.notes.length || this.props.track.id !== nextProps.track.id) this.setState({
                 bufferedNotes: nextProps.track.notes
             });
+        }
+    }, {
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            return nextProps.status === 0;
         }
     }, {
         key: 'toggleNote',
@@ -43628,7 +43691,7 @@ exports.default = Color;
 
 // ['#ff7e00', '#ff69a8', '#00a8cc', '#00d2ae', '#584d4d', '#7171d8', '#df2020', '#24eb24', '#ffcc99', '#ffbdd8', '#85e9ff', '#75ffe8', '#aea2a2', '#b7b7eb', '#ef8f8f', '#98f598']
 
-},{"../../../stringifyColor":508,"react":434,"react-color":233}],490:[function(require,module,exports){
+},{"../../../stringifyColor":509,"react":434,"react-color":233}],490:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -43846,7 +43909,7 @@ var TrackRow = function TrackRow(_ref) {
 
 exports.default = TrackRow;
 
-},{"../../../stringifyColor":508,"./Color":489,"react":434}],493:[function(require,module,exports){
+},{"../../../stringifyColor":509,"./Color":489,"react":434}],493:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -43940,6 +44003,7 @@ var Player = function (_Component) {
         _this.changeChannel = _this.changeChannel.bind(_this);
         _this.exportSong = _this.exportSong.bind(_this);
         _this.createSongCode = _this.createSongCode.bind(_this);
+        _this.createAndPlaySong = _this.createAndPlaySong.bind(_this);
 
         return _this;
     }
@@ -43954,6 +44018,8 @@ var Player = function (_Component) {
 
             document.addEventListener('exportSong', this.exportSong);
             document.addEventListener('createSongCode', this.createSongCode);
+
+            document.addEventListener('playCompleteSong', this.createAndPlaySong);
         }
     }, {
         key: 'componentWillUnmount',
@@ -43965,6 +44031,8 @@ var Player = function (_Component) {
 
             document.addEventListener('exportSong', this.exportSong);
             document.addEventListener('createSongCode', this.createSongCode);
+
+            document.removeEventListener('playCompleteSong', this.createAndPlaySong);
         }
     }, {
         key: 'playOnce',
@@ -44001,7 +44069,7 @@ var Player = function (_Component) {
             var drum = track.type === 'drum';
             var channel = this.state.channel;
 
-            var noteSequence = createNoteSequence(track);
+            var noteSequence = (0, _createSong.createNoteSequence)(track);
 
             var templateSong = [2, // number of tracks
             0, // address of track 0
@@ -44037,7 +44105,7 @@ var Player = function (_Component) {
         }
     }, {
         key: 'playSong',
-        value: function playSong(song, type) {
+        value: function playSong(song) {
             // Initialize player
             this.player = new SquawkStream(this.emulateSampleRate);
             this.player.setSource(song);
@@ -44143,6 +44211,38 @@ var Player = function (_Component) {
             document.body.appendChild(download);
             download.click();
             document.body.removeChild(download);
+        }
+    }, {
+        key: 'createAndPlaySong',
+        value: function createAndPlaySong() {
+            var props = this.props;
+
+            var music = (0, _createSong.createSongFromChannels)(props.tracks, props.channels, props.fx);
+
+            music = music.replace(/\/\/"Track.*"/g, 'Track,');
+            music = music.replace(/, /g, ',\n');
+            music = music.replace(/,\t*.*\n/g, ',');
+            music = music.slice(84, -15);
+
+            music = music.split(',');
+
+            var number = void 0;
+            var trackCounter = 0;
+            var item = void 0;
+            var splitItem = void 0;
+            for (var i = 0, l = music.length; i < l; i++) {
+                item = music[i];
+                if (item.indexOf('0x') === 0) {
+                    splitItem = item.split('+');
+                    if (splitItem.length === 2) number = parseInt(splitItem[0], 16) + parseInt(splitItem[1], 10);else number = parseInt(splitItem[0], 16);
+                    music[i] = number;
+                } else {
+                    number = parseInt(item, 10);
+                    music[i] = isNaN(number) ? item + ' ' + trackCounter++ : number;
+                }
+            }
+
+            this.playSong(music);
         }
     }, {
         key: 'createSongCode',
@@ -45210,6 +45310,9 @@ function fx() {
         case "FX_SET_DATA":
             return action.fx;
 
+        case "FX_HIDE_VIEW":
+            return Object.assign({}, state, { enabled: false });
+
         default:
             return state;
 
@@ -45320,6 +45423,10 @@ var _fx = require('./fx');
 
 var _fx2 = _interopRequireDefault(_fx);
 
+var _status = require('./status');
+
+var _status2 = _interopRequireDefault(_status);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = (0, _redux.combineReducers)({
@@ -45327,17 +45434,11 @@ exports.default = (0, _redux.combineReducers)({
     activeTrack: _activeTrack2.default,
     song: _song2.default,
     channels: _channels2.default,
-    fx: _fx2.default
+    fx: _fx2.default,
+    status: _status2.default
 });
 
-// activetrack
-// tracks
-// channels
-// channelfx
-// trackfx
-//
-
-},{"./activeTrack":499,"./channels":500,"./fx":501,"./song":503,"./tracks/tracks":505,"redux":453}],503:[function(require,module,exports){
+},{"./activeTrack":499,"./channels":500,"./fx":501,"./song":503,"./status":504,"./tracks/tracks":506,"redux":453}],503:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -45363,6 +45464,32 @@ function song() {
 }
 
 },{}],504:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = status;
+var defaultState = 0;
+
+// 0: 'idle'
+// 1: 'loading file'
+
+function status() {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultState;
+    var action = arguments[1];
+
+    switch (action.type) {
+
+        case 'STATUS_SET':
+            return action.status;
+
+        default:
+            return state;
+    }
+}
+
+},{}],505:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -45428,7 +45555,7 @@ function getNewTrackColor(id) {
     }
 }
 
-},{}],505:[function(require,module,exports){
+},{}],506:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -45480,7 +45607,7 @@ function tracks() {
     }
 }
 
-},{"./createNewTrack":504,"./updateColor":506,"./updateTrack":507}],506:[function(require,module,exports){
+},{"./createNewTrack":505,"./updateColor":507,"./updateTrack":508}],507:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45513,7 +45640,7 @@ function updateColor() {
     return newTracks;
 }
 
-},{}],507:[function(require,module,exports){
+},{}],508:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -45541,7 +45668,7 @@ function updateTrack() {
     return newTracks;
 }
 
-},{}],508:[function(require,module,exports){
+},{}],509:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {

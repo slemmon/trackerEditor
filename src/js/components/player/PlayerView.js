@@ -1,6 +1,6 @@
 // TODO change tempo
 import React, { Component } from 'react'
-import { createSongFromChannels } from './createSong'
+import { createSongFromChannels, createNoteSequence } from './createSong'
 
 class Player extends Component {
     constructor () {

@@ -33,19 +33,15 @@
         border-bottom: 1px solid #bfe4e4; }
         #song-editor-container .song-editor-channels .channel-tracks .channel-track:last-child {
           border-bottom: none; }
+        #song-editor-container .song-editor-channels .channel-tracks .channel-track.active {
+          background-color: #fafbf9; }
     #song-editor-container .song-editor-channels .channel-fx-box {
       flex: 0 0 6%;
-      border: 1px solid #00969c;
       margin-left: 1px; }
       #song-editor-container .song-editor-channels .channel-fx-box .channel-fx {
-        height: 25px;
-        border-bottom: 1px solid #bfe4e4;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: 800; }
-        #song-editor-container .song-editor-channels .channel-fx-box .channel-fx:last-child {
-          border-bottom: none; }
+        margin: 0; }
+        #song-editor-container .song-editor-channels .channel-fx-box .channel-fx.active {
+          background-color: #dedede; }
 
 .droppable {
   display: flex;
@@ -338,7 +334,7 @@
         right: 0; }
 
 #fx-editor-container {
-  margin-top: 10px; }
+  margin-bottom: 10px; }
   #fx-editor-container .fx-editor-channel .channel-selector {
     margin-bottom: 10px;
     display: flex;
