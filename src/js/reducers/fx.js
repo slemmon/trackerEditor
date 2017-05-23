@@ -7,27 +7,27 @@ const defaultState = {
         fxType: '',
         id: 0
     },
-    channel: [
-        {
+    channel: {
+        "0": {
             flags: 1048576,
             fx: {
                 1048576: {val_0: 25}
             }
         },
-        {
+        "1": {
             flags: 0,
             fx: {}
         },
-        {
+        "2": {
             flags: 0,
             fx: {}
         },
-        {
+        "3": {
             flags: 0,
             fx: {}
         }
-    ],
-    track: []
+    },
+    track: {}
 }
 
 export default function fx (state = defaultState, action) {
@@ -39,6 +39,9 @@ export default function fx (state = defaultState, action) {
         case "FX_ADD_FX":
         return addFx(state, action)
 
+        case "FX_INIT_TRACK_FX":
+        return createTrackFx(state, action)
+
         case "FX_REMOVE_FX":
         return removeFx(state, action)
 
@@ -49,28 +52,28 @@ export default function fx (state = defaultState, action) {
         return action.fx
 
         case "FX_HIDE_VIEW":
-        return Object.assign({}, state, {enabled: false})
+        return merge({}, state, {enabled: false})
 
         default: return state
 
     }
 }
 
-function setView (state, action) {
-    return Object.assign({}, state, {
+function setView (state, {fxType, id} = action) {
+    return merge({}, state, {
         enabled: true,
         status: {
-            fxType: action.fxType,
-            id: action.id
+            fxType,
+            id
         }
     })
 }
 
 function addFx (state, {fxType, id, fx} = action) {
-    const newState = Object.assign({}, state)
-    newState[fxType] = newState[fxType].slice()
+    const newState = merge({}, state)
+    newState[fxType] = merge({}, newState[fxType])
 
-    const update = Object.assign({}, newState[fxType][id])
+    const update = merge({}, newState[fxType][id])
 
     update.flags = update.flags | fx
 
@@ -94,10 +97,10 @@ function getFxValuesObject (fx) {
 }
 
 function removeFx (state, {fxType, id, fx} = action) {
-    const newState = Object.assign({}, state)
-    newState[fxType] = newState[fxType].slice()
+    const newState = merge({}, state)
+    newState[fxType] = merge({}, newState[fxType])
 
-    const update = Object.assign({}, state[fxType][id])
+    const update = merge({}, state[fxType][id])
 
     update.flags = update.flags ^ fx
     delete update.fx[fx]
@@ -111,6 +114,14 @@ function updateFx (state, {fxType, id, fx, key, value} = action) {
     const newState = merge({}, state)
 
     newState[fxType][id].fx[fx][key] = value
+
+    return newState
+}
+
+function createTrackFx (state, action) {
+    const newState = merge({}, state)
+
+    newState.track[action.id] = {flags: 0, fx: {}}
 
     return newState
 }

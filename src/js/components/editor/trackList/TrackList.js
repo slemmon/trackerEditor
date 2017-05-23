@@ -18,6 +18,12 @@ const mapDispatchToProps = (dispatch) => {
                 type: 'CHANNEL_REMOVE_TRACKS_BY_ID',
                 trackId
             })
+            dispatch({
+                type: 'SET_ACTIVE_TRACK',
+                track:{
+                    notes: []
+                }
+            })
         },
         setTrackColor (trackId, color) {
             dispatch({

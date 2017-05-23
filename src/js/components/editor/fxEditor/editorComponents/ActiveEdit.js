@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import SingleOption from './SingleOption'
 import DoubleOption from './DoubleOption'
-import fxInfo from '../../../fxInfo'
+import fxInfo from '../../../../fxInfo'
 
 const ActiveEdit = ({fx: fxId, passNewValue, data}) => {
     const fx = fxInfo[fxId] || {}

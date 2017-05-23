@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import ChannelFxEditor from './ChannelFxEditor'
+import FxEditor from './FxEditor'
 
-class FxEditor extends Component {
+class FxEditorManager extends Component {
     constructor (props) {
         super(props)
 
@@ -29,16 +29,32 @@ class FxEditor extends Component {
         const type = props.fx.status.fxType
         let editor
 
+        let fx
         switch (type) {
 
             case 'channel':
-            const fx = props.fx[props.fx.status.fxType][props.fx.status.id]
-            editor = <ChannelFxEditor
+            fx = props.fx[props.fx.status.fxType][props.fx.status.id]
+            editor = <FxEditor
+                    id = {props.fx.status.id}
+                    type="channel"
                     addFx = {this.addFx}
                     removeFx = {this.removeFx}
                     updateFx = {this.updateFx}
                     {...fx}
                  />
+            break
+
+            case 'track':
+            fx = props.fx[props.fx.status.fxType][props.fx.status.id] || { flags: false, fx: [] }
+            editor = <FxEditor
+                    id = {props.fx.status.id}
+                    type="track"
+                    addFx = {this.addFx}
+                    removeFx = {this.removeFx}
+                    updateFx = {this.updateFx}
+                    initFx = {props.initFx}
+                    {...fx}
+                />
             break
 
             default: editor = <p>nobody here</p>
@@ -54,4 +70,4 @@ class FxEditor extends Component {
     }
 }
 
-export default FxEditor
+export default FxEditorManager

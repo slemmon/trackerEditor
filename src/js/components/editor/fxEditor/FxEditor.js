@@ -1,46 +1,111 @@
-import { connect } from 'react-redux'
-import FxEditorView from './FxEditorView'
+import React, { Component } from 'react'
+import Available from './editorComponents/Available'
+import Used from './editorComponents/Used'
+import ActiveEdit from './editorComponents/ActiveEdit'
 
-const mapStateToProps = (state) => {
-    return {
-        fx: state.fx
+class FxEditor extends Component {
+    constructor (props) {
+        super()
+
+        const sorted = this.getSortedFx(props.flags || 0)
+
+        this.state = {
+            activeFx: sorted.active,
+            availableFx: sorted.available,
+            selected: sorted.active[0]
+        }
+
+        this.addToUsed = this.addToUsed.bind(this)
+        this.removeFromUsed = this.removeFromUsed.bind(this)
+        this.setActiveEdit = this.setActiveEdit.bind(this)
+        this.updateValue = this.updateValue.bind(this)
     }
-}
 
-const mapDispatchToProps = (dispatch) => {
-    return {
-        addFx ({fxType, id} = status, fx) {
-            dispatch({
-                type: "FX_ADD_FX",
-                fxType,
-                id,
-                fx
-            })
-        },
-        removeFx ({fxType, id} = status, fx) {
-            dispatch({
-                type: "FX_REMOVE_FX",
-                fxType,
-                id,
-                fx
-            })
-        },
-        updateFx ({fxType, id} = status, fx, key, value) {
-            dispatch({
-                type: "FX_UPDATE_FX",
-                fxType,
-                id,
-                fx,
-                key,
-                value
-            })
+    componentDidMount() {
+        const props = this.props
+        if ( props.type === 'track' && props.flags === false )
+            props.initFx(props.id)
+    }
+
+    componentWillReceiveProps (nextProps) {
+        const sorted = this.getSortedFx(nextProps.flags)
+
+        this.setState({
+            activeFx: sorted.active,
+            availableFx: sorted.available
+        })
+
+        if ( nextProps.type === 'track' && nextProps.id !== this.props.id && nextProps.flags === false )
+            nextProps.initFx(nextProps.id)
+    }
+
+    getSortedFx (activeEffects) {
+        const active = [],
+              available = []
+
+        for ( let i = 1; i <= 2097152; i *= 2 ) {
+            if ( activeEffects & i )
+                active.push(i)
+            else
+                available.push(i)
+        }
+
+        return {
+            active, available
         }
     }
-}
 
-const FxEditor = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(FxEditorView)
+    addToUsed (fx) {
+        this.props.addFx(fx)
+    }
+
+    removeFromUsed (fx) {
+        if ( fx === this.state.selected )
+            this.setState({selected: 0}, () =>
+                this.props.removeFx(fx)
+            )
+        else
+            this.props.removeFx(fx)
+    }
+
+    updateValue (key, value) {
+        this.props.updateFx(this.state.selected, key, value)
+    }
+
+    setActiveEdit (fx) {
+        this.setState({
+            selected: fx
+        })
+    }
+
+    render () {
+        const props = this.props
+        const state = this.state
+        return (
+            <div className="fx-editor-channel">
+                <h5>{`${props.type === 'channel' ? 'Channel' : 'Track'} Fx Editor`}</h5>
+                <div className="fx-lists">
+                    <Available
+                        fx={state.availableFx}
+                        addToUsed={this.addToUsed}
+                        removeFromUsed={this.removeFromUsed}
+                        setActiveEdit={this.setActiveEdit}
+                    />
+                    <Used
+                        fx={state.activeFx}
+                        addToUsed={this.addToUsed}
+                        removeFromUsed={this.removeFromUsed}
+                        setActiveEdit={this.setActiveEdit}
+                    />
+                    <ActiveEdit
+                        fx={state.selected}
+                        data={props.fx[state.selected]}
+                        passNewValue={this.updateValue}
+                    />
+                </div>
+            </div>
+        )
+    }
+}
 
 export default FxEditor

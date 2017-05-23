@@ -20,8 +20,11 @@ let previousTracksLength = 0
 const unsubscribe = store.subscribe(() => {
     const state = store.getState()
 
-    if ( state.tracks.length > previousTracksLength ) {
-        previousTracksLength = state.tracks.length
+    const newLength = state.tracks.length
+    const previousLength = previousTracksLength
+    if ( previousLength !== newLength )
+        previousTracksLength = newLength
+    if ( (newLength > previousLength) || (newLength && !previousLength) ) {
         store.dispatch({
             type: 'SET_ACTIVE_TRACK',
             track: state.tracks.slice(-1)[0]

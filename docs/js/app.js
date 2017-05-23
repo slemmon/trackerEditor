@@ -40214,9 +40214,9 @@ var _DrumEditor = require('./drumEditor/DrumEditor');
 
 var _DrumEditor2 = _interopRequireDefault(_DrumEditor);
 
-var _FxEditor = require('./fxEditor/FxEditor');
+var _FxEditorManager = require('./fxEditor/FxEditorManager');
 
-var _FxEditor2 = _interopRequireDefault(_FxEditor);
+var _FxEditorManager2 = _interopRequireDefault(_FxEditorManager);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -40226,7 +40226,7 @@ var Editor = function Editor(_ref) {
         'div',
         null,
         _react2.default.createElement(_SongEditor2.default, null),
-        _react2.default.createElement(_FxEditor2.default, null),
+        _react2.default.createElement(_FxEditorManager2.default, null),
         _react2.default.createElement(_TrackList2.default, null),
         activeTrack.type === 'tune' ? _react2.default.createElement(_TrackEditor2.default, null) : activeTrack.type === 'drum' ? _react2.default.createElement(_DrumEditor2.default, null) : null
     );
@@ -40234,7 +40234,7 @@ var Editor = function Editor(_ref) {
 
 exports.default = Editor;
 
-},{"./drumEditor/DrumEditor":463,"./fxEditor/FxEditor":472,"./songEditor/SongEditor":480,"./trackEditor/TrackEditor":487,"./trackList/TrackList":490,"react":434}],463:[function(require,module,exports){
+},{"./drumEditor/DrumEditor":463,"./fxEditor/FxEditorManager":469,"./songEditor/SongEditor":480,"./trackEditor/TrackEditor":487,"./trackList/TrackList":490,"react":434}],463:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -40909,6 +40909,357 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _Available = require('./editorComponents/Available');
+
+var _Available2 = _interopRequireDefault(_Available);
+
+var _Used = require('./editorComponents/Used');
+
+var _Used2 = _interopRequireDefault(_Used);
+
+var _ActiveEdit = require('./editorComponents/ActiveEdit');
+
+var _ActiveEdit2 = _interopRequireDefault(_ActiveEdit);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FxEditor = function (_Component) {
+    _inherits(FxEditor, _Component);
+
+    function FxEditor(props) {
+        _classCallCheck(this, FxEditor);
+
+        var _this = _possibleConstructorReturn(this, (FxEditor.__proto__ || Object.getPrototypeOf(FxEditor)).call(this));
+
+        var sorted = _this.getSortedFx(props.flags || 0);
+
+        _this.state = {
+            activeFx: sorted.active,
+            availableFx: sorted.available,
+            selected: sorted.active[0]
+        };
+
+        _this.addToUsed = _this.addToUsed.bind(_this);
+        _this.removeFromUsed = _this.removeFromUsed.bind(_this);
+        _this.setActiveEdit = _this.setActiveEdit.bind(_this);
+        _this.updateValue = _this.updateValue.bind(_this);
+        return _this;
+    }
+
+    _createClass(FxEditor, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            var props = this.props;
+            if (props.type === 'track' && props.flags === false) props.initFx(props.id);
+        }
+    }, {
+        key: 'componentWillReceiveProps',
+        value: function componentWillReceiveProps(nextProps) {
+            var sorted = this.getSortedFx(nextProps.flags);
+
+            this.setState({
+                activeFx: sorted.active,
+                availableFx: sorted.available
+            });
+
+            if (nextProps.type === 'track' && nextProps.id !== this.props.id && nextProps.flags === false) nextProps.initFx(nextProps.id);
+        }
+    }, {
+        key: 'getSortedFx',
+        value: function getSortedFx(activeEffects) {
+            var active = [],
+                available = [];
+
+            for (var i = 1; i <= 2097152; i *= 2) {
+                if (activeEffects & i) active.push(i);else available.push(i);
+            }
+
+            return {
+                active: active, available: available
+            };
+        }
+    }, {
+        key: 'addToUsed',
+        value: function addToUsed(fx) {
+            this.props.addFx(fx);
+        }
+    }, {
+        key: 'removeFromUsed',
+        value: function removeFromUsed(fx) {
+            var _this2 = this;
+
+            if (fx === this.state.selected) this.setState({ selected: 0 }, function () {
+                return _this2.props.removeFx(fx);
+            });else this.props.removeFx(fx);
+        }
+    }, {
+        key: 'updateValue',
+        value: function updateValue(key, value) {
+            this.props.updateFx(this.state.selected, key, value);
+        }
+    }, {
+        key: 'setActiveEdit',
+        value: function setActiveEdit(fx) {
+            this.setState({
+                selected: fx
+            });
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var props = this.props;
+            var state = this.state;
+            return _react2.default.createElement(
+                'div',
+                { className: 'fx-editor-channel' },
+                _react2.default.createElement(
+                    'h5',
+                    null,
+                    (props.type === 'channel' ? 'Channel' : 'Track') + ' Fx Editor'
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'fx-lists' },
+                    _react2.default.createElement(_Available2.default, {
+                        fx: state.availableFx,
+                        addToUsed: this.addToUsed,
+                        removeFromUsed: this.removeFromUsed,
+                        setActiveEdit: this.setActiveEdit
+                    }),
+                    _react2.default.createElement(_Used2.default, {
+                        fx: state.activeFx,
+                        addToUsed: this.addToUsed,
+                        removeFromUsed: this.removeFromUsed,
+                        setActiveEdit: this.setActiveEdit
+                    }),
+                    _react2.default.createElement(_ActiveEdit2.default, {
+                        fx: state.selected,
+                        data: props.fx[state.selected],
+                        passNewValue: this.updateValue
+                    })
+                )
+            );
+        }
+    }]);
+
+    return FxEditor;
+}(_react.Component);
+
+exports.default = FxEditor;
+
+},{"./editorComponents/ActiveEdit":471,"./editorComponents/Available":472,"./editorComponents/Used":476,"react":434}],469:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _reactRedux = require('react-redux');
+
+var _FxEditorManagerView = require('./FxEditorManagerView');
+
+var _FxEditorManagerView2 = _interopRequireDefault(_FxEditorManagerView);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mapStateToProps = function mapStateToProps(state) {
+    return {
+        fx: state.fx
+    };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+    return {
+        addFx: function addFx() {
+            var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : status,
+                fxType = _ref.fxType,
+                id = _ref.id;
+
+            var fx = arguments[1];
+
+            dispatch({
+                type: "FX_ADD_FX",
+                fxType: fxType,
+                id: id,
+                fx: fx
+            });
+        },
+        removeFx: function removeFx() {
+            var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : status,
+                fxType = _ref2.fxType,
+                id = _ref2.id;
+
+            var fx = arguments[1];
+
+            dispatch({
+                type: "FX_REMOVE_FX",
+                fxType: fxType,
+                id: id,
+                fx: fx
+            });
+        },
+        updateFx: function updateFx() {
+            var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : status,
+                fxType = _ref3.fxType,
+                id = _ref3.id;
+
+            var fx = arguments[1];
+            var key = arguments[2];
+            var value = arguments[3];
+
+            dispatch({
+                type: "FX_UPDATE_FX",
+                fxType: fxType,
+                id: id,
+                fx: fx,
+                key: key,
+                value: value
+            });
+        },
+        initFx: function initFx(id) {
+            dispatch({
+                type: "FX_INIT_TRACK_FX",
+                id: id
+            });
+        }
+    };
+};
+
+var FxEditorManager = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_FxEditorManagerView2.default);
+
+exports.default = FxEditorManager;
+
+},{"./FxEditorManagerView":470,"react-redux":400}],470:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _FxEditor = require('./FxEditor');
+
+var _FxEditor2 = _interopRequireDefault(_FxEditor);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FxEditorManager = function (_Component) {
+    _inherits(FxEditorManager, _Component);
+
+    function FxEditorManager(props) {
+        _classCallCheck(this, FxEditorManager);
+
+        var _this = _possibleConstructorReturn(this, (FxEditorManager.__proto__ || Object.getPrototypeOf(FxEditorManager)).call(this, props));
+
+        _this.addFx = _this.addFx.bind(_this);
+        _this.removeFx = _this.removeFx.bind(_this);
+        _this.updateFx = _this.updateFx.bind(_this);
+        return _this;
+    }
+
+    _createClass(FxEditorManager, [{
+        key: 'addFx',
+        value: function addFx(fx) {
+            this.props.addFx(this.props.fx.status, fx);
+        }
+    }, {
+        key: 'removeFx',
+        value: function removeFx(fx) {
+            this.props.removeFx(this.props.fx.status, fx);
+        }
+    }, {
+        key: 'updateFx',
+        value: function updateFx(fx, key, value) {
+            this.props.updateFx(this.props.fx.status, fx, key, value);
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var state = this.state;
+            var props = this.props;
+
+            var type = props.fx.status.fxType;
+            var editor = void 0;
+
+            var fx = void 0;
+            switch (type) {
+
+                case 'channel':
+                    fx = props.fx[props.fx.status.fxType][props.fx.status.id];
+                    editor = _react2.default.createElement(_FxEditor2.default, _extends({
+                        id: props.fx.status.id,
+                        type: 'channel',
+                        addFx: this.addFx,
+                        removeFx: this.removeFx,
+                        updateFx: this.updateFx
+                    }, fx));
+                    break;
+
+                case 'track':
+                    fx = props.fx[props.fx.status.fxType][props.fx.status.id] || { flags: false, fx: [] };
+                    editor = _react2.default.createElement(_FxEditor2.default, _extends({
+                        id: props.fx.status.id,
+                        type: 'track',
+                        addFx: this.addFx,
+                        removeFx: this.removeFx,
+                        updateFx: this.updateFx,
+                        initFx: props.initFx
+                    }, fx));
+                    break;
+
+                default:
+                    editor = _react2.default.createElement(
+                        'p',
+                        null,
+                        'nobody here'
+                    );
+            }
+
+            return _react2.default.createElement(
+                'div',
+                { id: 'fx-editor-container', className: '' + (props.fx.enabled ? '' : 'hidden') },
+                editor
+            );
+        }
+    }]);
+
+    return FxEditorManager;
+}(_react.Component);
+
+exports.default = FxEditorManager;
+
+},{"./FxEditor":468,"react":434}],471:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -40921,7 +41272,7 @@ var _DoubleOption = require('./DoubleOption');
 
 var _DoubleOption2 = _interopRequireDefault(_DoubleOption);
 
-var _fxInfo = require('../../../fxInfo');
+var _fxInfo = require('../../../../fxInfo');
 
 var _fxInfo2 = _interopRequireDefault(_fxInfo);
 
@@ -40964,7 +41315,7 @@ var ActiveEdit = function ActiveEdit(_ref) {
 
 exports.default = ActiveEdit;
 
-},{"../../../fxInfo":497,"./DoubleOption":471,"./SingleOption":475,"react":434}],469:[function(require,module,exports){
+},{"../../../../fxInfo":497,"./DoubleOption":473,"./SingleOption":475,"react":434}],472:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -41038,157 +41389,7 @@ var Available = function (_Component) {
 
 exports.default = Available;
 
-},{"./FxItem":474,"react":434}],470:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _Available = require('./Available');
-
-var _Available2 = _interopRequireDefault(_Available);
-
-var _Used = require('./Used');
-
-var _Used2 = _interopRequireDefault(_Used);
-
-var _ActiveEdit = require('./ActiveEdit');
-
-var _ActiveEdit2 = _interopRequireDefault(_ActiveEdit);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ChannelFxEditor = function (_Component) {
-    _inherits(ChannelFxEditor, _Component);
-
-    function ChannelFxEditor(props) {
-        _classCallCheck(this, ChannelFxEditor);
-
-        var _this = _possibleConstructorReturn(this, (ChannelFxEditor.__proto__ || Object.getPrototypeOf(ChannelFxEditor)).call(this));
-
-        var sorted = _this.getSortedFx(props.flags);
-
-        _this.state = {
-            activeFx: sorted.active,
-            availableFx: sorted.available,
-            selected: sorted.active[0]
-        };
-
-        _this.addToUsed = _this.addToUsed.bind(_this);
-        _this.removeFromUsed = _this.removeFromUsed.bind(_this);
-        _this.setActiveEdit = _this.setActiveEdit.bind(_this);
-        _this.updateValue = _this.updateValue.bind(_this);
-        return _this;
-    }
-
-    _createClass(ChannelFxEditor, [{
-        key: 'componentWillReceiveProps',
-        value: function componentWillReceiveProps(nextProps) {
-            var sorted = this.getSortedFx(nextProps.flags);
-
-            this.setState({
-                activeFx: sorted.active,
-                availableFx: sorted.available
-            });
-        }
-    }, {
-        key: 'getSortedFx',
-        value: function getSortedFx(activeEffects) {
-            var active = [],
-                available = [];
-
-            for (var i = 1; i <= 2097152; i *= 2) {
-                if (activeEffects & i) active.push(i);else available.push(i);
-            }
-
-            return {
-                active: active, available: available
-            };
-        }
-    }, {
-        key: 'addToUsed',
-        value: function addToUsed(fx) {
-            this.props.addFx(fx);
-        }
-    }, {
-        key: 'removeFromUsed',
-        value: function removeFromUsed(fx) {
-            var _this2 = this;
-
-            console.log('removeFromUsed', fx);
-            if (fx === this.state.selected) this.setState({ selected: 0 }, function () {
-                return _this2.props.removeFx(fx);
-            });else this.props.removeFx(fx);
-        }
-    }, {
-        key: 'updateValue',
-        value: function updateValue(key, value) {
-            this.props.updateFx(this.state.selected, key, value);
-        }
-    }, {
-        key: 'setActiveEdit',
-        value: function setActiveEdit(fx) {
-            this.setState({
-                selected: fx
-            });
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var props = this.props;
-            var state = this.state;
-            return _react2.default.createElement(
-                'div',
-                { className: 'fx-editor-channel' },
-                _react2.default.createElement(
-                    'h5',
-                    null,
-                    'Channel Fx Editor'
-                ),
-                _react2.default.createElement(
-                    'div',
-                    { className: 'fx-lists' },
-                    _react2.default.createElement(_Available2.default, {
-                        fx: state.availableFx,
-                        addToUsed: this.addToUsed,
-                        removeFromUsed: this.removeFromUsed,
-                        setActiveEdit: this.setActiveEdit
-                    }),
-                    _react2.default.createElement(_Used2.default, {
-                        fx: state.activeFx,
-                        addToUsed: this.addToUsed,
-                        removeFromUsed: this.removeFromUsed,
-                        setActiveEdit: this.setActiveEdit
-                    }),
-                    _react2.default.createElement(_ActiveEdit2.default, {
-                        fx: state.selected,
-                        data: props.fx[state.selected],
-                        passNewValue: this.updateValue
-                    })
-                )
-            );
-        }
-    }]);
-
-    return ChannelFxEditor;
-}(_react.Component);
-
-exports.default = ChannelFxEditor;
-
-},{"./ActiveEdit":468,"./Available":469,"./Used":476,"react":434}],471:[function(require,module,exports){
+},{"./FxItem":474,"react":434}],473:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41234,180 +41435,7 @@ var DoubleOption = function DoubleOption(_ref) {
 
 exports.default = DoubleOption;
 
-},{"react":434}],472:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _reactRedux = require('react-redux');
-
-var _FxEditorView = require('./FxEditorView');
-
-var _FxEditorView2 = _interopRequireDefault(_FxEditorView);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var mapStateToProps = function mapStateToProps(state) {
-    return {
-        fx: state.fx
-    };
-};
-
-var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-    return {
-        addFx: function addFx() {
-            var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : status,
-                fxType = _ref.fxType,
-                id = _ref.id;
-
-            var fx = arguments[1];
-
-            dispatch({
-                type: "FX_ADD_FX",
-                fxType: fxType,
-                id: id,
-                fx: fx
-            });
-        },
-        removeFx: function removeFx() {
-            var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : status,
-                fxType = _ref2.fxType,
-                id = _ref2.id;
-
-            var fx = arguments[1];
-
-            dispatch({
-                type: "FX_REMOVE_FX",
-                fxType: fxType,
-                id: id,
-                fx: fx
-            });
-        },
-        updateFx: function updateFx() {
-            var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : status,
-                fxType = _ref3.fxType,
-                id = _ref3.id;
-
-            var fx = arguments[1];
-            var key = arguments[2];
-            var value = arguments[3];
-
-            dispatch({
-                type: "FX_UPDATE_FX",
-                fxType: fxType,
-                id: id,
-                fx: fx,
-                key: key,
-                value: value
-            });
-        }
-    };
-};
-
-var FxEditor = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_FxEditorView2.default);
-
-exports.default = FxEditor;
-
-},{"./FxEditorView":473,"react-redux":400}],473:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _ChannelFxEditor = require('./ChannelFxEditor');
-
-var _ChannelFxEditor2 = _interopRequireDefault(_ChannelFxEditor);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var FxEditor = function (_Component) {
-    _inherits(FxEditor, _Component);
-
-    function FxEditor(props) {
-        _classCallCheck(this, FxEditor);
-
-        var _this = _possibleConstructorReturn(this, (FxEditor.__proto__ || Object.getPrototypeOf(FxEditor)).call(this, props));
-
-        _this.addFx = _this.addFx.bind(_this);
-        _this.removeFx = _this.removeFx.bind(_this);
-        _this.updateFx = _this.updateFx.bind(_this);
-        return _this;
-    }
-
-    _createClass(FxEditor, [{
-        key: 'addFx',
-        value: function addFx(fx) {
-            this.props.addFx(this.props.fx.status, fx);
-        }
-    }, {
-        key: 'removeFx',
-        value: function removeFx(fx) {
-            this.props.removeFx(this.props.fx.status, fx);
-        }
-    }, {
-        key: 'updateFx',
-        value: function updateFx(fx, key, value) {
-            this.props.updateFx(this.props.fx.status, fx, key, value);
-        }
-    }, {
-        key: 'render',
-        value: function render() {
-            var state = this.state;
-            var props = this.props;
-
-            var type = props.fx.status.fxType;
-            var editor = void 0;
-
-            switch (type) {
-
-                case 'channel':
-                    var fx = props.fx[props.fx.status.fxType][props.fx.status.id];
-                    editor = _react2.default.createElement(_ChannelFxEditor2.default, _extends({
-                        addFx: this.addFx,
-                        removeFx: this.removeFx,
-                        updateFx: this.updateFx
-                    }, fx));
-                    break;
-
-                default:
-                    editor = _react2.default.createElement(
-                        'p',
-                        null,
-                        'nobody here'
-                    );
-            }
-
-            return _react2.default.createElement(
-                'div',
-                { id: 'fx-editor-container', className: '' + (props.fx.enabled ? '' : 'hidden') },
-                editor
-            );
-        }
-    }]);
-
-    return FxEditor;
-}(_react.Component);
-
-exports.default = FxEditor;
-
-},{"./ChannelFxEditor":470,"react":434}],474:[function(require,module,exports){
+},{"react":434}],474:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -41420,7 +41448,7 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _fxInfo = require('../../../fxInfo');
+var _fxInfo = require('../../../../fxInfo');
 
 var _fxInfo2 = _interopRequireDefault(_fxInfo);
 
@@ -41500,7 +41528,7 @@ var FxItem = function (_Component) {
 
 exports.default = FxItem;
 
-},{"../../../fxInfo":497,"react":434}],475:[function(require,module,exports){
+},{"../../../../fxInfo":497,"react":434}],475:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -41658,6 +41686,13 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
                 editorId: editorId,
                 channel: channel
             });
+        },
+        openFx: function openFx(editorId) {
+            dispatch({
+                type: "FX_SET_VIEW",
+                fxType: 'track',
+                id: editorId
+            });
         }
     };
 };
@@ -41754,7 +41789,8 @@ var ChannelRowView = function (_Component) {
                             return t.id === track.id;
                         }),
                         removeTrack: _this2.props.removeTrack,
-                        channel: _this2.props.channel
+                        channel: _this2.props.channel,
+                        openFx: _this2.props.openFx
                     });
                 })
             );
@@ -42168,6 +42204,7 @@ var Track = function (_Component) {
 
         _this.handleDragStart = _this.handleDragStart.bind(_this);
         _this.handleDrop = _this.handleDrop.bind(_this);
+        _this.openFx = _this.openFx.bind(_this);
         return _this;
     }
 
@@ -42215,17 +42252,32 @@ var Track = function (_Component) {
             window.removeEventListener('dragover', this.handleDragOver);
         }
     }, {
+        key: 'openFx',
+        value: function openFx() {
+            this.props.openFx(this.props.track.editorId);
+        }
+    }, {
         key: 'render',
         value: function render() {
             var track = this.props.track;
             var detail = this.props.detail;
-            return _react2.default.createElement('span', {
-                draggable: true,
-                onDragStart: this.handleDragStart,
-                'data-position': this.props.position,
-                className: 'draggable ' + (track.type === 'tune' ? 'draggable-tune' : 'draggable-drum') + ' ' + (this.state.imBeingDragged ? 'beingdragged' : ''),
-                style: { width: detail.ticks * 2, backgroundColor: (0, _stringifyColor2.default)(detail.color, 'rgba', { a: 0.5 }), borderColor: (0, _stringifyColor2.default)(detail.color, 'rgb') }
-            });
+            var colorLight = (0, _stringifyColor2.default)(detail.color, 'rgba', { a: 0.5 });
+            var colorDark = (0, _stringifyColor2.default)(detail.color, 'rgb');
+            return _react2.default.createElement(
+                'span',
+                {
+                    draggable: true,
+                    onDragStart: this.handleDragStart,
+                    'data-position': this.props.position,
+                    className: 'draggable ' + (track.type === 'tune' ? 'draggable-tune' : 'draggable-drum') + ' ' + (this.state.imBeingDragged ? 'beingdragged' : ''),
+                    style: { width: detail.ticks * 2, backgroundColor: colorLight, borderColor: colorDark, color: colorDark }
+                },
+                _react2.default.createElement(
+                    'span',
+                    { onClick: this.openFx },
+                    'fx'
+                )
+            );
         }
     }]);
 
@@ -43723,6 +43775,12 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
                 type: 'CHANNEL_REMOVE_TRACKS_BY_ID',
                 trackId: trackId
             });
+            dispatch({
+                type: 'SET_ACTIVE_TRACK',
+                track: {
+                    notes: []
+                }
+            });
         },
         setTrackColor: function setTrackColor(trackId, color) {
             dispatch({
@@ -44300,6 +44358,7 @@ var drumTracks = {
 };
 
 function createSongFromChannels(tracks, channels, fx) {
+    console.log(fx);
 
     var trackAtm = {};
     var totalTracks = 0;
@@ -44333,7 +44392,8 @@ function createSongFromChannels(tracks, channels, fx) {
             tracks: trackAtm,
             channel: channels[i],
             index: i,
-            effects: fx.channel[i]
+            effects: fx.channel[i],
+            trackEffects: fx.track
         }));
     }
     var _concatAllChannels = concatAllChannels( /*totalTracks, */channelTracks),
@@ -44538,54 +44598,18 @@ function atmifyChannel(_ref) {
     var tracks = _ref.tracks,
         channel = _ref.channel,
         index = _ref.index,
-        effects = _ref.effects;
+        effects = _ref.effects,
+        trackEffects = _ref.trackEffects;
 
     var channelTrack = [];
     var totalBytes = 0;
-    // if ( addTempo ) {
-    //     channelTrack.push(`0x9D, ${tempo},\t\t// SET song tempo: value = ${tempo}`)                                     // add song tempo
-    //     totalBytes += 2
-    // }
-
-    // const channelVolume = channel.length && index !== 3 ? 48 : 0
-    // channelTrack.push(`0x40, ${channelVolume},\t\t// FX: SET VOLUME: volume = ${channelVolume}`)
-    // totalBytes += 2
-
-
-    // filter fx by start and end fx
-    // add startfx before anyhting else
-    // add endfx after everything except 0x9F (end channel)
-    // console.log(effects)
-    // const first = getFxList(effects, 'first')
-    // const last = getFxList(effects, 'last')
-    // console.log(first)
-    // console.log(last)
 
     var newFxStart = createFxArray(getFxList(effects, 'first'), 'start', effects);
     channelTrack = channelTrack.concat(newFxStart.fx);
     totalBytes += newFxStart.bytes;
 
-    // let fxInfo,
-    //     fxData
-    // for ( let i = 0, l = first.length; i < l; i++ ) {
-    //     fxInfo = startFx[first[i]]
-    //     fxData = effects.fx[first[i]]
-
-    //     let params = ','
-    //     if ( fxInfo.values >= 1 )
-    //         params += ` ${fxData.val_0},`
-    //     if ( fxInfo.values === 2 )
-    //         params += ` ${fxData.val_1},`
-
-    //     channelTrack.push(`0x${fxInfo.address}${params}\t\t// ${fxInfo.name}`)
-
-    //     totalBytes += fxInfo.values
-    // }
-
-    // console.log(channelTrack)
-
-
     var previousTrackId = -1,
+        previousTrackEffects = 0,
         count = 0;
     var _iteratorNormalCompletion = true;
     var _didIteratorError = false;
@@ -44596,7 +44620,9 @@ function atmifyChannel(_ref) {
             var track = _step.value;
 
 
-            if (previousTrackId === track.id) {
+            var eff = trackEffects[track.editorId] || { flags: 0 };
+
+            if (previousTrackId === track.id && !eff.flags && !previousTrackEffects) {
 
                 count++;
                 channelTrack.pop();
@@ -44604,11 +44630,31 @@ function atmifyChannel(_ref) {
                 if (count === 1) totalBytes++; // we remove a line with 2 bytes (GOTO = 2 bytes) and we add 3 bytes (REPEAT = 3 bytes)
             } else {
 
+                var _startFx = void 0,
+                    _endFx = void 0;
+                if (eff.flags) {
+                    _startFx = createFxArray(getFxList(eff, 'first'), 'start', eff);
+                    _endFx = createFxArray(getFxList(eff, 'last'), 'end', eff);
+                }
+
+                // add first track fx before track
+                if (_startFx) {
+                    channelTrack = channelTrack.concat(_startFx.fx);
+                    totalBytes += _startFx.bytes;
+                }
+
                 count = 0;
                 channelTrack.push("0xFC, " + (tracks[track.id].index + 4) + ",\t\t// GOTO track " + (tracks[track.id].index + 4)); // goto track
                 totalBytes += 2;
 
+                // add last track fx after track
+                if (_endFx) {
+                    channelTrack = channelTrack.concat(_endFx.fx);
+                    totalBytes += _endFx.bytes;
+                }
+
                 previousTrackId = track.id;
+                previousTrackEffects = eff.flags;
             }
         }
 
@@ -45101,8 +45147,10 @@ var previousTracksLength = 0;
 var unsubscribe = store.subscribe(function () {
     var state = store.getState();
 
-    if (state.tracks.length > previousTracksLength) {
-        previousTracksLength = state.tracks.length;
+    var newLength = state.tracks.length;
+    var previousLength = previousTracksLength;
+    if (previousLength !== newLength) previousTracksLength = newLength;
+    if (newLength > previousLength || newLength && !previousLength) {
         store.dispatch({
             type: 'SET_ACTIVE_TRACK',
             track: state.tracks.slice(-1)[0]
@@ -45271,22 +45319,27 @@ var defaultState = {
         fxType: '',
         id: 0
     },
-    channel: [{
-        flags: 1048576,
-        fx: {
-            1048576: { val_0: 25 }
+    channel: {
+        "0": {
+            flags: 1048576,
+            fx: {
+                1048576: { val_0: 25 }
+            }
+        },
+        "1": {
+            flags: 0,
+            fx: {}
+        },
+        "2": {
+            flags: 0,
+            fx: {}
+        },
+        "3": {
+            flags: 0,
+            fx: {}
         }
-    }, {
-        flags: 0,
-        fx: {}
-    }, {
-        flags: 0,
-        fx: {}
-    }, {
-        flags: 0,
-        fx: {}
-    }],
-    track: []
+    },
+    track: {}
 };
 
 function fx() {
@@ -45301,6 +45354,9 @@ function fx() {
         case "FX_ADD_FX":
             return addFx(state, action);
 
+        case "FX_INIT_TRACK_FX":
+            return createTrackFx(state, action);
+
         case "FX_REMOVE_FX":
             return removeFx(state, action);
 
@@ -45311,7 +45367,7 @@ function fx() {
             return action.fx;
 
         case "FX_HIDE_VIEW":
-            return Object.assign({}, state, { enabled: false });
+            return (0, _lodash2.default)({}, state, { enabled: false });
 
         default:
             return state;
@@ -45319,26 +45375,30 @@ function fx() {
     }
 }
 
-function setView(state, action) {
-    return Object.assign({}, state, {
+function setView(state) {
+    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : action,
+        fxType = _ref.fxType,
+        id = _ref.id;
+
+    return (0, _lodash2.default)({}, state, {
         enabled: true,
         status: {
-            fxType: action.fxType,
-            id: action.id
+            fxType: fxType,
+            id: id
         }
     });
 }
 
 function addFx(state) {
-    var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : action,
-        fxType = _ref.fxType,
-        id = _ref.id,
-        fx = _ref.fx;
+    var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : action,
+        fxType = _ref2.fxType,
+        id = _ref2.id,
+        fx = _ref2.fx;
 
-    var newState = Object.assign({}, state);
-    newState[fxType] = newState[fxType].slice();
+    var newState = (0, _lodash2.default)({}, state);
+    newState[fxType] = (0, _lodash2.default)({}, newState[fxType]);
 
-    var update = Object.assign({}, newState[fxType][id]);
+    var update = (0, _lodash2.default)({}, newState[fxType][id]);
 
     update.flags = update.flags | fx;
 
@@ -45361,15 +45421,15 @@ function getFxValuesObject(fx) {
 }
 
 function removeFx(state) {
-    var _ref2 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : action,
-        fxType = _ref2.fxType,
-        id = _ref2.id,
-        fx = _ref2.fx;
+    var _ref3 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : action,
+        fxType = _ref3.fxType,
+        id = _ref3.id,
+        fx = _ref3.fx;
 
-    var newState = Object.assign({}, state);
-    newState[fxType] = newState[fxType].slice();
+    var newState = (0, _lodash2.default)({}, state);
+    newState[fxType] = (0, _lodash2.default)({}, newState[fxType]);
 
-    var update = Object.assign({}, state[fxType][id]);
+    var update = (0, _lodash2.default)({}, state[fxType][id]);
 
     update.flags = update.flags ^ fx;
     delete update.fx[fx];
@@ -45380,16 +45440,24 @@ function removeFx(state) {
 }
 
 function updateFx(state) {
-    var _ref3 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : action,
-        fxType = _ref3.fxType,
-        id = _ref3.id,
-        fx = _ref3.fx,
-        key = _ref3.key,
-        value = _ref3.value;
+    var _ref4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : action,
+        fxType = _ref4.fxType,
+        id = _ref4.id,
+        fx = _ref4.fx,
+        key = _ref4.key,
+        value = _ref4.value;
 
     var newState = (0, _lodash2.default)({}, state);
 
     newState[fxType][id].fx[fx][key] = value;
+
+    return newState;
+}
+
+function createTrackFx(state, action) {
+    var newState = (0, _lodash2.default)({}, state);
+
+    newState.track[action.id] = { flags: 0, fx: {} };
 
     return newState;
 }

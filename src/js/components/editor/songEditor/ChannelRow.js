@@ -34,6 +34,13 @@ const mapDispatchToProps = (dispatch) => {
                 editorId,
                 channel
             })
+        },
+        openFx (editorId) {
+            dispatch({
+                type: "FX_SET_VIEW",
+                fxType: 'track',
+                id: editorId
+            })
         }
     }
 }

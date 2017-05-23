@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import fxInfo from '../../../fxInfo'
+import fxInfo from '../../../../fxInfo'
 
 class FxItem extends Component {
 

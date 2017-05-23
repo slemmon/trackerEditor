@@ -3,12 +3,12 @@ import SongEditor from './songEditor/SongEditor'
 import TrackList from './trackList/TrackList'
 import TrackEditor from './trackEditor/TrackEditor'
 import DrumEditor from './drumEditor/DrumEditor'
-import FxEditor from './fxEditor/FxEditor'
+import FxEditorManager from './fxEditor/FxEditorManager'
 
 const Editor = ({activeTrack}) =>
     <div>
         <SongEditor />
-        <FxEditor />
+        <FxEditorManager />
         <TrackList />
         { activeTrack.type === 'tune' ?
             <TrackEditor />

@@ -11,6 +11,7 @@ class Track extends Component {
 
         this.handleDragStart = this.handleDragStart.bind(this)
         this.handleDrop = this.handleDrop.bind(this)
+        this.openFx = this.openFx.bind(this)
     }
 
     componentWillUnmount () {
@@ -53,17 +54,24 @@ class Track extends Component {
         window.removeEventListener('dragover', this.handleDragOver)
     }
 
+    openFx () {
+        this.props.openFx(this.props.track.editorId)
+    }
+
     render () {
         const track = this.props.track
         const detail = this.props.detail
+        const colorLight = stringifyColor(detail.color, 'rgba', {a: 0.5})
+        const colorDark = stringifyColor(detail.color, 'rgb')
         return (
             <span
                 draggable = { true }
                 onDragStart = { this.handleDragStart }
                 data-position = { this.props.position }
                 className = { `draggable ${track.type === 'tune' ? 'draggable-tune' : 'draggable-drum' } ${this.state.imBeingDragged ? 'beingdragged' : ''}` }
-                style = { {width: detail.ticks*2, backgroundColor: stringifyColor(detail.color, 'rgba', {a: 0.5}), borderColor: stringifyColor(detail.color, 'rgb')} }
+                style = { {width: detail.ticks*2, backgroundColor: colorLight, borderColor: colorDark, color: colorDark} }
             >
+                <span onClick={this.openFx}>fx</span>
             </span>
         )
     }

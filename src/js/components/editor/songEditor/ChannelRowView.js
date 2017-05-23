@@ -49,6 +49,7 @@ class ChannelRowView extends Component {
                         detail = {tracks.find( t => t.id === track.id )}
                         removeTrack = {this.props.removeTrack}
                         channel = {this.props.channel}
+                        openFx = {this.props.openFx}
                     />
                 )}
             </div>

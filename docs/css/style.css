@@ -35,6 +35,8 @@
           border-bottom: none; }
         #song-editor-container .song-editor-channels .channel-tracks .channel-track.active {
           background-color: #fafbf9; }
+        #song-editor-container .song-editor-channels .channel-tracks .channel-track .draggable-tune {
+          font-size: 7pt; }
     #song-editor-container .song-editor-channels .channel-fx-box {
       flex: 0 0 6%;
       margin-left: 1px; }

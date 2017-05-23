@@ -60,6 +60,7 @@ const drumTracks = {
 }
 
 function createSongFromChannels (tracks, channels, fx) {
+console.log(fx)
 
     const trackAtm = {}
     let totalTracks = 0
@@ -93,7 +94,8 @@ function createSongFromChannels (tracks, channels, fx) {
             tracks: trackAtm,
             channel: channels[i],
             index: i,
-            effects: fx.channel[i]
+            effects: fx.channel[i],
+            trackEffects: fx.track
         }))
 
     const { channelAddresses, channelString, channelEntryTracks, totalBytes } = concatAllChannels(/*totalTracks, */channelTracks)
@@ -314,57 +316,22 @@ function createInfoComment (template, values) {
     return result
 }
 
-function atmifyChannel ({tracks, channel, /*addTempo,*/ index, /*tempo, */effects}) {
+function atmifyChannel ({tracks, channel, /*addTempo,*/ index, /*tempo, */effects, trackEffects}) {
     let channelTrack = []
     let totalBytes = 0
-    // if ( addTempo ) {
-    //     channelTrack.push(`0x9D, ${tempo},\t\t// SET song tempo: value = ${tempo}`)                                     // add song tempo
-    //     totalBytes += 2
-    // }
-
-    // const channelVolume = channel.length && index !== 3 ? 48 : 0
-    // channelTrack.push(`0x40, ${channelVolume},\t\t// FX: SET VOLUME: volume = ${channelVolume}`)
-    // totalBytes += 2
-
-
-    // filter fx by start and end fx
-    // add startfx before anyhting else
-    // add endfx after everything except 0x9F (end channel)
-    // console.log(effects)
-    // const first = getFxList(effects, 'first')
-    // const last = getFxList(effects, 'last')
-    // console.log(first)
-    // console.log(last)
 
     const newFxStart = createFxArray(getFxList(effects, 'first'), 'start', effects)
     channelTrack = channelTrack.concat(newFxStart.fx)
     totalBytes += newFxStart.bytes
 
-    // let fxInfo,
-    //     fxData
-    // for ( let i = 0, l = first.length; i < l; i++ ) {
-    //     fxInfo = startFx[first[i]]
-    //     fxData = effects.fx[first[i]]
-
-    //     let params = ','
-    //     if ( fxInfo.values >= 1 )
-    //         params += ` ${fxData.val_0},`
-    //     if ( fxInfo.values === 2 )
-    //         params += ` ${fxData.val_1},`
-
-    //     channelTrack.push(`0x${fxInfo.address}${params}\t\t// ${fxInfo.name}`)
-
-    //     totalBytes += fxInfo.values
-    // }
-
-// console.log(channelTrack)
-
-
     let previousTrackId = -1,
+        previousTrackEffects = 0,
         count = 0
     for ( const track of channel ) {
 
-        if ( previousTrackId === track.id ) {
+        const eff = trackEffects[track.editorId] || {flags:0}
+
+        if ( previousTrackId === track.id && !eff.flags && !previousTrackEffects ) {
 
             count++
             channelTrack.pop()
@@ -374,11 +341,31 @@ function atmifyChannel ({tracks, channel, /*addTempo,*/ index, /*tempo, */effect
 
         } else {
 
+            let startFx,
+                endFx
+            if ( eff.flags ) {
+                startFx = createFxArray(getFxList(eff, 'first'), 'start', eff)
+                endFx = createFxArray(getFxList(eff, 'last'), 'end', eff)
+            }
+
+            // add first track fx before track
+            if ( startFx ) {
+                channelTrack = channelTrack.concat(startFx.fx)
+                totalBytes += startFx.bytes
+            }
+
             count = 0
             channelTrack.push(`0xFC, ${tracks[track.id].index + 4},\t\t// GOTO track ${tracks[track.id].index + 4}`)    // goto track
             totalBytes += 2
 
+            // add last track fx after track
+            if ( endFx ) {
+                channelTrack = channelTrack.concat(endFx.fx)
+                totalBytes += endFx.bytes
+            }
+
             previousTrackId = track.id
+            previousTrackEffects = eff.flags
         }
 
     }
