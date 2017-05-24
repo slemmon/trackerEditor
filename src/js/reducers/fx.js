@@ -60,7 +60,7 @@ export default function fx (state = defaultState, action) {
 }
 
 function setView (state, {fxType, id} = action) {
-    if ( fxType === 'track' && state.status.fxType === 'track' && id === state.status.id )
+    if ( fxType === state.status.fxType && id === state.status.id )
         return merge({}, state, {enabled: false, status: {fxType: ''}})
 
     return merge({}, state, {

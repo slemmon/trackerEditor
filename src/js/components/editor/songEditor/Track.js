@@ -68,7 +68,7 @@ class Track extends Component {
                 draggable = { true }
                 onDragStart = { this.handleDragStart }
                 data-position = { this.props.position }
-                className = { `draggable ${track.type === 'tune' ? 'draggable-tune' : 'draggable-drum' } ${this.state.imBeingDragged ? 'beingdragged' : ''}` }
+                className = { `draggable ${track.type === 'tune' ? 'draggable-tune' : 'draggable-drum' } ${this.state.imBeingDragged ? 'beingdragged' : ''} ${this.props.activeFx ? 'active' : ''}` }
                 style = { {width: detail.ticks*2, backgroundColor: colorLight, borderColor: colorDark, color: colorDark} }
             >
                 <span onClick={this.openFx}>fx</span>

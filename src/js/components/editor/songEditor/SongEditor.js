@@ -1,6 +1,12 @@
 import { connect } from 'react-redux'
 import SongEditorView from './SongEditorView'
 
+const mapStateToProps = (state) => {
+    return {
+        fxStatus: state.fx.status
+    }
+}
+
 const mapDispatchToProps = (dispatch) => {
     return {
         toggleFxEditor (channel) {
@@ -19,7 +25,7 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 const SongEditor = connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(SongEditorView)
 

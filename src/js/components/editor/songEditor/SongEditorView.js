@@ -8,8 +8,7 @@ class SongEditor extends Component {
         super(props)
 
         this.state = {
-            showCode: false,
-            activeFx: null
+            showCode: false
         }
 
         this.toggleShowCode = this.toggleShowCode.bind(this)
@@ -59,18 +58,7 @@ class SongEditor extends Component {
     }
 
     openChannelFx (channel) {
-        const current = this.state.activeFx
-        if ( current === channel ) {
-            this.setState({
-                activeFx: null
-            })
-            this.props.hideFxEditor()
-        } else {
-            this.setState({
-                activeFx: channel
-            })
-            this.props.toggleFxEditor(channel)
-        }
+        this.props.toggleFxEditor(channel)
     }
 
     playSong () {
@@ -79,7 +67,8 @@ class SongEditor extends Component {
 
     render () {
         const state = this.state
-        const activeFx = state.activeFx
+        const fxStatus = this.props.fxStatus
+        const activeFx = fxStatus.fxType === 'channel' && fxStatus.id
         return (
             <div id="song-editor-container">
                 <h5>Song editor</h5>

@@ -30,9 +30,17 @@ class FxEditor extends Component {
     componentWillReceiveProps (nextProps) {
         const sorted = this.getSortedFx(nextProps.flags)
 
+        let selected
+
+        if ( nextProps.id !== this.props.id || nextProps.type !== this.props.type ) {
+            selected = sorted.active[0]
+        } else
+            selected = this.state.selected
+
         this.setState({
             activeFx: sorted.active,
-            availableFx: sorted.available
+            availableFx: sorted.available,
+            selected
         })
 
         if ( nextProps.type === 'track' && nextProps.id !== this.props.id && nextProps.flags === false )

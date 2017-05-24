@@ -32,14 +32,16 @@ class ChannelRowView extends Component {
     }
 
     render () {
-        const channelTracks = this.props.channelTracks
-        // const channelTracks = this.props.status === 0 ? this.props.channelTracks : []
-        const tracks = this.props.tracks
+        const props = this.props
+        const channelTracks = props.channelTracks
+        const tracks = props.tracks
+        const fxStatus = props.fxStatus
+        const activeFx = fxStatus.fxType === 'track' && fxStatus.id
         return (
             <div
                 onDragOver = { this.handleDragover }
                 onDrop = { this.handleDrop }
-                className = {`channel-track droppable ${ this.props.editingFx ? 'active' : '' }`}
+                className = {`channel-track droppable ${ props.editingFx ? 'active' : '' }`}
             >
                 {channelTracks.map( (track, i) =>
                     <Track
@@ -47,9 +49,10 @@ class ChannelRowView extends Component {
                         position = {i}
                         track = {track}
                         detail = {tracks.find( t => t.id === track.id )}
-                        removeTrack = {this.props.removeTrack}
-                        channel = {this.props.channel}
-                        openFx = {this.props.openFx}
+                        removeTrack = {props.removeTrack}
+                        channel = {props.channel}
+                        openFx = {props.openFx}
+                        activeFx = {activeFx === track.editorId}
                     />
                 )}
             </div>

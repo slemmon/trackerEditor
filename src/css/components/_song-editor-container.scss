@@ -57,8 +57,13 @@
                     background-color: #fafbf9;
                 }
 
-                .draggable-tune {
+                .draggable-tune, .draggable-drum {
                     font-size: 7pt;
+
+                    &.active {
+                        background-color: #f3f3f3!important;
+                        color: #c5c5c5!important;
+                    }
                 }
             }
         }
