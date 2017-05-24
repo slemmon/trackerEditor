@@ -35,13 +35,17 @@
           border-bottom: none; }
         #song-editor-container .song-editor-channels .channel-tracks .channel-track.active {
           background-color: #fafbf9; }
-        #song-editor-container .song-editor-channels .channel-tracks .channel-track .draggable-tune {
+        #song-editor-container .song-editor-channels .channel-tracks .channel-track .draggable-tune, #song-editor-container .song-editor-channels .channel-tracks .channel-track .draggable-drum {
           font-size: 7pt; }
+          #song-editor-container .song-editor-channels .channel-tracks .channel-track .draggable-tune.active, #song-editor-container .song-editor-channels .channel-tracks .channel-track .draggable-drum.active {
+            background-color: #f3f3f3 !important;
+            color: #c5c5c5 !important; }
     #song-editor-container .song-editor-channels .channel-fx-box {
       flex: 0 0 6%;
       margin-left: 1px; }
       #song-editor-container .song-editor-channels .channel-fx-box .channel-fx {
-        margin: 0; }
+        margin: 0;
+        height: 26px; }
         #song-editor-container .song-editor-channels .channel-fx-box .channel-fx.active {
           background-color: #dedede; }
 

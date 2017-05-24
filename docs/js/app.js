@@ -40969,9 +40969,16 @@ var FxEditor = function (_Component) {
         value: function componentWillReceiveProps(nextProps) {
             var sorted = this.getSortedFx(nextProps.flags);
 
+            var selected = void 0;
+
+            if (nextProps.id !== this.props.id || nextProps.type !== this.props.type) {
+                selected = sorted.active[0];
+            } else selected = this.state.selected;
+
             this.setState({
                 activeFx: sorted.active,
-                availableFx: sorted.available
+                availableFx: sorted.available,
+                selected: selected
             });
 
             if (nextProps.type === 'track' && nextProps.id !== this.props.id && nextProps.flags === false) nextProps.initFx(nextProps.id);
@@ -41657,7 +41664,8 @@ var mapStateToProps = function mapStateToProps(state, props) {
     return {
         status: state.status,
         tracks: state.tracks,
-        channelTracks: state.channels[props.channel]
+        channelTracks: state.channels[props.channel],
+        fxStatus: state.fx.status
     };
 };
 
@@ -41768,17 +41776,17 @@ var ChannelRowView = function (_Component) {
     }, {
         key: 'render',
         value: function render() {
-            var _this2 = this;
-
-            var channelTracks = this.props.channelTracks;
-            // const channelTracks = this.props.status === 0 ? this.props.channelTracks : []
-            var tracks = this.props.tracks;
+            var props = this.props;
+            var channelTracks = props.channelTracks;
+            var tracks = props.tracks;
+            var fxStatus = props.fxStatus;
+            var activeFx = fxStatus.fxType === 'track' && fxStatus.id;
             return _react2.default.createElement(
                 'div',
                 {
                     onDragOver: this.handleDragover,
                     onDrop: this.handleDrop,
-                    className: 'channel-track droppable ' + (this.props.editingFx ? 'active' : '')
+                    className: 'channel-track droppable ' + (props.editingFx ? 'active' : '')
                 },
                 channelTracks.map(function (track, i) {
                     return _react2.default.createElement(_Track2.default, {
@@ -41788,9 +41796,10 @@ var ChannelRowView = function (_Component) {
                         detail: tracks.find(function (t) {
                             return t.id === track.id;
                         }),
-                        removeTrack: _this2.props.removeTrack,
-                        channel: _this2.props.channel,
-                        openFx: _this2.props.openFx
+                        removeTrack: props.removeTrack,
+                        channel: props.channel,
+                        openFx: props.openFx,
+                        activeFx: activeFx === track.editorId
                     });
                 })
             );
@@ -41858,6 +41867,12 @@ var _SongEditorView2 = _interopRequireDefault(_SongEditorView);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var mapStateToProps = function mapStateToProps(state) {
+    return {
+        fxStatus: state.fx.status
+    };
+};
+
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     return {
         toggleFxEditor: function toggleFxEditor(channel) {
@@ -41875,7 +41890,7 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     };
 };
 
-var SongEditor = (0, _reactRedux.connect)(null, mapDispatchToProps)(_SongEditorView2.default);
+var SongEditor = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_SongEditorView2.default);
 
 exports.default = SongEditor;
 
@@ -41921,8 +41936,7 @@ var SongEditor = function (_Component) {
         var _this = _possibleConstructorReturn(this, (SongEditor.__proto__ || Object.getPrototypeOf(SongEditor)).call(this, props));
 
         _this.state = {
-            showCode: false,
-            activeFx: null
+            showCode: false
         };
 
         _this.toggleShowCode = _this.toggleShowCode.bind(_this);
@@ -41977,18 +41991,7 @@ var SongEditor = function (_Component) {
     }, {
         key: 'openChannelFx',
         value: function openChannelFx(channel) {
-            var current = this.state.activeFx;
-            if (current === channel) {
-                this.setState({
-                    activeFx: null
-                });
-                this.props.hideFxEditor();
-            } else {
-                this.setState({
-                    activeFx: channel
-                });
-                this.props.toggleFxEditor(channel);
-            }
+            this.props.toggleFxEditor(channel);
         }
     }, {
         key: 'playSong',
@@ -42001,7 +42004,8 @@ var SongEditor = function (_Component) {
             var _this2 = this;
 
             var state = this.state;
-            var activeFx = state.activeFx;
+            var fxStatus = this.props.fxStatus;
+            var activeFx = fxStatus.fxType === 'channel' && fxStatus.id;
             return _react2.default.createElement(
                 'div',
                 { id: 'song-editor-container' },
@@ -42269,7 +42273,7 @@ var Track = function (_Component) {
                     draggable: true,
                     onDragStart: this.handleDragStart,
                     'data-position': this.props.position,
-                    className: 'draggable ' + (track.type === 'tune' ? 'draggable-tune' : 'draggable-drum') + ' ' + (this.state.imBeingDragged ? 'beingdragged' : ''),
+                    className: 'draggable ' + (track.type === 'tune' ? 'draggable-tune' : 'draggable-drum') + ' ' + (this.state.imBeingDragged ? 'beingdragged' : '') + ' ' + (this.props.activeFx ? 'active' : ''),
                     style: { width: detail.ticks * 2, backgroundColor: colorLight, borderColor: colorDark, color: colorDark }
                 },
                 _react2.default.createElement(
@@ -45379,6 +45383,8 @@ function setView(state) {
     var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : action,
         fxType = _ref.fxType,
         id = _ref.id;
+
+    if (fxType === state.status.fxType && id === state.status.id) return (0, _lodash2.default)({}, state, { enabled: false, status: { fxType: '' } });
 
     return (0, _lodash2.default)({}, state, {
         enabled: true,
