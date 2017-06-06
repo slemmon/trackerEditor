@@ -44293,7 +44293,7 @@ function atmifyDrumTrack(drumTrackNumbers, track) {
         } else if (note !== undefined && Object.prototype.toString.apply(note).slice(8, -1) === 'String') {
             skip = getEffectLength(note);
             wasEmpty = false;
-            noteSequence.push("0xFC, " + drumTrackNumbers[note] + ",\t\t// GOTO track " + drumTrackNumbers[note]);
+            noteSequence.push("0xFC, " + (drumTrackNumbers[note] + 4) + ",\t\t// GOTO track " + (drumTrackNumbers[note] + 4));
             totalBytes += 2;
         }
     }
