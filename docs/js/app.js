@@ -40103,6 +40103,7 @@ var LoaderView = function (_Component) {
             return _react2.default.createElement('input', {
                 className: 'hidden-file-input',
                 type: 'file',
+                accept: '.atm',
                 ref: function ref(el) {
                     return _this3.fileInput = el;
                 },

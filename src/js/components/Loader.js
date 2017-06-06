@@ -115,6 +115,7 @@ class LoaderView extends Component {
             <input
                 className="hidden-file-input"
                 type="file"
+                accept=".atm"
                 ref={ el => this.fileInput = el }
                 onChange={ this.handleFileChange }
             />
