@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 
 const NoteSheet = () =>
     <div className="sheet-note-container">
-        <div className="sheet-note-row">
+        {/*<div className="sheet-note-row">
             <span className="sheet-note sheet-note-low">C4</span>
             <span className="sheet-note sheet-note-high">
                   <span>C#</span>
@@ -220,7 +220,8 @@ const NoteSheet = () =>
             </span>
             <span className="sheet-note-key key-1">
             </span>
-        </div>
+        </div>*/}
+        <img src="images/sketch01.png"/>
     </div>
 
 export default NoteSheet

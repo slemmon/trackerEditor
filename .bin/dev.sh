@@ -19,6 +19,8 @@ cp -r lib/ build/js/
 
 cp -r src/css/images build/css/images
 cp -r src/images build/images
+# copy piano keys image
+cp mockups/sketch01.png build/images
 
 echo "starting watchify"
 node_modules/.bin/watchify -e src/js/index.js -o "build/js/app.js" -d -v -t [ babelify ] &
