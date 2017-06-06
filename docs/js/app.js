@@ -45570,11 +45570,9 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.default = createNewTrack;
-var idCounter = 0;
-
-function createNewTrack(type) {
+function createNewTrack(type, tracks) {
     var ticks = 8;
-    var myId = idCounter++;
+    var myId = getNewId(tracks);
     var newTrackData = {
         ticks: ticks,
         color: getNewTrackColor(myId),
@@ -45629,6 +45627,17 @@ function getNewTrackColor(id) {
     }
 }
 
+function getNewId(tracks) {
+    var counter = 0;
+
+    for (var i = 0, l = tracks.length; i < l; i++) {
+        if (counter !== tracks[i].id) break;
+        counter++;
+    }
+
+    return counter;
+}
+
 },{}],506:[function(require,module,exports){
 'use strict';
 
@@ -45660,7 +45669,7 @@ function tracks() {
     switch (action.type) {
 
         case 'ADD_TRACK':
-            return state.concat((0, _createNewTrack2.default)(action.trackType));
+            return state.concat((0, _createNewTrack2.default)(action.trackType, state));
 
         case 'DELETE_TRACK':
             return state.filter(function (t) {

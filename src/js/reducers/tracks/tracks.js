@@ -8,7 +8,7 @@ export default function tracks (state = defaultState, action) {
     switch (action.type) {
 
         case 'ADD_TRACK':
-        return state.concat(createNewTrack(action.trackType))
+        return state.concat(createNewTrack(action.trackType, state))
 
         case 'DELETE_TRACK':
         return state.filter(t => t.id !== action.trackId)

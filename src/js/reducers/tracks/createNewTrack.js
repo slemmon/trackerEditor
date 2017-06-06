@@ -1,8 +1,6 @@
-let idCounter = 0
-
-export default function createNewTrack (type) {
+export default function createNewTrack (type, tracks) {
     const ticks = 8
-    const myId = idCounter++
+    const myId = getNewId(tracks)
     const newTrackData = {
         ticks,
         color: getNewTrackColor(myId),
@@ -41,3 +39,14 @@ function getNewTrackColor (id) {
     }
 }
 
+function getNewId (tracks) {
+    let counter = 0
+
+    for ( let i = 0, l = tracks.length; i < l; i++ ) {
+        if ( counter !== tracks[i].id )
+            break
+        counter++
+    }
+
+    return counter
+}
