@@ -43874,7 +43874,6 @@ var drumTracks = {
 };
 
 function createSongFromChannels(tracks, channels, fx) {
-    console.log(fx);
 
     var trackAtm = {};
     var totalTracks = 0;
@@ -44280,7 +44279,7 @@ function atmifyDrumTrack(drumTrackNumbers, track) {
 
     for (var x = 0, l = track.ticks; x < l; x++) {
         note = notes[x];
-        if (note === undefined && skip-- < 1) {
+        if ((note === undefined || note === null) && skip-- < 1) {
             if (wasEmpty) {
                 lastDelayTotal++;
                 noteSequence[noteSequence.length - 1] = "0x9F + " + lastDelayTotal + ",\t\t// DELAY: ticks = " + lastDelayTotal;
@@ -45143,8 +45142,7 @@ function getNewId(tracks) {
     var counter = 0;
 
     for (var i = 0, l = tracks.length; i < l; i++) {
-        if (counter !== tracks[i].id) break;
-        counter++;
+        if (counter <= tracks[i].id) counter = tracks[i].id + 1;
     }
 
     return counter;

@@ -43,9 +43,8 @@ function getNewId (tracks) {
     let counter = 0
 
     for ( let i = 0, l = tracks.length; i < l; i++ ) {
-        if ( counter !== tracks[i].id )
-            break
-        counter++
+        if ( counter <= tracks[i].id )
+            counter = tracks[i].id + 1
     }
 
     return counter

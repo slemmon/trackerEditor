@@ -60,7 +60,6 @@ const drumTracks = {
 }
 
 function createSongFromChannels (tracks, channels, fx) {
-console.log(fx)
 
     const trackAtm = {}
     let totalTracks = 0
@@ -443,7 +442,7 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
 
     for ( let x = 0, l = track.ticks; x < l; x++ ) {
         note = notes[x]
-        if ( note === undefined && skip-- < 1 ) {
+        if ( (note === undefined || note === null) && skip-- < 1 ) {
             if ( wasEmpty ) {
                 lastDelayTotal++
                 noteSequence[noteSequence.length - 1] = `0x9F + ${lastDelayTotal},\t\t// DELAY: ticks = ${lastDelayTotal}`
