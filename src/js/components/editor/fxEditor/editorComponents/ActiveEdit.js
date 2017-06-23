@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import SingleOption from './SingleOption'
 import DoubleOption from './DoubleOption'
+import ArpeggioOption from './ArpeggioOption'
 import fxInfo from '../../../../fxInfo'
 
 const ActiveEdit = ({fx: fxId, passNewValue, data}) => {
@@ -11,6 +12,8 @@ const ActiveEdit = ({fx: fxId, passNewValue, data}) => {
         options = <SingleOption handleValueChange={passNewValue} data={data} />
     } else if ( fx.values === 2 ) {
         options = <DoubleOption handleValueChange={passNewValue} data={data} />
+    } else if ( fx.values === 5 ) {
+        options = <ArpeggioOption handleValueChange={passNewValue} data={data} />
     }
 
     return (

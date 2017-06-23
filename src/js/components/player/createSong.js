@@ -143,7 +143,7 @@ const startFx = {
     },
     128: {
         name: 'FX: SET ARPEGGIO: {val_0} {val_1}',
-        values: 2,
+        values: 5,
         address: '47'
     },
     512: {
@@ -294,10 +294,18 @@ function createFxArray (fxToAdd, type, effects) {
         fxData = effects.fx[fxToAdd[i]] || {}
 
         let params = ','
-        if ( fxInfo.values >= 1 )
+
+        const values = fxInfo.values
+        if ( values < 5 )
             params += ` ${fxData.val_0||0},`
-        if ( fxInfo.values === 2 )
+        if ( values > 1 && values < 5 )
             params += ` ${fxData.val_1||0},`
+        if ( values === 5 ) { // then it's arpeggio
+            params += ` 0x${hexify(fxData.val_2, true)}${hexify(fxData.val_3, true)}`
+            params += `, 0x${fxData.val_0 ? '80' : '00'}`
+            params += ` + 0x${fxData.val_1 ? '40' : '00'}`
+            params += ` + ${fxData.val_4}`
+        }
 
         result.fx.push(`0x${fxInfo.address}${params}\t\t${fxInfo.extraTab?'\t':''}// ${createInfoComment(fxInfo.name, fxData)}`)
 
@@ -517,9 +525,11 @@ function concatAllTracks (bytesOffset, tracks) {
     }
 }
 
-function hexify (number) {
-    const hex = number.toString(16)
-    return `${hex.length < 2 ? 0 : ''}${hex}`
+function hexify (number, nopadding) {
+    let hex = number.toString(16)
+    if ( !nopadding )
+        hex = `${hex.length < 2 ? 0 : ''}${hex}`
+    return hex
 }
 
 function concatAllChannels (/*tracksOffset, */channels) {

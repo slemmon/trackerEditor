@@ -29,7 +29,7 @@
     },
     "128": {
         "name": "set arpeggio",
-        "values": 2
+        "values": 5
     },
     "256": {
         "name": "arpeggio off",
