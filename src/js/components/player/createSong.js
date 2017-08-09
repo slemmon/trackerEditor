@@ -142,7 +142,7 @@ const startFx = {
         address: '45'
     },
     128: {
-        name: 'FX: SET ARPEGGIO: {val_0} {val_1}',
+        name: 'FX: SET ARPEGGIO: {val_0} {val_1} {val_2} {val_3} {val_4}',
         values: 5,
         address: '47'
     },

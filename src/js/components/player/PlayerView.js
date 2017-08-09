@@ -265,8 +265,11 @@ class Player extends Component {
             item = music[i]
             if ( item.indexOf('0x') === 0 ) {
                 splitItem = item.split('+')
-                if ( splitItem.length === 2 )
-                    number = parseInt(splitItem[0], 16) + parseInt(splitItem[1], 10)
+                if ( splitItem.length >= 2 ) {
+                    number = parseInt(splitItem[0], 16)
+                    for ( let i = 1, l = splitItem.length; i < l; i++ )
+                        number += parseInt(splitItem[i], ~splitItem[i].indexOf('0x') ? 16 : 10)
+                }
                 else
                     number = parseInt(splitItem[0], 16)
                 music[i] = number

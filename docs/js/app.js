@@ -44330,7 +44330,12 @@ var Player = function (_Component) {
                 item = music[i];
                 if (item.indexOf('0x') === 0) {
                     splitItem = item.split('+');
-                    if (splitItem.length === 2) number = parseInt(splitItem[0], 16) + parseInt(splitItem[1], 10);else number = parseInt(splitItem[0], 16);
+                    if (splitItem.length >= 2) {
+                        number = parseInt(splitItem[0], 16);
+                        for (var _i = 1, _l = splitItem.length; _i < _l; _i++) {
+                            number += parseInt(splitItem[_i], ~splitItem[_i].indexOf('0x') ? 16 : 10);
+                        }
+                    } else number = parseInt(splitItem[0], 16);
                     music[i] = number;
                 } else {
                     number = parseInt(item, 10);
@@ -44485,7 +44490,7 @@ var startFx = {
         address: '45'
     },
     128: {
-        name: 'FX: SET ARPEGGIO: {val_0} {val_1}',
+        name: 'FX: SET ARPEGGIO: {val_0} {val_1} {val_2} {val_3} {val_4}',
         values: 5,
         address: '47'
     },
