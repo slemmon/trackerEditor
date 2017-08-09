@@ -296,7 +296,7 @@ function createFxArray (fxToAdd, type, effects) {
         let params = ','
 
         const values = fxInfo.values
-        if ( values < 5 )
+        if ( values < 5 && values > 0 )
             params += ` ${fxData.val_0||0},`
         if ( values > 1 && values < 5 )
             params += ` ${fxData.val_1||0},`
