@@ -41758,7 +41758,7 @@ var ArpeggioOption = function ArpeggioOption(_ref) {
             _react2.default.createElement(
                 "label",
                 { htmlFor: "checkbox_1" },
-                "use a third note"
+                "retrigger"
             )
         ),
         _react2.default.createElement(
@@ -41775,7 +41775,7 @@ var ArpeggioOption = function ArpeggioOption(_ref) {
             _react2.default.createElement(
                 "label",
                 { htmlFor: "checkbox_2" },
-                "retrigger"
+                "only user 2 notes"
             )
         ),
         _react2.default.createElement(
