@@ -12,7 +12,7 @@ class Player extends Component {
             channel: 0
         }
 
-        this.tempo = 25
+        this.tempo = 24
         this.synth = new SquawkSynth()
         try {
             this.output = new WebAudioStream()

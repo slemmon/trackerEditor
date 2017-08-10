@@ -41758,7 +41758,7 @@ var ArpeggioOption = function ArpeggioOption(_ref) {
             _react2.default.createElement(
                 "label",
                 { htmlFor: "checkbox_1" },
-                "retrigger"
+                "use only 2nd note"
             )
         ),
         _react2.default.createElement(
@@ -41775,7 +41775,7 @@ var ArpeggioOption = function ArpeggioOption(_ref) {
             _react2.default.createElement(
                 "label",
                 { htmlFor: "checkbox_2" },
-                "only user 2 notes"
+                "retrigger"
             )
         ),
         _react2.default.createElement(
@@ -44081,7 +44081,7 @@ var Player = function (_Component) {
             channel: 0
         };
 
-        _this.tempo = 25;
+        _this.tempo = 24;
         _this.synth = new SquawkSynth();
         try {
             _this.output = new WebAudioStream();
@@ -44624,8 +44624,8 @@ function createFxArray(fxToAdd, type, effects) {
         if (values === 5) {
             // then it's arpeggio
             params += " 0x" + hexify(fxData.val_2, true) + hexify(fxData.val_3, true);
-            params += ", 0x" + (fxData.val_0 ? '80' : '00');
-            params += " + 0x" + (fxData.val_1 ? '40' : '00');
+            params += ", 0x" + (fxData.val_0 ? '40' : '00');
+            params += " + 0x" + (fxData.val_1 ? '20' : '00');
             params += " + " + fxData.val_4 + ",";
         }
 
@@ -45375,7 +45375,7 @@ var defaultState = {
         "0": {
             flags: 1048576,
             fx: {
-                1048576: { val_0: 25 }
+                1048576: { val_0: 24 }
             }
         },
         "1": {

@@ -9,7 +9,7 @@ const ArpeggioOption = ({handleValueChange, data}) =>
                 checked={(data||{}).val_0 || 0}
                 id="checkbox_1"
             />
-            <label htmlFor="checkbox_1">retrigger</label>
+            <label htmlFor="checkbox_1">use only 2nd note</label>
         </div>
         <div className="input-group">
             <input
@@ -18,7 +18,7 @@ const ArpeggioOption = ({handleValueChange, data}) =>
                 checked={(data||{}).val_1 || 0}
                 id="checkbox_2"
             />
-            <label htmlFor="checkbox_2">only user 2 notes</label>
+            <label htmlFor="checkbox_2">retrigger</label>
         </div>
         <div className="input-group">
             <input

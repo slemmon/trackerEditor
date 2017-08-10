@@ -302,8 +302,8 @@ function createFxArray (fxToAdd, type, effects) {
             params += ` ${fxData.val_1||0},`
         if ( values === 5 ) { // then it's arpeggio
             params += ` 0x${hexify(fxData.val_2, true)}${hexify(fxData.val_3, true)}`
-            params += `, 0x${fxData.val_0 ? '80' : '00'}`
-            params += ` + 0x${fxData.val_1 ? '40' : '00'}`
+            params += `, 0x${fxData.val_0 ? '40' : '00'}`
+            params += ` + 0x${fxData.val_1 ? '20' : '00'}`
             params += ` + ${fxData.val_4},`
         }
 
