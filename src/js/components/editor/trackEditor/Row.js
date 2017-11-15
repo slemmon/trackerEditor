@@ -30,7 +30,7 @@ class Row extends Component {
                 className = { `editor-table-row ${ last ? 'editor-table-row-last' : '' } ${ isHighlightedRow ? 'editor-table-row-highlighted' : '' }` }
             >
                 {isHighlightedRow?
-                    <RowNumber number={rowNumber} />
+                    <RowNumber number={("0" + rowNumber).slice(-2)} />
                     :null
                 }
                 <Block number={1} activeNote={activeNote} modifier={modifier} toggleNote={this.toggleNote} handleMouseEnter={this.handleMouseEnter} />
