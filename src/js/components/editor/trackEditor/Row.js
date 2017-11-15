@@ -22,7 +22,7 @@ class Row extends Component {
               last = this.props.last,
               modifier = this.props.nextIsSame && this.props.previousIsSame ? 'editor-table-block-note-middle' : this.props.nextIsSame ? 'editor-table-block-note-first' : this.props.previousIsSame ? 'editor-table-block-note-last' : '',
               activeNote = this.props.note.active,
-              rowNumber = this.props.totalRows - this.props.row,
+              rowNumber = this.props.totalRows - (this.props.row + 1),
               isHighlightedRow = rowNumber % 4 === 0
 
         return (
