@@ -34,6 +34,7 @@
     "redux": "^3.6.0"
   },
   "devDependencies": {
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.22.0",
     "babel-preset-latest": "^6.24.0",
     "babel-preset-react": "^6.22.0",

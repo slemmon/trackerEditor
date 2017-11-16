@@ -32,6 +32,7 @@ class Player extends Component {
         this.exportSong = this.exportSong.bind(this)
         this.createSongCode = this.createSongCode.bind(this)
         this.createAndPlaySong = this.createAndPlaySong.bind(this)
+        this.stopSong = this.stopSong.bind(this)
 
     }
 
@@ -45,6 +46,7 @@ class Player extends Component {
         document.addEventListener('createSongCode', this.createSongCode)
 
         document.addEventListener('playCompleteSong', this.createAndPlaySong)
+        document.addEventListener('stopCompleteSong', this.stopSong)
     }
 
     componentWillUnmount() {
@@ -57,6 +59,7 @@ class Player extends Component {
         document.addEventListener('createSongCode', this.createSongCode)
 
         document.removeEventListener('playCompleteSong', this.createAndPlaySong)
+        document.removeEventListener('stopCompleteSong', this.stopSong)
     }
 
     playOnce (e) {
@@ -179,10 +182,23 @@ class Player extends Component {
         this.playSong(song)
     }
 
-    stopRepeat () {
+    /**
+     * Stops playing the currently loaded song and deletes the player instance
+     * as it's recreated on each play() call
+     */
+    stopSong () {
         clearInterval(this.listenForSongEndInterval)
         clearInterval(this.trackPlayPositionInterval)
         this.output.pause(true)
+        
+        delete this.player
+    }
+
+    /**
+     * Stops the currently playing song and toggles off the repeating indicator
+     */
+    stopRepeat () {
+        this.stopSong()
         this.setState({repeatIsOn: false})
     }
 
