@@ -1,0 +1,41 @@
+.popper {
+    background-color: #594e4e;
+    color: white;
+    text-align: center;
+    padding: 12px;
+
+    button {
+        margin: 12px 0 0 0;
+        color: white;
+        background-color: #594e4e;
+    }
+    .popper__arrow {
+        border-color: #594e4e;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        position: absolute;
+        margin: 5px;
+    }
+}
+
+.popper[data-placement^="top"] .popper__arrow {
+    border-width: 5px 5px 0 5px;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    bottom: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.popper[data-placement^="bottom"] .popper__arrow {
+    border-width: 0 5px 5px 5px;
+    border-left-color: transparent;
+    border-right-color: transparent;
+    border-top-color: transparent;
+    top: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+}

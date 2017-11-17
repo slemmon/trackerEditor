@@ -1,7 +1,7 @@
 import { colorsObj as colors } from '../../appColors'
 
 export default function createNewTrack (type, tracks) {
-    const ticks = 8
+    const ticks = 9
     const myId = getNewId(tracks)
     const newTrackData = {
         ticks,
