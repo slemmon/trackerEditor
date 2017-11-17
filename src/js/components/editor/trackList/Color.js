@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { GithubPicker } from 'react-color'
 import stringifyColor from '../../../stringifyColor'
+import { colorsHex as colors } from '../../../appColors'
 
 class Color extends Component {
 
@@ -52,7 +53,7 @@ class Color extends Component {
                     <span className="colorpicker">
                         <GithubPicker
                             onChangeComplete = { color => this.props.setTrackColor(track.id, color) }
-                            colors = {['#ff7e00', '#ff69a8', '#00a8cc', '#00d2ae', '#584d4d', '#7171d8', '#df2020', '#24eb24', '#ffcc99', '#ffbdd8', '#85e9ff', '#75ffe8', '#aea2a2', '#b7b7eb', '#ef8f8f', '#98f598']}
+                            colors = {colors}
                         />
                     </span>
                     :null

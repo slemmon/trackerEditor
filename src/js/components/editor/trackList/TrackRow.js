@@ -1,9 +1,14 @@
 import React from 'react'
 import Color from './Color'
 import stringifyColor from '../../../stringifyColor'
+import color from 'color'
 
-const TrackRow = ({last, i, track, deleteTrack, setActiveTrack, setTrackColor}) =>
-    <li className={`track-list-item ${ last === i + 1 ? 'track-list-item-last' : '' }`}>
+
+
+const TrackRow = ({last, i, track, deleteTrack, setActiveTrack, setTrackColor}) => {
+    const rgbObj = color(track.color.rgb);
+
+    return <li className={`track-list-item ${ last === i + 1 ? 'track-list-item-last' : '' }`}>
         <span className="track-list-item-icon">
             <i className={`fa fa-${ track.type === 'tune' ? 'music' : 'superpowers' }`} aria-hidden="true"></i>
         </span>
@@ -15,7 +20,11 @@ const TrackRow = ({last, i, track, deleteTrack, setActiveTrack, setTrackColor}) 
                 onDragStart = { e => { e.dataTransfer.setData('trackId', track.id); e.dataTransfer.setData('type', track.type) } }
                 data-track-id = { track.id }
                 className = { `track-list-item-tickbar-bar ${track.type === 'tune' ? 'tickbar-tune' : 'tickbar-drum' }` }
-                style = {{ width: track.ticks * 2, backgroundColor: stringifyColor(track.color, 'rgba', {a: 0.5}), borderColor: stringifyColor(track.color, 'rgb') }}
+                style = {{
+                    width: track.ticks * 2,
+                    backgroundColor: rgbObj.fade(.5),
+                    borderColor: rgbObj.string()
+                }}
             ></span>
         </span>
         <span
@@ -26,5 +35,6 @@ const TrackRow = ({last, i, track, deleteTrack, setActiveTrack, setTrackColor}) 
             <span onClick={ () => setActiveTrack(track) }><i className="fa fa-pencil" aria-hidden="true"></i></span>
         </span>
     </li>
+}
 
 export default TrackRow
