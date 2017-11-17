@@ -8,7 +8,8 @@ class SongEditor extends Component {
         super(props)
 
         this.state = {
-            showCode: false
+            showCode: false,
+            songIsPlaying: false
         }
 
         this.toggleShowCode = this.toggleShowCode.bind(this)
@@ -61,12 +62,33 @@ class SongEditor extends Component {
         this.props.toggleFxEditor(channel)
     }
 
-    playSong () {
+    /**
+     * Plays the currently loaded song
+     */
+    playSong = () => {
+        this.setState({
+            // toggles playing indicator for play / stop btn
+            songIsPlaying: true
+        })
         customEventEmitter('playCompleteSong')
+    }
+
+    /**
+     * Stops playing the currently loaded song
+     */
+    stopSong = () => {
+        this.setState({
+            // toggles playing indicator for play / stop btn
+            songIsPlaying: false
+        })
+        customEventEmitter('stopCompleteSong')
     }
 
     render () {
         const state = this.state
+        const { songIsPlaying } = state
+        const playOrStop = songIsPlaying ? 'stopSong' : 'playSong'
+        const playOrStopText = songIsPlaying ? 'Stop' : 'Play'
         const fxStatus = this.props.fxStatus
         const activeFx = fxStatus.fxType === 'channel' && fxStatus.id
         return (
@@ -78,7 +100,7 @@ class SongEditor extends Component {
                 <button onClick={ this.saveJSON }>save</button>
                 <button onClick={ this.loadJSON }>load</button>
                 <button onClick={ this.toggleShowCode }>{ `${state.showString ? 'Hide' : 'Show'} code` }</button>
-                <button onClick={ this.playSong }>Play Song</button>
+                <button onClick={ this[playOrStop] }>{`${playOrStopText}`} Song</button>
 
                 <div className="song-editor-channels">
 
