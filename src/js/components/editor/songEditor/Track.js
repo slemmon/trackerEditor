@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import stringifyColor from '../../../stringifyColor'
+import color from 'color'
 
 class Track extends Component {
     constructor () {
@@ -61,8 +62,9 @@ class Track extends Component {
     render () {
         const track = this.props.track
         const detail = this.props.detail
-        const colorLight = stringifyColor(detail.color, 'rgba', {a: 0.5})
-        const colorDark = stringifyColor(detail.color, 'rgb')
+        const rgbObj = color(detail.color.rgb).rgb()
+        const colorLight = rgbObj.fade(.5)
+        const colorDark = rgbObj.string()
         return (
             <span
                 draggable = { true }
