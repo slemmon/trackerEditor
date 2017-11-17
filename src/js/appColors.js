@@ -2,7 +2,7 @@ import color from 'color'
 import colormap from 'colormap'
 
 const colors = colormap({
-    colormap: 'rainboxw',
+    colormap: 'rainbow',
     nshades: 16,
     format: 'hex',
     alpha: 1
