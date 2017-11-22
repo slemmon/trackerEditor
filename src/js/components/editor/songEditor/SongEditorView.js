@@ -9,7 +9,8 @@ class SongEditor extends Component {
 
         this.state = {
             showCode: false,
-            songIsPlaying: false
+            songIsPlaying: false,
+            isNew: false
         }
 
         this.toggleShowCode = this.toggleShowCode.bind(this)
@@ -27,9 +28,25 @@ class SongEditor extends Component {
             })
         else {
             this.setState({
-                showCode: true
+                showCode: true,
+                isNew: false
             })
             customEventEmitter('createSongCode')
+        }
+    }
+
+    toggleShowCodeNew = () => {
+        const codeIsVisible = this.state.showCode
+        if ( codeIsVisible )
+            this.setState({
+                showCode: false
+            })
+        else {
+            this.setState({
+                showCode: true,
+                isNew: true
+            })
+            customEventEmitter('createSongCodeNew')
         }
     }
 
@@ -100,6 +117,7 @@ class SongEditor extends Component {
                 <button onClick={ this.saveJSON }>save</button>
                 <button onClick={ this.loadJSON }>load</button>
                 <button onClick={ this.toggleShowCode }>{ `${state.showString ? 'Hide' : 'Show'} code` }</button>
+                <button onClick={ this.toggleShowCodeNew }>SHOW NEW CODE</button>
                 <button onClick={ this[playOrStop] }>{`${playOrStopText}`} Song</button>
 
                 <div className="song-editor-channels">
@@ -153,7 +171,7 @@ class SongEditor extends Component {
 
                 </div>
 
-                <SongCode show={state.showCode} />
+                <SongCode show={state.showCode} isNew={state.isNew} />
 
             </div>
         )

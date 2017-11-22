@@ -1,6 +1,10 @@
 // TODO change tempo
 import React, { Component } from 'react'
 import { createSongFromChannels, createNoteSequence } from './createSong'
+import {
+    createSongFromChannels as n_createSongFromChannels,
+    createNoteSequence as n_createNoteSequence
+} from './createSongNew'
 
 class Player extends Component {
     constructor () {
@@ -44,6 +48,7 @@ class Player extends Component {
 
         document.addEventListener('exportSong', this.exportSong)
         document.addEventListener('createSongCode', this.createSongCode)
+        document.addEventListener('createSongCodeNew', this.createSongCodeNew)
 
         document.addEventListener('playCompleteSong', this.createAndPlaySong)
         document.addEventListener('stopCompleteSong', this.stopSong)
@@ -57,6 +62,7 @@ class Player extends Component {
 
         document.addEventListener('exportSong', this.exportSong)
         document.addEventListener('createSongCode', this.createSongCode)
+        document.removeEventListener('createSongCodeNew', this.createSongCodeNew)
 
         document.removeEventListener('playCompleteSong', this.createAndPlaySong)
         document.removeEventListener('stopCompleteSong', this.stopSong)
@@ -301,6 +307,19 @@ class Player extends Component {
     createSongCode () {
         const props = this.props
         props.saveSongCode(createSongFromChannels(props.tracks, props.channels, props.fx))
+    }
+
+    createSongCodeNew = () => {
+        const { saveSongCode, tracks, channels, fx } = this.props
+
+        saveSongCode(
+            n_createSongFromChannels(
+                Object.assign(
+                    {},
+                    { tracks, channels, fx }
+                )
+            )
+        )
     }
 
     render () {

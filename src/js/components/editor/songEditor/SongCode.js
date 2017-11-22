@@ -7,12 +7,12 @@ const mapStateToProps = (state) => {
     }
 }
 
-const SongCodeView = ({code, show}) =>
+const SongCodeView = ({code, show, isNew}) =>
     <pre style={{
         textTransform: 'initial',
         borderStyle: 'inset',
         padding: 2,
-        backgroundColor: '#f3f3f3',
+        backgroundColor: isNew ? '#dcdbff' : '#f3f3f3',
         display: `${show ? '' : 'none'}`
     }}>
         {code}
