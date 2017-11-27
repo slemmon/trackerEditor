@@ -35,21 +35,6 @@ class SongEditor extends Component {
         }
     }
 
-    toggleShowCodeNew = () => {
-        const codeIsVisible = this.state.showCode
-        if ( codeIsVisible )
-            this.setState({
-                showCode: false
-            })
-        else {
-            this.setState({
-                showCode: true,
-                isNew: true
-            })
-            customEventEmitter('createSongCodeNew')
-        }
-    }
-
     addDefaultVolumeFx (channel) {
 
         const channelsFx = this.state.channelsFx
@@ -117,7 +102,6 @@ class SongEditor extends Component {
                 <button onClick={ this.saveJSON }>save</button>
                 <button onClick={ this.loadJSON }>load</button>
                 <button onClick={ this.toggleShowCode }>{ `${state.showString ? 'Hide' : 'Show'} code` }</button>
-                <button onClick={ this.toggleShowCodeNew }>SHOW NEW CODE</button>
                 <button onClick={ this[playOrStop] }>{`${playOrStopText}`} Song</button>
 
                 <div className="song-editor-channels">

@@ -1,6 +1,7 @@
 import orderBy from 'lodash.orderby';
+import { getEffectLength } from './createSong';
 
-export { createNoteSequence, createSongFromChannels }
+export { createSongFileFromChannels };
 
 
 /////////////////////////////////////////////////////
@@ -248,7 +249,7 @@ const headerDefinitions = `#ifndef SONG_H
  * @return {String} The audio file content.  See the following for reference:
  * https://github.com/moduscreate/ATMlib/blob/d8a8631d6ba53179f284ef3de74aeb125de6fe47/examples/songs/song01_sfx/song.h
  */
-function createSongFromChannels (song) {
+function createSongFileFromChannels (song) {
   const { tracks, channels, fx } = song;
   
   const trackAtm = {};
@@ -308,7 +309,8 @@ function createSongFromChannels (song) {
   
 ${getPatternDefinitions(allPatterns)}
 ${getScoreData(allPatterns)}
-  `;
+
+#endif`;
 
   return completeSong;
 }
@@ -736,103 +738,4 @@ function getRequiredDrumTracks (tracks) {
   Object.keys(required).forEach((name, i) => required[name] = i);
   
   return required;
-}
-
-
-
-
-
-
-function createNoteSequence (track) {
-    if ( track.type === 'tune')
-        return tuneSequence(track)
-    else
-        return drumSequence(track)
-}
-
-function tuneSequence (track) {
-    const notes = track.notes,
-          noteSequence = []
-
-    let thisNote,
-        lastNote = -1,
-        thisNoteNumber
-
-    for ( const note of notes ) {
-        thisNote = (note||{}).active
-        thisNoteNumber = ~thisNote ? thisNote : 0
-        if ( thisNote === lastNote ) {
-            if ( !noteSequence.length ) {
-                noteSequence[0] = thisNoteNumber
-                noteSequence[1] = 159 + 1
-            } else
-                noteSequence[noteSequence.length - 1]++
-        } else {
-            noteSequence.push(thisNoteNumber) // note to play
-            noteSequence.push(159 + 1)  // play for 1 tick
-        }
-        lastNote = thisNote
-    }
-
-    noteSequence.push(67)
-
-    return noteSequence
-}
-
-function drumSequence (track) {
-    const notes = track.notes
-
-    let note,
-        noteSequence = [],
-        wasEmpty = false,
-        skip = 0,
-        lastDelayTotal
-
-    for ( let x = 0, l = track.ticks; x < l; x++ ) {
-        note = notes[x]
-        if ( note === undefined && skip-- < 1 ) {
-            if ( wasEmpty ) {
-                lastDelayTotal++
-                noteSequence[noteSequence.length - 1] = 0x9F + lastDelayTotal
-            } else {
-                wasEmpty = true
-                noteSequence.push(0x40)
-                noteSequence.push(0)
-                noteSequence.push(0x9F + 1)
-                lastDelayTotal = 1
-            }
-        } else if ( note !== undefined && Object.prototype.toString.apply(note).slice(8, -1) === 'String' ) {
-            skip = getEffectLength(note)
-            // skip = note === 'snare' ? 1 : note === 'shake' ? 3 : 15
-            wasEmpty = false
-            noteSequence = noteSequence.concat( getEffect(note) )
-        }
-    }
-
-    return noteSequence
-}
-
-function getEffectLength (effectName) {
-    switch (effectName) {
-        case 'snare': return 1
-        case 'shake': return 3
-        case 'crash': return 15
-        case 'tick': return 0
-        case 'short_crash': return 7
-    }
-}
-
-function getEffect (note) {
-    switch (note) {
-        case 'snare':
-        return [64, 32, 65, -16, 161, 67]
-        case 'shake':
-        return [73, 4, 64, 32, 65, -8, 163, 74, 67]
-        case 'crash':
-        return [64, 32, 65, -2, 175, 67]
-        case 'tick':
-        return [64, 32, 160, 64, 0]
-        case 'short_crash':
-        return [64, 32, 65, -4, 167, 67]
-    }
 }
