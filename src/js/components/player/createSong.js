@@ -1,4 +1,4 @@
-export { createNoteSequence, createSongFromChannels }
+export { createNoteSequence, createSongFromChannels, getEffectLength }
 
 const drumTracks = {
     snare: {

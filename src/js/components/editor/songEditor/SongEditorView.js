@@ -9,7 +9,8 @@ class SongEditor extends Component {
 
         this.state = {
             showCode: false,
-            songIsPlaying: false
+            songIsPlaying: false,
+            isNew: false
         }
 
         this.toggleShowCode = this.toggleShowCode.bind(this)
@@ -27,7 +28,8 @@ class SongEditor extends Component {
             })
         else {
             this.setState({
-                showCode: true
+                showCode: true,
+                isNew: false
             })
             customEventEmitter('createSongCode')
         }
@@ -153,7 +155,7 @@ class SongEditor extends Component {
 
                 </div>
 
-                <SongCode show={state.showCode} />
+                <SongCode show={state.showCode} isNew={state.isNew} />
 
             </div>
         )

@@ -1,6 +1,7 @@
 // TODO change tempo
 import React, { Component } from 'react'
 import { createSongFromChannels, createNoteSequence } from './createSong'
+import { createSongFileFromChannels } from './createSongFile'
 
 class Player extends Component {
     constructor () {
@@ -244,10 +245,10 @@ class Player extends Component {
     }
 
     exportSong () {
-        const props = this.props
-        const songString = createSongFromChannels(props.tracks, props.channels, props.fx)
+        const { saveSongCode } = this.props
+        const songString = this.getSongFileCode()
 
-        this.props.saveSongCode(songString)
+        saveSongCode(songString)
 
         // make the browser download the file
         const download = document.createElement('a')
@@ -257,14 +258,12 @@ class Player extends Component {
         document.body.appendChild(download)
         download.click()
         document.body.removeChild(download)
-
-
     }
 
     createAndPlaySong () {
-        const props = this.props
+        const { tracks, channels, fx } = this.props
 
-        let music = createSongFromChannels(props.tracks, props.channels, props.fx)
+        let music = createSongFromChannels(tracks, channels, fx)
 
         music = music.replace(/\/\/"Track.*"/g, 'Track,')
         music = music.replace(/, /g, ',\n')
@@ -299,8 +298,20 @@ class Player extends Component {
     }
 
     createSongCode () {
-        const props = this.props
-        props.saveSongCode(createSongFromChannels(props.tracks, props.channels, props.fx))
+        const { saveSongCode } = this.props
+
+        saveSongCode(this.getSongFileCode())
+    }
+
+    getSongFileCode = () => {
+        const { tracks, channels, fx } = this.props
+
+        return createSongFileFromChannels(
+            Object.assign(
+                {},
+                { tracks, channels, fx }
+            )
+        )
     }
 
     render () {
