@@ -2,6 +2,7 @@
 import React, { Component } from 'react'
 import { createSongFromChannels, createNoteSequence } from './createSong'
 import { createSongFileFromChannels } from './createSongFile'
+import once from 'lodash.once'
 
 class Player extends Component {
     constructor () {
@@ -47,7 +48,7 @@ class Player extends Component {
         document.addEventListener('createSongCode', this.createSongCode)
 
         document.addEventListener('playCompleteSong', this.createAndPlaySong)
-        document.addEventListener('stopCompleteSong', this.stopSong)
+        document.addEventListener('stopPlaying', this.stopSong)
     }
 
     componentWillUnmount() {
@@ -56,19 +57,29 @@ class Player extends Component {
         document.removeEventListener('toggleMute', this.toggleMute)
         document.removeEventListener('changeChannel', this.changeChannel)
 
-        document.addEventListener('exportSong', this.exportSong)
-        document.addEventListener('createSongCode', this.createSongCode)
+        document.removeEventListener('exportSong', this.exportSong)
+        document.removeEventListener('createSongCode', this.createSongCode)
 
         document.removeEventListener('playCompleteSong', this.createAndPlaySong)
-        document.removeEventListener('stopCompleteSong', this.stopSong)
+        document.removeEventListener('stopPlaying', this.stopSong)
     }
 
     playOnce (e) {
-        const songArray = this.createTheSongArray(e.detail.song)
-        this.playSong(songArray)
-        this.setState({
-            autoplay: false
+        const pattern = this.createTheSongArray(this.props.activeTrack)
+
+        this.playSong(pattern, () => {
+            const { trackRepeat } = this.props
+
+            if (trackRepeat) {
+                this.playOnce()
+                this.setState({
+                    autoplay: false
+                })
+            } else {
+                this.stopSong();
+            }
         })
+        this.props.setTrackIsPlaying(true);
     }
 
     toggleRepeat (e) {
@@ -78,7 +89,7 @@ class Player extends Component {
         })
 
         if ( newState )
-            this.playSongAndRepeat(this.createTheSongArray(e.detail.song), e.detail.song.type)
+            this.playActiveTrack(true)
         else
             this.stopRepeat()
     }
@@ -97,6 +108,8 @@ class Player extends Component {
         const channel = this.state.channel
 
         const noteSequence = createNoteSequence(track)
+        const tempoFx = this.props.fx.channel[channel].fx['1048576']
+        const tempo = tempoFx ? tempoFx.val_0 : this.tempo
 
         const templateSong = [
 
@@ -106,10 +119,10 @@ class Player extends Component {
             3,              // address of track 1
             0,              // address of track 1
 
-            drum?0:1,              // Channel 0 entry track (PULSE)
+            drum?0:1,       // Channel 0 entry track (PULSE)
             0,              // Channel 1 entry track (SQUARE)
             0,              // Channel 2 entry track (TRIANGLE)
-            drum?1:0,              // Channel 3 entry track (NOISE)
+            drum?1:0,       // Channel 3 entry track (NOISE)
 
 
             "Track 0",      // ticks = 0 / bytes = 3
@@ -119,7 +132,7 @@ class Player extends Component {
 
 
             "Track 1",
-            157, this.tempo,        // SET song tempo: value = 50
+            157, tempo,     // SET song tempo: value = 50
             64, 48          // FX: SET VOLUME: volume = 48
 
         ]
@@ -135,9 +148,16 @@ class Player extends Component {
 
     }
 
-    playSong (song) {
+    playSong (song, callback) {
         // Initialize player
         this.player = new SquawkStream(this.emulateSampleRate)
+        this.player.onPlayEnd = () => {
+            if (callback) {
+                callback()
+            } else {
+                this.stopSong()
+            }
+        }
         this.player.setSource(song)
         // Build graph [this.player]=>[synth]=>[converter]=>[output]
         // Output is the sink, and drives/times the entire graph.
@@ -148,20 +168,21 @@ class Player extends Component {
         this.output.play()
 
         this.trackPlayPosition()
-        this.listenForSongEnd()
     }
 
-    playSongAndRepeat (song, type) {
+    // DEV NOTE: Kept for reference in case we want a method to add a repeat
+    // to a song programmatically
+    playSongAndRepeat = (song, type, repeatCount = 255) => {
         song.pop()     // remove last fx
         song.push(254) // add RETURN fx to end of array
         song[0]++      // increase track number
 
         const repeater = [
             "Track 2",
-            253, // repeat
-            255, // 255x
-            1,   // track 1
-            159  // stop channel
+            253,         // repeat
+            repeatCount, // 255x
+            1,           // track 1
+            159          // stop channel
         ]
 
         song = song.concat(repeater)
@@ -193,6 +214,9 @@ class Player extends Component {
         this.output.pause(true)
         
         delete this.player
+
+        this.props.setSongIsPlaying(false);
+        this.props.setTrackIsPlaying(false);
     }
 
     /**
@@ -201,21 +225,6 @@ class Player extends Component {
     stopRepeat () {
         this.stopSong()
         this.setState({repeatIsOn: false})
-    }
-
-    listenForSongEnd () {
-        if ( this.listenForSongEndInterval )
-            clearInterval(this.listenForSongEndInterval)
-        this.listenForSongEndInterval = setInterval(
-            () => {
-                if ( this.player.getChannelActiveMute() === 0 ) {
-                    this.output.pause(true)
-
-                    clearInterval(this.listenForSongEndInterval)
-                    clearInterval(this.trackPlayPositionInterval)
-
-                }
-            }, 100)
     }
 
     trackPlayPosition () {
@@ -261,7 +270,7 @@ class Player extends Component {
     }
 
     createAndPlaySong () {
-        const { tracks, channels, fx } = this.props
+        const { tracks, channels, fx, songRepeat } = this.props
 
         let music = createSongFromChannels(tracks, channels, fx)
 
@@ -294,7 +303,11 @@ class Player extends Component {
             }
         }
 
-        this.playSong(music)
+        this.props.setSongIsPlaying(true);
+        this.playSong(music, () => {
+            const { songRepeat } = this.props
+            this[songRepeat ? 'createAndPlaySong' : 'stopSong']()
+        })
     }
 
     createSongCode () {

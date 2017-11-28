@@ -24,6 +24,10 @@ const mapDispatchToProps = (dispatch) => {
                     notes: []
                 }
             })
+            dispatch({
+                type: 'SET_ACTIVE_TRACK_TYPE',
+                trackType: null
+            })
         },
         setTrackColor (trackId, color) {
             dispatch({
@@ -32,10 +36,14 @@ const mapDispatchToProps = (dispatch) => {
                 color
             })
         },
-        setActiveTrack (track) {
+        setActiveTrack (track, type) {
             dispatch({
                 type: 'SET_ACTIVE_TRACK',
                 track
+            })
+            dispatch({
+                type: 'SET_ACTIVE_TRACK_TYPE',
+                trackType: type
             })
         }
     }

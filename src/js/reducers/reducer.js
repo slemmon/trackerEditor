@@ -1,16 +1,26 @@
 import { combineReducers } from 'redux'
-import tracks from './tracks/tracks'
 import activeTrack from './activeTrack'
-import song from './song'
+import activeTrackType from './activeTrackType'
 import channels from './channels'
 import fx from './fx'
+import song from './song'
+import songIsPlaying from './songIsPlaying'
+import songRepeat from './songRepeat'
 import status from './status'
+import trackIsPlaying from './tracks/trackIsPlaying'
+import trackRepeat from './tracks/trackRepeat'
+import tracks from './tracks/tracks'
 
 export default combineReducers({
-    tracks,
     activeTrack,
-    song,
+    activeTrackType,
     channels,
     fx,
-    status
+    song,
+    songIsPlaying,
+    songRepeat,
+    status,
+    trackIsPlaying,
+    trackRepeat,
+    tracks
 });

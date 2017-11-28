@@ -2,10 +2,16 @@ import { connect } from 'react-redux'
 import PlayerView from './PlayerView'
 
 const mapStateToProps = (state) => {
+    const { channels, tracks, fx, activeTrack,
+          activeTrackType, songRepeat, trackRepeat } = state
     return {
-        channels: state.channels,
-        tracks: state.tracks,
-        fx: state.fx
+        channels,
+        tracks,
+        fx,
+        activeTrack,
+        activeTrackType,
+        songRepeat,
+        trackRepeat
     }
 }
 
@@ -15,6 +21,18 @@ const mapDispatchToProps = (dispatch) => {
             dispatch({
                 type: 'SONG_SAVE',
                 code
+            })
+        },
+        setSongIsPlaying (playing) {
+            dispatch({
+                type: 'SONG_IS_PLAYING',
+                playing
+            })
+        },
+        setTrackIsPlaying (playing) {
+            dispatch({
+                type: 'TRACK_IS_PLAYING',
+                playing
             })
         }
     }

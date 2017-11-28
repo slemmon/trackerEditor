@@ -28,6 +28,7 @@
     "colormap": "^2.3.0",
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.0",
+    "lodash.once": "^4.1.1",
     "lodash.orderby": "^4.6.0",
     "lodash.uniq": "^4.5.0",
     "react": "^15.4.2",

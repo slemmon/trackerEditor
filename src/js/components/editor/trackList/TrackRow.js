@@ -57,7 +57,7 @@ class TrackRow extends React.Component {
                         show={showConfirm}
                         hide={this.hideDialog}
                     />
-                    <span onClick={ () => setActiveTrack(track) }><i className="fa fa-pencil" aria-hidden="true"></i></span>
+                    <span onClick={ () => setActiveTrack(track, track.type) }><i className="fa fa-pencil" aria-hidden="true"></i></span>
                 </span>
             </li>
         )
