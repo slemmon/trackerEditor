@@ -20,8 +20,6 @@ class DrumEditor extends Component {
         this.changeTicksAmount = this.changeTicksAmount.bind(this)
         this.selectEffect = this.selectEffect.bind(this)
         this.addEffectAtPosition = this.addEffectAtPosition.bind(this)
-        this.playOnce = this.playOnce.bind(this)
-        this.playSongAndRepeat = this.playSongAndRepeat.bind(this)
         this.toggleAutoplay = this.toggleAutoplay.bind(this)
     }
 
@@ -117,7 +115,6 @@ class DrumEditor extends Component {
         const track = this.props.track
 
         const effectLength = this.getEffectLength(selectedEffect)
-        // const effectLength = selectedEffect === 'snare' ? 2 : selectedEffect === 'shake' ? 4 : 16
         if ( position + effectLength > track.ticks )
             return effects
 
@@ -169,26 +166,25 @@ class DrumEditor extends Component {
         return effects
     }
 
-    playOnce (p, e, track = this.props.track) {
-        this.setState({
-            repeatIsOn: false
-        })
+    playTrack = () => {
         emitCustomEvent('playOnce', {
-            song: track
-        })
-    }
-
-    toggleMute () {
-        emitCustomEvent('toggleMute')
-    }
-
-    playSongAndRepeat () {
-        this.setState({
-            repeatIsOn: !this.state.repeatIsOn
-        })
-        emitCustomEvent('toggleRepeat', {
             song: this.props.track
         })
+    }
+
+    /**
+     * Stops playing the currently loaded track
+     */
+    stopTrack = () => {
+        emitCustomEvent('stopPlaying')
+    }
+
+    toggleMute = () => {
+        const newState = !this.state.isMuted
+        this.setState({
+            isMuted: newState
+        })
+        emitCustomEvent('toggleMute')
     }
 
     toggleAutoplay () {
@@ -198,9 +194,12 @@ class DrumEditor extends Component {
     }
 
     render () {
-        const activeTrack = this.props.track
+        const { track: activeTrack, toggleTrackRepeat, 
+              trackIsPlaying, trackRepeat } = this.props
         const state = this.state
         const selectedEffect = state.selectedEffect
+        const playOrStop = trackIsPlaying ? 'stopTrack' : 'playTrack'
+        const playOrStopText = trackIsPlaying ? 'Stop' : 'Play'
 
         return (
             <div id="drum-editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
@@ -220,8 +219,20 @@ class DrumEditor extends Component {
                 </div>
 
                 <div className="editor-play-buttons">
-                    <button onClick={this.playOnce}>play once</button>
-                    <button onClick={this.playSongAndRepeat}>{ `${state.repeatIsOn ? 'stop' : 'play'} repeat` }</button>
+                    {/* <button onClick={this.playOnce}>play once</button> */}
+                    <button onClick={ this[playOrStop] }>
+                        {`${playOrStopText}`}
+                    </button>
+                    {/* <button onClick={this.playSongAndRepeat}>{ `${state.repeatIsOn ? 'stop' : 'play'} repeat` }</button> */}
+                    <label>
+                        Repeat
+                        <input
+                            type="checkbox"
+                            onChange={e => toggleTrackRepeat(e.target.checked)}
+                            checked={trackRepeat}
+                        />
+                    </label>
+                    <div style={{flex: 1}}></div>
                     <button onClick={this.toggleAutoplay}>{ `autoplay ${state.autoplayIsOn ? 'off' : 'on'}` }</button>
                     <button onClick={this.toggleMute}>{ `${state.isMuted ? 'un' : ''}mute` }</button>
                 </div>

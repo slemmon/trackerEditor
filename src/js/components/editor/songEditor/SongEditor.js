@@ -2,8 +2,11 @@ import { connect } from 'react-redux'
 import SongEditorView from './SongEditorView'
 
 const mapStateToProps = (state) => {
+    const { fx, songIsPlaying } = state
+
     return {
-        fxStatus: state.fx.status
+        fxStatus: fx.status,
+        songIsPlaying
     }
 }
 
@@ -19,6 +22,12 @@ const mapDispatchToProps = (dispatch) => {
         hideFxEditor () {
             dispatch({
                 type: "FX_HIDE_VIEW"
+            })
+        },
+        toggleSongRepeat (repeat) {
+            dispatch({
+                type: "TOGGLE_SONG_REPEAT",
+                repeat
             })
         }
     }

@@ -9,8 +9,7 @@ class SongEditor extends Component {
 
         this.state = {
             showCode: false,
-            songIsPlaying: false,
-            isNew: false
+            isMuted: false
         }
 
         this.toggleShowCode = this.toggleShowCode.bind(this)
@@ -28,8 +27,7 @@ class SongEditor extends Component {
             })
         else {
             this.setState({
-                showCode: true,
-                isNew: false
+                showCode: true
             })
             customEventEmitter('createSongCode')
         }
@@ -79,30 +77,60 @@ class SongEditor extends Component {
      * Stops playing the currently loaded song
      */
     stopSong = () => {
+        customEventEmitter('stopPlaying')
+    }
+
+    toggleMute = () => {
+        const newState = !this.state.isMuted
         this.setState({
-            // toggles playing indicator for play / stop btn
-            songIsPlaying: false
+            isMuted: newState
         })
-        customEventEmitter('stopCompleteSong')
+        customEventEmitter('toggleMute')
     }
 
     render () {
         const state = this.state
-        const { songIsPlaying } = state
+        const { songIsPlaying } = this.props
         const playOrStop = songIsPlaying ? 'stopSong' : 'playSong'
         const playOrStopText = songIsPlaying ? 'Stop' : 'Play'
-        const fxStatus = this.props.fxStatus
+        const { fxStatus, toggleSongRepeat } = this.props
         const activeFx = fxStatus.fxType === 'channel' && fxStatus.id
         return (
             <div id="song-editor-container">
-                <h5>Song editor</h5>
-                {/*<button>Pause</button>*/}
-                {/*<button onClick={ this.props.stopSong }>Stop</button>*/}
-                <button onClick={ this.exportSong }>Export song</button>
+                <h5>
+                    Song editor
+                    <div style={{flex: 1}}></div>
+                    <input id="song-title" placeholder="song title..." />
+                    <button onClick={ this.saveJSON }>
+                        <i className="fa fa-save" aria-hidden="true"></i>
+                    </button>
+                    <button onClick={ this.exportSong }>
+                        <i className="fa fa-download" aria-hidden="true"></i>
+                    </button>
+                    <button onClick={ this.loadJSON }>load</button>
+                    <button onClick={ this.toggleShowCode }>
+                        { `${state.showCode ? 'Hide' : 'Show'} code` }
+                    </button>
+                </h5>
+                
+                {/* <button onClick={ this.exportSong }>Export song</button>
                 <button onClick={ this.saveJSON }>save</button>
-                <button onClick={ this.loadJSON }>load</button>
-                <button onClick={ this.toggleShowCode }>{ `${state.showString ? 'Hide' : 'Show'} code` }</button>
-                <button onClick={ this[playOrStop] }>{`${playOrStopText}`} Song</button>
+                <button onClick={ this.loadJSON }>load</button> */}
+                <div className="song-editor-controls">
+                    <button onClick={ this[playOrStop] }>
+                        {`${playOrStopText}`} Song
+                    </button>
+                    <label>
+                        Repeat
+                        <input
+                            type="checkbox"
+                            onChange={ e => toggleSongRepeat(e.target.checked) }
+                        />
+                    </label>
+                    <div style={{flex: 1}}></div>
+                    <button onClick={this.toggleMute}>{ `${state.isMuted ? 'un' : ''}mute` }</button>
+                    {/* <button onClick={ this.toggleShowCode }>{ `${state.showCode ? 'Hide' : 'Show'} code` }</button> */}
+                </div>
 
                 <div className="song-editor-channels">
 

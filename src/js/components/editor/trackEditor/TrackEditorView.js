@@ -22,9 +22,8 @@ class TrackEditor extends Component {
         this.changeTrackChannel = this.changeTrackChannel.bind(this)
         this.trackTicksAmount = this.trackTicksAmount.bind(this)
         this.changeTicksAmount = this.changeTicksAmount.bind(this)
-        this.playOnce = this.playOnce.bind(this)
+        this.playTrackOnce = this.playTrack.bind(this)
         this.sendUpdate = this.sendUpdate.bind(this)
-        this.playSongAndRepeat = this.playSongAndRepeat.bind(this)
         this.toggleAutoplay = this.toggleAutoplay.bind(this)
     }
 
@@ -60,7 +59,7 @@ class TrackEditor extends Component {
         if ( this.throttle ) clearTimeout(this.throttle)
         this.throttle = setTimeout(() => {
             this.sendUpdate(track)
-            if ( this.state.autoplayIsOn ) this.playOnce()
+            if ( this.state.autoplayIsOn ) this.playTrack()
         }, 250)
 
     }
@@ -117,30 +116,25 @@ class TrackEditor extends Component {
         })
     }
 
-    playOnce () {
-        this.setState({
-            repeatIsOn: false
-        })
+    playTrack = () => {
         emitCustomEvent('playOnce', {
             song: this.props.track
         })
     }
 
-    toggleMute () {
-        // const newState = !this.state.isMuted
-        // this.setState({
-        //     isMuted: newState
-        // })
-        emitCustomEvent('toggleMute')
+    /**
+     * Stops playing the currently loaded track
+     */
+    stopTrack = () => {
+        emitCustomEvent('stopPlaying')
     }
 
-    playSongAndRepeat () {
+    toggleMute = () => {
+        const newState = !this.state.isMuted
         this.setState({
-            repeatIsOn: !this.state.repeatIsOn
+            isMuted: newState
         })
-        emitCustomEvent('toggleRepeat', {
-            song: this.props.track
-        })
+        emitCustomEvent('toggleMute')
     }
 
     toggleAutoplay () {
@@ -150,8 +144,11 @@ class TrackEditor extends Component {
     }
 
     render () {
-        const activeTrack = this.props.track
+        const { track: activeTrack, toggleTrackRepeat, trackRepeat } = this.props
         const state = this.state
+        const { trackIsPlaying } = this.props
+        const playOrStop = trackIsPlaying ? 'stopTrack' : 'playTrack'
+        const playOrStopText = trackIsPlaying ? 'Stop' : 'Play'
 
         return (
             <div id="editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
@@ -175,8 +172,16 @@ class TrackEditor extends Component {
                 </div>
 
                 <div className="editor-play-buttons">
-                    <button onClick={this.playOnce}>play once</button>
-                    <button onClick={this.playSongAndRepeat}>{ `${state.repeatIsOn ? 'stop' : 'play'} repeat` }</button>
+                    <button onClick={ this[playOrStop] }>{`${playOrStopText}`}</button>
+                    <label>
+                        Repeat
+                        <input
+                            type="checkbox"
+                            onChange={ e => toggleTrackRepeat(e.target.checked) }
+                            value={trackRepeat}
+                        />
+                    </label>
+                    <div style={{flex: 1}}></div>
                     <button onClick={this.toggleAutoplay}>{ `autoplay ${state.autoplayIsOn ? 'off' : 'on'}` }</button>
                     <button onClick={this.toggleMute}>{ `${state.isMuted ? 'un' : ''}mute` }</button>
                 </div>

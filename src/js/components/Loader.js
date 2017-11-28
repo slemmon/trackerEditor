@@ -54,7 +54,6 @@ class LoaderView extends Component {
             }
 
             if ( this.validateFile(result) ) {
-
                 // backwards compatibility with older saved files
                 if ( Array.isArray(result.fx) )
                     result.fx = {
@@ -142,6 +141,12 @@ const mapDispatchToProps = (dispatch) => {
                 type: 'SET_ACTIVE_TRACK',
                 track: {notes: []}
             })
+            if (tracks && tracks.length) {
+                dispatch({
+                    type: 'SET_ACTIVE_TRACK_TYPE',
+                    trackType: tracks[tracks.length - 1].type
+                })
+            }
             dispatch({
                 type: 'TRACK_SET_DATA',
                 tracks

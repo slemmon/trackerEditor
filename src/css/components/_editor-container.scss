@@ -26,7 +26,15 @@
         }
     }
 
-    .editor-play-buttons {}
+    .editor-play-buttons {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+
+        button {
+            margin-bottom: 0;
+        }
+    }
 
     .editor-table-container {
         position: relative;

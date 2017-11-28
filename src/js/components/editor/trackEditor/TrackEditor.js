@@ -3,9 +3,12 @@ import TrackEditorView from './TrackEditorView'
 
 const mapStateToProps = (state) => {
     const activeTrackId = state.activeTrack.id
+    const { status, tracks, trackIsPlaying, trackRepeat } = state
     return {
-        status: state.status,
-        track: state.tracks.find( t => t.id === activeTrackId )
+        status,
+        track: tracks.find( t => t.id === activeTrackId ),
+        trackIsPlaying,
+        trackRepeat
     }
 }
 
@@ -20,6 +23,16 @@ const mapDispatchToProps = (dispatch) => {
             dispatch({
                 type: 'SET_ACTIVE_TRACK',
                 track
+            })
+            dispatch({
+                type: 'SET_ACTIVE_TRACK_TYPE',
+                trackType: 'tune'
+            })
+        },
+        toggleTrackRepeat (repeat) {
+            dispatch({
+                type: "TOGGLE_TRACK_REPEAT",
+                repeat
             })
         }
     }

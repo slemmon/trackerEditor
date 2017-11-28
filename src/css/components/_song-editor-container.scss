@@ -2,6 +2,40 @@
 #song-editor-container {
     margin-bottom: 10px;
 
+    h5 {
+        display: flex;
+        align-items: center;
+
+        button {
+            margin-bottom: 0;
+        }
+        input {
+            border: 2px solid #594e4e;
+            font-size: 11px;
+            padding: 3px 4px 4px 4px;
+            border-right-width: 0;
+        }
+        input + button {
+            border-radius: 0;
+            margin-right: 0;
+            border-right-width: 0;
+        }
+        input + button + button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+
+    .song-editor-controls {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+
+        button {
+            margin-bottom: 0;
+        }
+    }
+
     .song-editor-channels {
         display: flex;
 
