@@ -16,18 +16,21 @@ class LoaderView extends Component {
 
     saveJSON (e) {
 
-        // get fx, tracks, channels
-        const props = this.props
+        // get fx, tracks, channels, and songName
+        const { channels, fx, songName, tracks  } = this.props
         const saveData = {
             fx: props.fx,
             channels: props.channels,
-            tracks: props.tracks
+            tracks: props.tracks,
+            meta: {
+                name: songName
+            }
         }
 
         // make the browser download the file
         const download = document.createElement('a')
         download.href = `data:text/plain;charset=utf-8;base64,${btoa(JSON.stringify(saveData))}`
-        download.download = 'song.atm'
+        download.download = `${songName}.atm`
 
         document.body.appendChild(download)
         download.click()
@@ -65,6 +68,10 @@ class LoaderView extends Component {
                         "channel": JSON.parse(JSON.stringify(result.fx).replace(/val_b/g, 'val_1').replace(/val"/g, 'val_0"')),
                         "track": []
                       }
+                const fileName = file.name.replace('.atm', '')
+                result.meta = result.meta || {}
+                result.meta.name = result.meta.name || fileName
+                console.log(JSON.stringify(result, null, 2))
                 this.props.setLoadedData(result)
             } else {
                 return alert('invalid file (2)')
@@ -84,7 +91,7 @@ class LoaderView extends Component {
 
         const names = Object.getOwnPropertyNames(file)
 
-        if ( names.length === 3 ) truths++
+        if ( names.length === 3 || names.length === 4 ) truths++
 
         for ( const name of names ) {
 
@@ -122,17 +129,18 @@ class LoaderView extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ({ channels, fx, songName, tracks }) => {
     return {
-        tracks: state.tracks,
-        channels: state.channels,
-        fx: state.fx
+        channels,
+        fx,
+        songName,
+        tracks
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        setLoadedData ({channels, tracks, fx} = data) {
+        setLoadedData ({channels, tracks, fx, meta} = data) {
             dispatch({
                 type: 'STATUS_SET',
                 status: 1
@@ -162,6 +170,10 @@ const mapDispatchToProps = (dispatch) => {
             dispatch({
                 type: 'STATUS_SET',
                 status: 0
+            })
+            dispatch({
+                type: 'SET_SONG_NAME',
+                songName: meta.name
             })
         }
     }

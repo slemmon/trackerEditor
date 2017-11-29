@@ -219,11 +219,9 @@ class DrumEditor extends Component {
                 </div>
 
                 <div className="editor-play-buttons">
-                    {/* <button onClick={this.playOnce}>play once</button> */}
                     <button onClick={ this[playOrStop] }>
                         {`${playOrStopText}`}
                     </button>
-                    {/* <button onClick={this.playSongAndRepeat}>{ `${state.repeatIsOn ? 'stop' : 'play'} repeat` }</button> */}
                     <label>
                         Repeat
                         <input

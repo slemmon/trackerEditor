@@ -1,5 +1,5 @@
-import orderBy from 'lodash.orderby';
 import { getEffectLength } from './createSong';
+import orderBy from 'lodash.orderby';
 
 export { createSongFileFromChannels };
 
@@ -218,24 +218,6 @@ const endFx = {
   }
 };
 
-// audio file boilerplate members defined
-const headerDefinitions = `#ifndef SONG_H
-#define SONG_H
-
-#include "atm_cmd_constants.h"
-
-#ifndef ARRAY_SIZE
-#define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
-#endif
-
-#ifndef NUM_PATTERNS
-#define NUM_PATTERNS(struct_) (ARRAY_SIZE( ((struct_ *)0)->patterns_offset))
-#endif
-
-#ifndef DEFINE_PATTERN
-#define DEFINE_PATTERN(pattern_id, values) const uint8_t pattern_id[] = values;
-#endif`;
-
 
 /////////////////////////////////////////////////////
 // 
@@ -250,8 +232,8 @@ const headerDefinitions = `#ifndef SONG_H
  * https://github.com/moduscreate/ATMlib/blob/d8a8631d6ba53179f284ef3de74aeb125de6fe47/examples/songs/song01_sfx/song.h
  */
 function createSongFileFromChannels (song) {
-  const { tracks, channels, fx } = song;
-  
+  const { channels, fx, songName, tracks } = song;
+  const normalizedSongName = songName.replace(/[ -]/g, '_');
   const trackAtm = {};
   let totalTracks = 0;
   
@@ -305,15 +287,39 @@ function createSongFileFromChannels (song) {
   // construct the audio file text
   // DEV NOTE: keep the awkward indentation below to preserve the final shape
   // expected in the output
-  const completeSong = `${headerDefinitions}
+  const completeSong = `${getHeaderDefinitions(normalizedSongName.toUpperCase())}
   
-${getPatternDefinitions(allPatterns)}
-${getScoreData(allPatterns)}
+${getPatternDefinitions(allPatterns, normalizedSongName)}
+${getScoreData(allPatterns, normalizedSongName)}
 
 #endif`;
 
   return completeSong;
 }
+
+/**
+ * audio file boilerplate members defined
+ * @param {String} songName The song name to apply to the header definitions
+ * @return {String} The template string with the song name applied
+ */
+function getHeaderDefinitions (songName = 'SONG_H') {
+  return `#ifndef ${songName}
+#define ${songName}
+  
+#include "atm_cmd_constants.h"
+  
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(a) (sizeof (a) / sizeof ((a)[0]))
+#endif
+  
+#ifndef NUM_PATTERNS
+#define NUM_PATTERNS(struct_) (ARRAY_SIZE( ((struct_ *)0)->patterns_offset))
+#endif
+  
+#ifndef DEFINE_PATTERN
+#define DEFINE_PATTERN(pattern_id, values) const uint8_t pattern_id[] = values;
+#endif`;
+  }
 
 /**
  * Returns the note string correlating to the scale described here:
@@ -345,37 +351,41 @@ function getNote (note) {
  * channel and non-channel patterns.
  * @param {Array} allPatterns An array of all patterns in the order they're to
  * be processed in playback
+ * @param {String} songName The song name to apply to the template string
  * @return {String} The pattern info for the output audio file
  */
-function getScoreData (allPatterns) {
+function getScoreData (allPatterns, songName) {
   // filter out just the channel-type patterns from the full array
   const channels = allPatterns.filter(pattern => pattern.type === 'channel');
   const channelCount = channels.length;
+
   // return the string used for the size of each pattern variable
   const sizeData = allPatterns.map((pattern, i) => {
-    return `uint8_t pattern${i}[sizeof(pattern${i}_array)];`
+    return `uint8_t ${songName}_pattern${i}[sizeof(${songName}_pattern${i}_array)];`
   }).join('\n  ');
+
   // return the string of all pattern offsets
   const patternOffsets = allPatterns.map((pattern, i) => {
-    return `offsetof(struct score_data, pattern${i}),`
+    return `offsetof(struct ${songName}_score_data, ${songName}_pattern${i}),`
   }).join('\n      ');
+  
   // return the string for all pattern data mappings
   const patternData = allPatterns.map((pattern, i) => {
-    return `.pattern${i} = pattern${i}_data,`
+    return `.${songName}_pattern${i} = ${songName}_pattern${i}_data,`
   }).join('\n  ');
 
   // DEV NOTE: keep the awkward indentation below to preserve the final shape
   // expected in the output
-  return `const PROGMEM struct score_data {
+  return `const PROGMEM struct ${songName}_score_data {
   uint8_t fmt;
   uint8_t num_patterns;
   uint16_t patterns_offset[${allPatterns.length}];
   uint8_t num_channels;
   uint8_t start_patterns[${channelCount}];
   ${sizeData}
-} score = {
+} ${songName} = {
   .fmt = ATM_SCORE_FMT_FULL,
-  .num_patterns = NUM_PATTERNS(struct score_data),
+  .num_patterns = NUM_PATTERNS(struct ${songName}_score_data),
   .patterns_offset = {
       ${patternOffsets}
   },
@@ -395,10 +405,11 @@ function getScoreData (allPatterns) {
  * patterns
  * @param {Array} allPatterns An array of all patterns in the order they're to
  * be processed in playback
+ * @param {String} songName The song name to apply to the template string
  * @return {String} The string of pattern definitions for the pre-compiled audio
  * file
  */
-function getPatternDefinitions (allPatterns) {
+function getPatternDefinitions (allPatterns, songName) {
   let patterns = [];
 
   // loop over all of the patterns to add their individual definitions to the
@@ -411,10 +422,10 @@ function getPatternDefinitions (allPatterns) {
     // DEV NOTE: keep the awkward indentation below to preserve the final shape
     // expected in the output
     let string = `/* ${typeText}${nameText} / bytes = ${bytes}*/
-#define pattern${i}_data { \\
+#define ${songName}_pattern${i}_data { \\
     ${notes.join(', \\\n    ')}, \\
 }
-DEFINE_PATTERN(pattern${i}_array, pattern${i}_data);
+DEFINE_PATTERN(${songName}_pattern${i}_array, ${songName}_pattern${i}_data);
     `;
 
     patterns.push(string);

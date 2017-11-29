@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import PlayerView from './PlayerView'
 
 const mapStateToProps = (state) => {
-    const { channels, tracks, fx, activeTrack,
+    const { channels, tracks, fx, activeTrack, songName,
           activeTrackType, songRepeat, trackRepeat } = state
     return {
         channels,
@@ -10,6 +10,7 @@ const mapStateToProps = (state) => {
         fx,
         activeTrack,
         activeTrackType,
+        songName,
         songRepeat,
         trackRepeat
     }

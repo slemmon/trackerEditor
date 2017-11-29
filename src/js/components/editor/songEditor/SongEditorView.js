@@ -90,7 +90,10 @@ class SongEditor extends Component {
 
     render () {
         const state = this.state
-        const { songIsPlaying } = this.props
+        const { onSongNameChange, songIsPlaying, songName } = this.props
+        const defaultTip = 'ENTER A SONG NAME'
+        const saveTip = songName.length ? `SAVE ${songName}.atm` : defaultTip
+        const exportTip = songName.length ? `EXPORT ${songName}.h` : defaultTip
         const playOrStop = songIsPlaying ? 'stopSong' : 'playSong'
         const playOrStopText = songIsPlaying ? 'Stop' : 'Play'
         const { fxStatus, toggleSongRepeat } = this.props
@@ -100,12 +103,32 @@ class SongEditor extends Component {
                 <h5>
                     Song editor
                     <div style={{flex: 1}}></div>
-                    <input id="song-title" placeholder="song title..." />
-                    <button onClick={ this.saveJSON }>
-                        <i className="fa fa-save" aria-hidden="true"></i>
+                    <input
+                        value={songName}
+                        onChange={onSongNameChange}
+                        id="song-title"
+                        placeholder="song title..."
+                    />
+                    <button
+                        onClick={ this.saveJSON }
+                        disabled={!songName.length}
+                        data-tooltip={saveTip}
+                    >
+                        <i
+                            className="fa fa-save"
+                            aria-hidden="true"
+                        />
                     </button>
-                    <button onClick={ this.exportSong }>
-                        <i className="fa fa-download" aria-hidden="true"></i>
+                    <button
+                        onClick={ this.exportSong }
+                        disabled={!songName.length}
+                        data-tooltip={exportTip}
+                    >
+                        <i
+                            disabled={!songName.length}
+                            className="fa fa-download"
+                            aria-hidden="true"
+                        />
                     </button>
                     <button onClick={ this.loadJSON }>load</button>
                     <button onClick={ this.toggleShowCode }>
@@ -113,9 +136,6 @@ class SongEditor extends Component {
                     </button>
                 </h5>
                 
-                {/* <button onClick={ this.exportSong }>Export song</button>
-                <button onClick={ this.saveJSON }>save</button>
-                <button onClick={ this.loadJSON }>load</button> */}
                 <div className="song-editor-controls">
                     <button onClick={ this[playOrStop] }>
                         {`${playOrStopText}`} Song
@@ -129,7 +149,6 @@ class SongEditor extends Component {
                     </label>
                     <div style={{flex: 1}}></div>
                     <button onClick={this.toggleMute}>{ `${state.isMuted ? 'un' : ''}mute` }</button>
-                    {/* <button onClick={ this.toggleShowCode }>{ `${state.showCode ? 'Hide' : 'Show'} code` }</button> */}
                 </div>
 
                 <div className="song-editor-channels">

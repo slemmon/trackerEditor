@@ -317,12 +317,12 @@ class Player extends Component {
     }
 
     getSongFileCode = () => {
-        const { tracks, channels, fx } = this.props
+        const { channels, fx, songName, tracks } = this.props
 
         return createSongFileFromChannels(
             Object.assign(
                 {},
-                { tracks, channels, fx }
+                { channels, fx, songName, tracks }
             )
         )
     }
