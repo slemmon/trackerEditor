@@ -5,6 +5,7 @@ import channels from './channels'
 import fx from './fx'
 import song from './song'
 import songIsPlaying from './songIsPlaying'
+import songName from './songName'
 import songRepeat from './songRepeat'
 import status from './status'
 import trackIsPlaying from './tracks/trackIsPlaying'
@@ -18,6 +19,7 @@ export default combineReducers({
     fx,
     song,
     songIsPlaying,
+    songName,
     songRepeat,
     status,
     trackIsPlaying,

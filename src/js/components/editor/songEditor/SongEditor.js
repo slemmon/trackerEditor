@@ -1,12 +1,12 @@
 import { connect } from 'react-redux'
 import SongEditorView from './SongEditorView'
 
-const mapStateToProps = (state) => {
-    const { fx, songIsPlaying } = state
-
+const mapStateToProps = ({ fx, songIsPlaying, songName, songState }) => {
     return {
         fxStatus: fx.status,
-        songIsPlaying
+        songIsPlaying,
+        songName,
+        songState
     }
 }
 
@@ -28,6 +28,12 @@ const mapDispatchToProps = (dispatch) => {
             dispatch({
                 type: "TOGGLE_SONG_REPEAT",
                 repeat
+            })
+        },
+        onSongNameChange (e) {
+            dispatch({
+                type: "SET_SONG_NAME",
+                songName: e.target.value
             })
         }
     }

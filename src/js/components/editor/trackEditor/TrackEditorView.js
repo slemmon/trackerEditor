@@ -167,7 +167,7 @@ class TrackEditor extends Component {
                     <form className="editor-info-row" onSubmit={ this.changeTicksAmount }>
                         <label htmlFor="track-ticks">Ticks: </label>
                         <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={state.currentTicks || 0} />
-                        <input type="submit" value="apply" />
+                        <input type="submit" value="ok" />
                     </form>
                 </div>
 
