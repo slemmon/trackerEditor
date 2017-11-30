@@ -304,7 +304,7 @@ ${getScoreData(allPatterns, normalizedSongName)}
  * @return {String} The template string with the song name applied
  */
 function getHeaderDefinitions (songName = 'SONG') {
-  return `#ifndef ${songName}
+  return `#ifndef ${songName}_H
 #define ${songName}_H
   
 #include "atm_cmd_constants.h"

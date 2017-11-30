@@ -1,4 +1,3 @@
-import sanitize from 'sanitize-filename';
 const defaultState = ''
 
 export default function songName (state = defaultState, action) {
@@ -6,10 +5,8 @@ export default function songName (state = defaultState, action) {
         case 'SET_SONG_NAME': {
             let { songName } = action
             
-            //songName = songName.replace(/[\*]/gi, '')
             songName = songName.replace(/[^a-z0-9 _-]/gi, '')
 
-            // return sanitize(action.songName)
             return songName
         }
 
