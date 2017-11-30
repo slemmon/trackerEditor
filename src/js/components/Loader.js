@@ -17,13 +17,14 @@ class LoaderView extends Component {
     saveJSON (e) {
 
         // get fx, tracks, channels, and songName
-        const { channels, fx, songName, tracks  } = this.props
+        const { channels, fx, songName, songRepeat, tracks  } = this.props
         const saveData = {
-            fx: props.fx,
-            channels: props.channels,
-            tracks: props.tracks,
+            fx: fx,
+            channels: channels,
+            tracks: tracks,
             meta: {
-                name: songName
+                name: songName,
+                songRepeat
             }
         }
 
@@ -71,7 +72,6 @@ class LoaderView extends Component {
                 const fileName = file.name.replace('.atm', '')
                 result.meta = result.meta || {}
                 result.meta.name = result.meta.name || fileName
-                console.log(JSON.stringify(result, null, 2))
                 this.props.setLoadedData(result)
             } else {
                 return alert('invalid file (2)')
@@ -129,11 +129,12 @@ class LoaderView extends Component {
     }
 }
 
-const mapStateToProps = ({ channels, fx, songName, tracks }) => {
+const mapStateToProps = ({ channels, fx, songName, songRepeat, tracks }) => {
     return {
         channels,
         fx,
         songName,
+        songRepeat,
         tracks
     }
 }
@@ -141,6 +142,8 @@ const mapStateToProps = ({ channels, fx, songName, tracks }) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         setLoadedData ({channels, tracks, fx, meta} = data) {
+            const { name = '', songRepeat = false } = meta
+
             dispatch({
                 type: 'STATUS_SET',
                 status: 1
@@ -173,7 +176,11 @@ const mapDispatchToProps = (dispatch) => {
             })
             dispatch({
                 type: 'SET_SONG_NAME',
-                songName: meta.name
+                songName: name
+            })
+            dispatch({
+                type: "TOGGLE_SONG_REPEAT",
+                repeat: songRepeat
             })
         }
     }

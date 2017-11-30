@@ -273,6 +273,7 @@ class Player extends Component {
         const { tracks, channels, fx, songRepeat } = this.props
 
         let music = createSongFromChannels(tracks, channels, fx)
+        console.log(music);
 
         music = music.replace(/\/\/"Track.*"/g, 'Track,')
         music = music.replace(/, /g, ',\n')
@@ -303,7 +304,7 @@ class Player extends Component {
             }
         }
 
-        this.props.setSongIsPlaying(true);
+        this.props.setSongIsPlaying(true)
         this.playSong(music, () => {
             const { songRepeat } = this.props
             this[songRepeat ? 'createAndPlaySong' : 'stopSong']()
@@ -317,12 +318,12 @@ class Player extends Component {
     }
 
     getSongFileCode = () => {
-        const { channels, fx, songName, tracks } = this.props
+        const { channels, fx, songName, songRepeat, tracks } = this.props
 
         return createSongFileFromChannels(
             Object.assign(
                 {},
-                { channels, fx, songName, tracks }
+                { channels, fx, songName, songRepeat, tracks }
             )
         )
     }

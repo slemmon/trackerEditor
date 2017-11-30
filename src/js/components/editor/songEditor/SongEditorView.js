@@ -90,7 +90,9 @@ class SongEditor extends Component {
 
     render () {
         const state = this.state
-        const { onSongNameChange, songIsPlaying, songName } = this.props
+        const {
+            onSongNameChange, songIsPlaying, songName, songRepeat
+        } = this.props
         const defaultTip = 'ENTER A SONG NAME'
         const saveTip = songName.length ? `SAVE ${songName}.atm` : defaultTip
         const exportTip = songName.length ? `EXPORT ${songName}.h` : defaultTip
@@ -145,6 +147,7 @@ class SongEditor extends Component {
                         <input
                             type="checkbox"
                             onChange={ e => toggleSongRepeat(e.target.checked) }
+                            checked={songRepeat}
                         />
                     </label>
                     <div style={{flex: 1}}></div>

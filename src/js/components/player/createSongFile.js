@@ -232,7 +232,7 @@ const endFx = {
  * https://github.com/moduscreate/ATMlib/blob/d8a8631d6ba53179f284ef3de74aeb125de6fe47/examples/songs/song01_sfx/song.h
  */
 function createSongFileFromChannels (song) {
-  const { channels, fx, songName, tracks } = song;
+  const { channels, fx, songName, songRepeat, tracks } = song;
   const normalizedSongName = songName.replace(/[ -]/g, '_');
   const trackAtm = {};
   let totalTracks = 0;
@@ -271,11 +271,12 @@ function createSongFileFromChannels (song) {
       type: 'channel',
       typeText: 'pattern (channel)',
       atm: atmifyChannel({
-        tracks: trackAtm,
         channel,
-        index: i,
         effects: fx.channel[i],
-        trackEffects: fx.track
+        index: i,
+        songRepeat,
+        trackEffects: fx.track,
+        tracks: trackAtm
       })
     };
   });
@@ -532,7 +533,8 @@ function createFxArray (fxToAdd, type, effects) {
  * @return {Object} An object with the channel byte count and the channel 
  * commands including effects as well as GOTO and REPEAT commands
  */
-function atmifyChannel ({tracks, channel, index, effects, trackEffects}) {
+function atmifyChannel ({ channel, effects, index, 
+                          songRepeat, trackEffects, tracks}) {
   let channelTrack = [];
   let totalBytes = 0;
 
@@ -602,6 +604,9 @@ function atmifyChannel ({tracks, channel, index, effects, trackEffects}) {
   totalBytes += newFxEnd.bytes;
 
   // end of channel
+  if (songRepeat && channelTrack.length) {
+    channelTrack.push(`ATM_CMD_M_SET_LOOP_PATTERN(${index})`);
+  }
   channelTrack.push('ATM_CMD_I_STOP');
   totalBytes++;
 

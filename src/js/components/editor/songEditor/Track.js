@@ -60,20 +60,29 @@ class Track extends Component {
     }
 
     render () {
-        const track = this.props.track
-        const detail = this.props.detail
+        const { appliedFx, detail, position, track } = this.props
         const rgbObj = color(detail.color.rgb).rgb()
         const colorLight = rgbObj.fade(.5)
         const colorDark = rgbObj.string()
+        const fxCount = Object.keys(appliedFx).length
+        const style = {
+            padding: '0 4px',
+            width: detail.ticks*2,
+            backgroundColor: colorLight,
+            borderColor: colorDark,
+            color: colorDark
+        }
+        
         return (
             <span
                 draggable = { true }
+                onDoubleClick = {this.openFx}
                 onDragStart = { this.handleDragStart }
-                data-position = { this.props.position }
+                data-position = { position }
                 className = { `draggable ${track.type === 'tune' ? 'draggable-tune' : 'draggable-drum' } ${this.state.imBeingDragged ? 'beingdragged' : ''} ${this.props.activeFx ? 'active' : ''}` }
-                style = { {width: detail.ticks*2, backgroundColor: colorLight, borderColor: colorDark, color: colorDark} }
+                style = {style}
             >
-                <span onClick={this.openFx}>fx</span>
+                {fxCount > 0 && <span>{fxCount}</span>}
             </span>
         )
     }
