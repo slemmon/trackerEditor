@@ -27,24 +27,54 @@ class TrackRow extends React.Component {
         })
     }
 
+    // adds the selected track to the track editor view
+    onEditClick = (track) => {
+        this.setState({
+            activeTrack: track.id
+        });
+        this.props.setActiveTrack(track)
+    }
+
+    // handles the dragging of a track tickbar element
+    onDragStart (e, id, type) {
+        e.dataTransfer.setData('trackId', id)
+        e.dataTransfer.setData('type', type)
+    }
+
     render () {
         const { showConfirm } = this.state
-        const {last, i, track, deleteTrack, setActiveTrack, setTrackColor} = this.props
+        const { activeTrack, isLast, track,
+                deleteTrack, setTrackColor} = this.props
+                
+        const { color, id, name, ticks, type } = track
+        const activated = id === activeTrack
+        const selectedCls = activated || (isLast && activeTrack === null) ?
+              ' track-list-item-selected' : ''
+        const iconCls = `fa fa-${ type === 'tune' ? 'music' : 'superpowers' }`
+        const textCls = 'track-list-item-text'
+        const tickbarCls = `track-list-item-tickbar-bar tickbar-tune-${type}`
+        const tickbarStyle = {
+                  width: ticks * 2,
+                  backgroundColor: stringifyColor(color, 'rgba', {a: 0.5}), 
+                  borderColor: stringifyColor(color, 'rgb')
+              }
 
         return (
-            <li className={`track-list-item ${ last === i + 1 ? 'track-list-item-last' : '' }`}>
+            <li className={`track-list-item${selectedCls}`}>
                 <span className="track-list-item-icon">
-                    <i className={`fa fa-${ track.type === 'tune' ? 'music' : 'superpowers' }`} aria-hidden="true"></i>
+                    <i className={iconCls} aria-hidden="true"></i>
                 </span>
-                <span className="track-list-item-text">{`${track.name} - (${track.type})`}</span>
-                <span className="track-list-item-text"><span>Ticks: </span><span>{track.ticks}</span></span>
+                <span className={textCls}>{`${name} - (${type})`}</span>
+                <span className={textCls}>
+                    <span>Ticks: </span><span>{ticks}</span>
+                </span>
                 <span className="track-list-item-tickbar">
                     <span
                         draggable = { true }
-                        onDragStart = { e => { e.dataTransfer.setData('trackId', track.id); e.dataTransfer.setData('type', track.type) } }
-                        data-track-id = { track.id }
-                        className = { `track-list-item-tickbar-bar ${track.type === 'tune' ? 'tickbar-tune' : 'tickbar-drum' }` }
-                        style = {{ width: track.ticks * 2, backgroundColor: stringifyColor(track.color, 'rgba', {a: 0.5}), borderColor: stringifyColor(track.color, 'rgb') }}
+                        onDragStart = { e => { this.onDragStart(e, id, type) } }
+                        data-track-id = { id }
+                        className = {tickbarCls}
+                        style = {tickbarStyle}
                     ></span>
                 </span>
                 <span
@@ -57,7 +87,9 @@ class TrackRow extends React.Component {
                         show={showConfirm}
                         hide={this.hideDialog}
                     />
-                    <span onClick={ () => setActiveTrack(track, track.type) }><i className="fa fa-pencil" aria-hidden="true"></i></span>
+                    <span onClick={ () => {this.onEditClick(track)} }>
+                        <i className="fa fa-pencil" aria-hidden="true"></i>
+                    </span>
                 </span>
             </li>
         )
