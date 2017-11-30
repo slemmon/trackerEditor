@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
-import activeTrack from './activeTrack'
-import activeTrackType from './activeTrackType'
+import activePattern from './activePattern'
+import activePatternType from './activePatternType'
 import channels from './channels'
 import fx from './fx'
 import song from './song'
@@ -8,13 +8,13 @@ import songIsPlaying from './songIsPlaying'
 import songName from './songName'
 import songRepeat from './songRepeat'
 import status from './status'
-import trackIsPlaying from './tracks/trackIsPlaying'
-import trackRepeat from './tracks/trackRepeat'
-import tracks from './tracks/tracks'
+import patternIsPlaying from './patterns/patternIsPlaying'
+import patternRepeat from './patterns/patternRepeat'
+import patterns from './patterns/patterns'
 
 export default combineReducers({
-    activeTrack,
-    activeTrackType,
+    activePattern,
+    activePatternType,
     channels,
     fx,
     song,
@@ -22,7 +22,7 @@ export default combineReducers({
     songName,
     songRepeat,
     status,
-    trackIsPlaying,
-    trackRepeat,
-    tracks
+    patternIsPlaying,
+    patternRepeat,
+    patterns
 });

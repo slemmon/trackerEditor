@@ -1,41 +1,41 @@
 import { colorsObj as colors } from '../../appColors'
 
-export default function createNewTrack (type, tracks) {
+export default function createNewPattern (type, patterns) {
     const ticks = 9
-    const myId = getNewId(tracks)
-    const newTrackData = {
+    const myId = getNewId(patterns)
+    const newPatternData = {
         ticks,
-        color: getNewTrackColor(myId),
+        color: getNewPatternColor(myId),
         id: myId,
-        name: `Track ${myId + 1}`,
+        name: `Pattern ${myId + 1}`,
         type,
         notes: []
     }
     if ( type === 'tune' )
         for ( let x = 0; x < ticks; x++ ) {
-            newTrackData.notes.push({active: -1})
+            newPatternData.notes.push({active: -1})
         }
 
-    return newTrackData
+    return newPatternData
 }
 
 /**
  * Returns the color object (hex and rgb) from the global application colors
- * @param {Number} id The id of the track requesting color info
+ * @param {Number} id The id of the pattern requesting color info
  * @return {Object} The colors object for the color value matching the `id`
  * passed.  Will have a `hex` key and `rgb` key with an object of `r`, `g`, and
  * `b` values
  */
-function getNewTrackColor (id = 0) {
+function getNewPatternColor (id = 0) {
     return colors[id] || colors[0];
 }
 
-function getNewId (tracks) {
+function getNewId (patterns) {
     let counter = 0
 
-    for ( let i = 0, l = tracks.length; i < l; i++ ) {
-        if ( counter <= tracks[i].id )
-            counter = tracks[i].id + 1
+    for ( let i = 0, l = patterns.length; i < l; i++ ) {
+        if ( counter <= patterns[i].id )
+            counter = patterns[i].id + 1
     }
 
     return counter

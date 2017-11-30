@@ -100,7 +100,7 @@
             }
         }
 
-        .channel-tracks {
+        .channel-patterns {
             flex: 1;
             max-width: 627px;
             overflow-x: scroll;
@@ -112,7 +112,7 @@
                 flex: 1;
             }
 
-            .channel-track {
+            .channel-pattern {
                 height: 25px;
                 border-bottom: 1px solid #bfe4e4;
                 &:last-child {

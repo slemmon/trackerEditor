@@ -4,13 +4,13 @@ import emitCustomEvent from '../../../customEventEmitter'
 import NoteSheet from './NoteSheet'
 import NewNotesTable from './NewNotesTable'
 
-class TrackEditor extends Component {
+class PatternEditor extends Component {
     constructor (props) {
         super(props)
 
         this.state = {
-            currentTicks: this.props.track.ticks,
-            bufferedNotes: this.props.track.notes,
+            currentTicks: this.props.pattern.ticks,
+            bufferedNotes: this.props.pattern.notes,
             autoplayIsOn: false,
             repeatIsOn: false,
             isMuted: false,
@@ -18,23 +18,23 @@ class TrackEditor extends Component {
         }
 
         this.toggleNote = this.toggleNote.bind(this)
-        this.changeTrackName = this.changeTrackName.bind(this)
-        this.changeTrackChannel = this.changeTrackChannel.bind(this)
-        this.trackTicksAmount = this.trackTicksAmount.bind(this)
+        this.changePatternName = this.changePatternName.bind(this)
+        this.changePatternChannel = this.changePatternChannel.bind(this)
+        this.patternTicksAmount = this.patternTicksAmount.bind(this)
         this.changeTicksAmount = this.changeTicksAmount.bind(this)
-        this.playTrackOnce = this.playTrack.bind(this)
+        this.playPatternOnce = this.playPattern.bind(this)
         this.sendUpdate = this.sendUpdate.bind(this)
         this.toggleAutoplay = this.toggleAutoplay.bind(this)
     }
 
     componentWillReceiveProps(nextProps) {
-        if ( this.state.currentTicks !== nextProps.track.ticks )
+        if ( this.state.currentTicks !== nextProps.pattern.ticks )
             this.setState({
-                currentTicks: nextProps.track.ticks
+                currentTicks: nextProps.pattern.ticks
             })
-        if ( this.state.bufferedNotes.length !== nextProps.track.notes.length || this.props.track.id !== nextProps.track.id )
+        if ( this.state.bufferedNotes.length !== nextProps.pattern.notes.length || this.props.pattern.id !== nextProps.pattern.id )
             this.setState({
-                bufferedNotes: nextProps.track.notes
+                bufferedNotes: nextProps.pattern.notes
             })
     }
 
@@ -44,40 +44,40 @@ class TrackEditor extends Component {
 
     toggleNote (note, row) {
 
-        const track = Object.assign({}, this.props.track)
+        const pattern = Object.assign({}, this.props.pattern)
         const notes = this.state.bufferedNotes.slice()
 
-        notes[track.ticks - 1 - row] = { active: note }
+        notes[pattern.ticks - 1 - row] = { active: note }
 
         this.setState({
             bufferedNotes: notes
         })
 
-        track.notes = notes
+        pattern.notes = notes
 
         // throttle dispatch, if redux has to process too many at once the app will freeze/stutter
         if ( this.throttle ) clearTimeout(this.throttle)
         this.throttle = setTimeout(() => {
-            this.sendUpdate(track)
-            if ( this.state.autoplayIsOn ) this.playTrack()
+            this.sendUpdate(pattern)
+            if ( this.state.autoplayIsOn ) this.playPattern()
         }, 250)
 
     }
 
-    sendUpdate (track) {
-        this.props.updateTrack(track.id, track)
+    sendUpdate (pattern) {
+        this.props.updatePattern(pattern.id, pattern)
     }
 
-    changeTrackName (e) {
-        const track = Object.assign({}, this.props.track)
+    changePatternName (e) {
+        const pattern = Object.assign({}, this.props.pattern)
         const newName = e.target.value
 
-        track.name = newName
+        pattern.name = newName
 
-        this.props.updateTrack(track.id, track)
+        this.props.updatePattern(pattern.id, pattern)
     }
 
-    trackTicksAmount (e) {
+    patternTicksAmount (e) {
         const newValue = parseInt(e.target.value)
 
         this.setState({
@@ -88,25 +88,25 @@ class TrackEditor extends Component {
     changeTicksAmount (e) {
         e.preventDefault()
 
-        const track = Object.assign({}, this.props.track)
+        const pattern = Object.assign({}, this.props.pattern)
         const currentTicks = this.state.currentTicks
         const newValue = currentTicks > 0 && currentTicks < 65 ? currentTicks : currentTicks > 64 ? 64 : 1
 
-        let notes = track.notes.slice()
+        let notes = pattern.notes.slice()
         while ( notes.length !== newValue ) {
             if ( notes.length > newValue )
-                notes = track.notes.slice(0, newValue)
+                notes = pattern.notes.slice(0, newValue)
             else
                 notes.push({active: -1})
         }
 
-        track.ticks = newValue
-        track.notes = notes
+        pattern.ticks = newValue
+        pattern.notes = notes
 
-        this.props.updateTrack(track.id, track)
+        this.props.updatePattern(pattern.id, pattern)
     }
 
-    changeTrackChannel (e) {
+    changePatternChannel (e) {
         const newValue = parseInt(e.target.value)
         emitCustomEvent('changeChannel', {
             channel: newValue
@@ -116,16 +116,16 @@ class TrackEditor extends Component {
         })
     }
 
-    playTrack = () => {
+    playPattern = () => {
         emitCustomEvent('playOnce', {
-            song: this.props.track
+            song: this.props.pattern
         })
     }
 
     /**
-     * Stops playing the currently loaded track
+     * Stops playing the currently loaded pattern
      */
-    stopTrack = () => {
+    stopPattern = () => {
         emitCustomEvent('stopPlaying')
     }
 
@@ -144,29 +144,29 @@ class TrackEditor extends Component {
     }
 
     render () {
-        const { track: activeTrack, toggleTrackRepeat, trackRepeat } = this.props
+        const { pattern: activePattern, togglePatternRepeat, patternRepeat } = this.props
         const state = this.state
-        const { trackIsPlaying } = this.props
-        const playOrStop = trackIsPlaying ? 'stopTrack' : 'playTrack'
-        const playOrStopText = trackIsPlaying ? 'Stop' : 'Play'
+        const { patternIsPlaying } = this.props
+        const playOrStop = patternIsPlaying ? 'stopPattern' : 'playPattern'
+        const playOrStopText = patternIsPlaying ? 'Stop' : 'Play'
 
         return (
-            <div id="editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
+            <div id="editor-container" className={ activePattern.id === undefined ? 'hidden' : '' }>
 
-                <h5>Tune track editor</h5>
+                <h5>Tune pattern editor</h5>
 
                 <div className="editor-info">
                     <div className="editor-info-row">
-                        <label htmlFor="track-name">Name: </label>
-                        <input id="track-name" onChange={this.changeTrackName} type="text" value={activeTrack.name || ""} />
+                        <label htmlFor="pattern-name">Name: </label>
+                        <input id="pattern-name" onChange={this.changePatternName} type="text" value={activePattern.name || ""} />
                     </div>
                     <div className="editor-info-row">
-                        <label htmlFor="track-channel">Channel: </label>
-                        <input id="track-channel" onChange={this.changeTrackChannel} type="number" min="0" max="3" value={state.channel || 0} />
+                        <label htmlFor="pattern-channel">Channel: </label>
+                        <input id="pattern-channel" onChange={this.changePatternChannel} type="number" min="0" max="3" value={state.channel || 0} />
                     </div>
                     <form className="editor-info-row" onSubmit={ this.changeTicksAmount }>
-                        <label htmlFor="track-ticks">Ticks: </label>
-                        <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={state.currentTicks || 0} />
+                        <label htmlFor="pattern-ticks">Ticks: </label>
+                        <input id="pattern-ticks" onChange={this.patternTicksAmount} type="number" min="1" max="64" value={state.currentTicks || 0} />
                         <input type="submit" value="ok" />
                     </form>
                 </div>
@@ -177,8 +177,8 @@ class TrackEditor extends Component {
                         Repeat
                         <input
                             type="checkbox"
-                            onChange={ e => toggleTrackRepeat(e.target.checked) }
-                            value={trackRepeat}
+                            onChange={ e => togglePatternRepeat(e.target.checked) }
+                            value={patternRepeat}
                         />
                     </label>
                     <div style={{flex: 1}}></div>
@@ -195,4 +195,4 @@ class TrackEditor extends Component {
     }
 }
 
-export default TrackEditor
+export default PatternEditor

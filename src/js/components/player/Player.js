@@ -2,17 +2,17 @@ import { connect } from 'react-redux'
 import PlayerView from './PlayerView'
 
 const mapStateToProps = (state) => {
-    const { channels, tracks, fx, activeTrack, songName,
-          activeTrackType, songRepeat, trackRepeat } = state
+    const { channels, patterns, fx, activePattern, songName,
+          activePatternType, songRepeat, patternRepeat } = state
     return {
         channels,
-        tracks,
+        patterns,
         fx,
-        activeTrack,
-        activeTrackType,
+        activePattern,
+        activePatternType,
         songName,
         songRepeat,
-        trackRepeat
+        patternRepeat
     }
 }
 
@@ -30,9 +30,9 @@ const mapDispatchToProps = (dispatch) => {
                 playing
             })
         },
-        setTrackIsPlaying (playing) {
+        setPatternIsPlaying (playing) {
             dispatch({
-                type: 'TRACK_IS_PLAYING',
+                type: 'PATTERN_IS_PLAYING',
                 playing
             })
         }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Track from './Track'
+import Pattern from './Pattern'
 
 class ChannelRowView extends Component {
     constructor (props) {
@@ -25,37 +25,37 @@ class ChannelRowView extends Component {
         const editorId = e.dataTransfer.getData('editorId')
         if ( editorId )
             //move
-            this.props.moveTrackToIndex( this.props.channel, parseInt(e.dataTransfer.getData('channel')), parseInt(editorId), parseInt(e.target.dataset.position||-1) )
+            this.props.movePatternToIndex( this.props.channel, parseInt(e.dataTransfer.getData('channel')), parseInt(editorId), parseInt(e.target.dataset.position||-1) )
         else
             //add
-            this.props.addTrackAtIndex( this.props.channel, this.props.tracks.find(t => t.id === parseInt(e.dataTransfer.getData('trackId'))), parseInt(e.target.dataset.position||-1) )
+            this.props.addPatternAtIndex( this.props.channel, this.props.patterns.find(t => t.id === parseInt(e.dataTransfer.getData('patternId'))), parseInt(e.target.dataset.position||-1) )
     }
 
     render () {
         const props = this.props
-        const channelTracks = props.channelTracks
-        const tracks = props.tracks
+        const channelPatterns = props.channelPatterns
+        const patterns = props.patterns
         const fxStatus = props.fxStatus
-        const activeFx = fxStatus.fxType === 'track' && fxStatus.id
+        const activeFx = fxStatus.fxType === 'pattern' && fxStatus.id
         const fx = props.fx
         return (
             <div
                 onDragOver = { this.handleDragover }
                 onDrop = { this.handleDrop }
-                className = {`channel-track droppable ${ props.editingFx ? 'active' : '' }`}
+                className = {`channel-pattern droppable ${ props.editingFx ? 'active' : '' }`}
             >
-                {channelTracks.map( (track, i) => {
-                    const { editorId, id } = track
-                    const trackFx = fx.track[editorId]
-                    const appliedFx = (trackFx && trackFx.fx) || {}
+                {channelPatterns.map( (pattern, i) => {
+                    const { editorId, id } = pattern
+                    const patternFx = fx.pattern[editorId]
+                    const appliedFx = (patternFx && patternFx.fx) || {}
 
                     return (
-                        <Track
+                        <Pattern
                             key = {editorId}
                             position = {i}
-                            track = {track}
-                            detail = {tracks.find( t => t.id === id )}
-                            removeTrack = {props.removeTrack}
+                            pattern = {pattern}
+                            detail = {patterns.find( t => t.id === id )}
+                            removePattern = {props.removePattern}
                             channel = {props.channel}
                             openFx = {props.openFx}
                             activeFx = {activeFx === editorId}

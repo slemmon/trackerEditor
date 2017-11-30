@@ -1,38 +1,38 @@
 
-#track-list-container {
+#pattern-list-container {
     margin-bottom: 10px;
 
-    .track-list {
+    .pattern-list {
         list-style: none;
         padding: 0;
         margin: 0;
         border: 1px solid #4e999c;
 
-        .track-list-item {
+        .pattern-list-item {
             height: 23px;
             display: flex;
             align-items: center;
             border-bottom: 1px solid #bfe4e4;
             
-            .track-list-item-icon {
+            .pattern-list-item-icon {
                 flex: 0;
                 padding: 0 5px;
             }
-            .track-list-item-text {
+            .pattern-list-item-text {
                 font-weight: 600;
-                flex: 1;
+                margin-right: 12px;
             }
-            .track-list-item-tickbar {
+            .pattern-list-item-tickbar {
                 flex: 2;
                 display: flex;
                 height: 15px;
-                .track-list-item-tickbar-bar {
+                .pattern-list-item-tickbar-bar {
                     border-radius: 2px;
                     border: 1px solid;
                     box-sizing: border-box;
                 }
             }
-            .track-list-item-buttons {
+            .pattern-list-item-buttons {
                 flex: 0 0 50px;
                 margin-right: 4px;
                 display: flex;
@@ -41,7 +41,7 @@
                 > * {
                     cursor: pointer;
                 }
-                .track-list-item-buttons-color-button {
+                .pattern-list-item-buttons-color-button {
                     width: 15px;
                     height: 15px;
                     border-radius: 3px;
@@ -49,11 +49,11 @@
             }
         }
 
-        .track-list-item:last-of-type {
+        .pattern-list-item:last-of-type {
             border-bottom-width: 0;
         }
 
-        .track-list-item-selected {
+        .pattern-list-item-selected {
             background-color: #efefef;
 
             .fa-pencil:before {

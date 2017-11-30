@@ -8,15 +8,15 @@ class DrumEditor extends Component {
         super(props)
 
         this.state = {
-            currentTicks: props.track.ticks,
+            currentTicks: props.pattern.ticks,
             selectedEffect: 'snare',
             repeatIsOn: false,
             autoplayIsOn: false,
             isMuted: false
         }
 
-        this.changeTrackName = this.changeTrackName.bind(this)
-        this.trackTicksAmount = this.trackTicksAmount.bind(this)
+        this.changePatternName = this.changePatternName.bind(this)
+        this.patternTicksAmount = this.patternTicksAmount.bind(this)
         this.changeTicksAmount = this.changeTicksAmount.bind(this)
         this.selectEffect = this.selectEffect.bind(this)
         this.addEffectAtPosition = this.addEffectAtPosition.bind(this)
@@ -26,7 +26,7 @@ class DrumEditor extends Component {
     componentWillReceiveProps(nextProps) {
         if ( nextProps.status === 0 )
             this.setState({
-                currentTicks: nextProps.track.ticks
+                currentTicks: nextProps.pattern.ticks
             })
     }
 
@@ -34,16 +34,16 @@ class DrumEditor extends Component {
         return nextProps.status === 0
     }
 
-    changeTrackName (e) {
-        const track = Object.assign({}, this.props.track)
+    changePatternName (e) {
+        const pattern = Object.assign({}, this.props.pattern)
         const newName = e.target.value
 
-        track.name = newName
+        pattern.name = newName
 
-        this.props.updateTrack(track.id, track)
+        this.props.updatePattern(pattern.id, pattern)
     }
 
-    trackTicksAmount (e) {
+    patternTicksAmount (e) {
         const newValue = parseInt(e.target.value)
 
         this.setState({
@@ -54,16 +54,16 @@ class DrumEditor extends Component {
     changeTicksAmount (e) {
         e.preventDefault()
 
-        const track = Object.assign({}, this.props.track)
+        const pattern = Object.assign({}, this.props.pattern)
         const currentTicks = this.state.currentTicks
         const newValue = currentTicks > 0 && currentTicks < 65 ? currentTicks : currentTicks > 64 ? 64 : 1
 
-        track.ticks = newValue
+        pattern.ticks = newValue
 
-        const newNotes = this.trimNotes(track.notes, newValue)
-        track.notes = newNotes
+        const newNotes = this.trimNotes(pattern.notes, newValue)
+        pattern.notes = newNotes
 
-        this.props.updateTrack(track.id, track)
+        this.props.updatePattern(pattern.id, pattern)
     }
 
     trimNotes (notes, ticks) {
@@ -95,27 +95,27 @@ class DrumEditor extends Component {
 
     addEffectAtPosition (position) {
 
-        const track = Object.assign({}, this.props.track)
-        const ticks = track.ticks
-        let effects = track.notes.slice()
+        const pattern = Object.assign({}, this.props.pattern)
+        const ticks = pattern.ticks
+        let effects = pattern.notes.slice()
 
         if ( effects[position] !== undefined )
             effects[position] = undefined
         else
             effects = this.updateEffectsList(effects, position)
 
-        track.notes = effects
+        pattern.notes = effects
 
-        this.props.updateTrack(track.id, track)
-        if ( this.state.autoplayIsOn ) this.playOnce(null, null, track)
+        this.props.updatePattern(pattern.id, pattern)
+        if ( this.state.autoplayIsOn ) this.playOnce(null, null, pattern)
     }
 
     updateEffectsList (effects, position) {
         const selectedEffect = this.state.selectedEffect
-        const track = this.props.track
+        const pattern = this.props.pattern
 
         const effectLength = this.getEffectLength(selectedEffect)
-        if ( position + effectLength > track.ticks )
+        if ( position + effectLength > pattern.ticks )
             return effects
 
         effects[position] = selectedEffect
@@ -166,16 +166,16 @@ class DrumEditor extends Component {
         return effects
     }
 
-    playTrack = () => {
+    playPattern = () => {
         emitCustomEvent('playOnce', {
-            song: this.props.track
+            song: this.props.pattern
         })
     }
 
     /**
-     * Stops playing the currently loaded track
+     * Stops playing the currently loaded pattern
      */
-    stopTrack = () => {
+    stopPattern = () => {
         emitCustomEvent('stopPlaying')
     }
 
@@ -194,26 +194,26 @@ class DrumEditor extends Component {
     }
 
     render () {
-        const { track: activeTrack, toggleTrackRepeat, 
-              trackIsPlaying, trackRepeat } = this.props
+        const { pattern: activePattern, togglePatternRepeat, 
+              patternIsPlaying, patternRepeat } = this.props
         const state = this.state
         const selectedEffect = state.selectedEffect
-        const playOrStop = trackIsPlaying ? 'stopTrack' : 'playTrack'
-        const playOrStopText = trackIsPlaying ? 'Stop' : 'Play'
+        const playOrStop = patternIsPlaying ? 'stopPattern' : 'playPattern'
+        const playOrStopText = patternIsPlaying ? 'Stop' : 'Play'
 
         return (
-            <div id="drum-editor-container" className={ activeTrack.id === undefined ? 'hidden' : '' }>
+            <div id="drum-editor-container" className={ activePattern.id === undefined ? 'hidden' : '' }>
 
-                <h5>Drum track editor</h5>
+                <h5>Drum pattern editor</h5>
 
                 <div className="editor-info">
                     <div className="editor-info-row">
-                        <label htmlFor="track-name">Name: </label>
-                        <input id="track-name" onChange={this.changeTrackName} type="text" value={activeTrack.name || ""} />
+                        <label htmlFor="pattern-name">Name: </label>
+                        <input id="pattern-name" onChange={this.changePatternName} type="text" value={activePattern.name || ""} />
                     </div>
                     <form onSubmit={this.changeTicksAmount} className="editor-info-row">
-                        <label htmlFor="track-ticks">Ticks: </label>
-                        <input id="track-ticks" onChange={this.trackTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
+                        <label htmlFor="pattern-ticks">Ticks: </label>
+                        <input id="pattern-ticks" onChange={this.patternTicksAmount} type="number" min="1" max="64" value={this.state.currentTicks || 0} />
                         <input type="submit" value="ok" />
                     </form>
                 </div>
@@ -226,8 +226,8 @@ class DrumEditor extends Component {
                         Repeat
                         <input
                             type="checkbox"
-                            onChange={e => toggleTrackRepeat(e.target.checked)}
-                            checked={trackRepeat}
+                            onChange={e => togglePatternRepeat(e.target.checked)}
+                            checked={patternRepeat}
                         />
                     </label>
                     <div style={{flex: 1}}></div>
@@ -235,7 +235,7 @@ class DrumEditor extends Component {
                     <button onClick={this.toggleMute}>{ `${state.isMuted ? 'un' : ''}mute` }</button>
                 </div>
 
-                <DrumTable notes={activeTrack.notes} ticks={activeTrack.ticks} addEffectAtPosition={this.addEffectAtPosition} repeatIsOn={state.repeatIsOn} />
+                <DrumTable notes={activePattern.notes} ticks={activePattern.ticks} addEffectAtPosition={this.addEffectAtPosition} repeatIsOn={state.repeatIsOn} />
 
                 <div className="drum-selector-container">
                     <DrumEffectSelector

@@ -60,11 +60,11 @@ const noteVal = {
   }
 };
 
-// All drum track patterns described
-const drumTracks = {
+// All drum pattern patterns described
+const drumPatterns = {
   snare: {
     notes: [
-      // "//\"Track snare\"",
+      // "//\"Pattern snare\"",
       'ATM_CMD_M_SET_VOLUME(16)',
       'ATM_CMD_M_SLIDE_VOL_ON(-8)',
       'ATM_CMD_M_DELAY_TICKS(2)',
@@ -75,7 +75,7 @@ const drumTracks = {
   },
   shake: {
     notes: [
-      // "//\"Track shake\"",
+      // "//\"Pattern shake\"",
       'ATM_CMD_M_NOISE_RETRIG_ON(4)',
       'ATM_CMD_M_SET_VOLUME(31)',
       'ATM_CMD_M_SLIDE_VOL_ON(-8)',
@@ -88,7 +88,7 @@ const drumTracks = {
   },
   crash: {
     notes: [
-      // "//\"Track crash\"",
+      // "//\"Pattern crash\"",
       'ATM_CMD_M_SET_VOLUME(31)',
       'ATM_CMD_M_SLIDE_VOL_ON(-2)',
       'ATM_CMD_M_DELAY_TICKS(16)',
@@ -99,7 +99,7 @@ const drumTracks = {
   },
   tick: {
     notes: [
-      // "//\"Track tick\"",
+      // "//\"Pattern tick\"",
       'ATM_CMD_M_SET_VOLUME(31)',
       'ATM_CMD_M_DELAY_TICKS(1)',
       'ATM_CMD_M_SET_VOLUME(0)',
@@ -109,7 +109,7 @@ const drumTracks = {
   },
   short_crash: {
     notes: [
-      // "//\"Track short crash\"",
+      // "//\"Pattern short crash\"",
       'ATM_CMD_M_SET_VOLUME(31)',
       'ATM_CMD_M_SLIDE_VOL_ON(-4)',
       'ATM_CMD_M_DELAY_TICKS(8)',
@@ -227,46 +227,46 @@ const endFx = {
 
 /**
  * Outputs the text needed for a header file used by Arduboy as an audio file
- * @param {Object} song The song object containing tracks, channels, and fx keys
+ * @param {Object} song The song object containing patterns, channels, and fx keys
  * @return {String} The audio file content.  See the following for reference:
  * https://github.com/moduscreate/ATMlib/blob/d8a8631d6ba53179f284ef3de74aeb125de6fe47/examples/songs/song01_sfx/song.h
  */
 function createSongFileFromChannels (song) {
-  const { channels, fx, songName, songRepeat, tracks } = song;
+  const { channels, fx, songName, songRepeat, patterns } = song;
   const normalizedSongName = songName.replace(/[ -]/g, '_');
-  const trackAtm = {};
-  let totalTracks = 0;
+  const patternAtm = {};
+  let totalPatterns = 0;
   
   // round up all percussion pattern instances (tick, snare, crash, etc.) to add
   // to the patterns array
-  const requiredDrumTracks = getRequiredDrumTracks(tracks);
+  const requiredDrumPatterns = getRequiredDrumPatterns(patterns);
 
   // add all percussion patterns to the patterns object containing all
   // non-channel patterns
-  Object.keys(requiredDrumTracks).forEach(key => {
-    totalTracks++;
-    trackAtm[key] = {
+  Object.keys(requiredDrumPatterns).forEach(key => {
+    totalPatterns++;
+    patternAtm[key] = {
       type: 'pattern',
       typeText: 'pattern (drum)',
-      track: {},
-      index: totalTracks - 1,
-      atm: drumTracks[key]
+      pattern: {},
+      index: totalPatterns - 1,
+      atm: drumPatterns[key]
     };
   });
   
-  tracks.forEach((track, i) => {
-    totalTracks++;
-    trackAtm[track.id] = {
+  patterns.forEach((pattern, i) => {
+    totalPatterns++;
+    patternAtm[pattern.id] = {
       type: 'pattern',
       typeText: 'pattern (tune)',
-      name: track.name,
-      track,
-      index: totalTracks - 1,
-      atm: atmifyTrack(requiredDrumTracks, track)
+      name: pattern.name,
+      pattern,
+      index: totalPatterns - 1,
+      atm: atmifyPattern(requiredDrumPatterns, pattern)
     };
   });
 
-  const channelTracks = channels.map((channel, i) => {
+  const channelPatterns = channels.map((channel, i) => {
     return {
       type: 'channel',
       typeText: 'pattern (channel)',
@@ -275,15 +275,15 @@ function createSongFileFromChannels (song) {
         effects: fx.channel[i],
         index: i,
         songRepeat,
-        trackEffects: fx.track,
-        tracks: trackAtm
+        patternEffects: fx.pattern,
+        patterns: patternAtm
       })
     };
   });
   
   // sort the non-channel patterns by index returned as an ordered array
-  const orderedPatterns = orderBy(trackAtm, ['index']);
-  const allPatterns = [...channelTracks, ...orderedPatterns];
+  const orderedPatterns = orderBy(patternAtm, ['index']);
+  const allPatterns = [...channelPatterns, ...orderedPatterns];
 
   // construct the audio file text
   // DEV NOTE: keep the awkward indentation below to preserve the final shape
@@ -392,10 +392,10 @@ function getScoreData (allPatterns, songName) {
   },
   .num_channels = ${channelCount},
   .start_patterns = {
-    0x00,                         // Channel 0 entry track (SQUARE)
-    0x01,                         // Channel 1 entry track (SQUARE)
-    0x02,                         // Channel 2 entry track (SQUARE)
-    0x03,                         // Channel 3 entry track (NOISE)
+    0x00,                         // Channel 0 entry pattern (SQUARE)
+    0x01,                         // Channel 1 entry pattern (SQUARE)
+    0x02,                         // Channel 2 entry pattern (SQUARE)
+    0x03,                         // Channel 3 entry pattern (NOISE)
   },
   ${patternData}
 };`;
@@ -522,20 +522,20 @@ function createFxArray (fxToAdd, type, effects) {
 /**
  * Aggregate all effects and GOTO and REPEAT commands for the passed channel
  * @param {Object} channel The channel to populate
- * @param {Object} channel.tracks All tracks for the channel keyed by an
+ * @param {Object} channel.patterns All patterns for the channel keyed by an
  * internal index
- * @param {Array} channel.channel Track data for all tracks represented in
- * `channel.tracks`
+ * @param {Array} channel.channel Pattern data for all patterns represented in
+ * `channel.patterns`
  * @param {Number} channel.index The channel index
  * @param {Object} channel.effects Effects to apply to the channel
- * @param {Object} channel.effects Effects to apply to the tracks on this
+ * @param {Object} channel.effects Effects to apply to the patterns on this
  * channel
  * @return {Object} An object with the channel byte count and the channel 
  * commands including effects as well as GOTO and REPEAT commands
  */
 function atmifyChannel ({ channel, effects, index, 
-                          songRepeat, trackEffects, tracks}) {
-  let channelTrack = [];
+                          songRepeat, patternEffects, patterns}) {
+  let channelPattern = [];
   let totalBytes = 0;
 
   // create the array of starting effects
@@ -546,22 +546,22 @@ function atmifyChannel ({ channel, effects, index,
   );
   
   // add the effects commands to the channel commands list
-  channelTrack = channelTrack.concat(newFxStart.fx);
+  channelPattern = channelPattern.concat(newFxStart.fx);
   totalBytes += newFxStart.bytes;
 
-  let previousTrackId = -1,
-      previousTrackEffects = 0,
+  let previousPatternId = -1,
+      previousPatternEffects = 0,
       count = 0;
 
-  // loop over all tracks and include references to them in the channel commands
-  for ( const track of channel ) {
-    const eff = trackEffects[track.editorId] || {flags:0};
+  // loop over all patterns and include references to them in the channel commands
+  for ( const pattern of channel ) {
+    const eff = patternEffects[pattern.editorId] || {flags:0};
 
-    if ( previousTrackId === track.id && !eff.flags && !previousTrackEffects ) {
+    if ( previousPatternId === pattern.id && !eff.flags && !previousPatternEffects ) {
       count++;
-      channelTrack.pop();
-      channelTrack.push(
-        `ATM_CMD_M_CALL_REPEAT(${tracks[track.id].index + 4}, ${count + 1})`
+      channelPattern.pop();
+      channelPattern.push(
+        `ATM_CMD_M_CALL_REPEAT(${patterns[pattern.id].index + 4}, ${count + 1})`
       );
       if (count === 1)
         // we remove a line with 2 bytes (GOTO = 2 bytes) and we add
@@ -576,68 +576,68 @@ function atmifyChannel ({ channel, effects, index,
         endFx = createFxArray(getFxList(eff, 'last'), 'end', eff);
       }
 
-      // add first track fx before track
+      // add first pattern fx before pattern
       if (startFx) {
-        channelTrack = channelTrack.concat(startFx.fx);
+        channelPattern = channelPattern.concat(startFx.fx);
         totalBytes += startFx.bytes;
       }
 
       count = 0;
-      // goto track
-      channelTrack.push(`ATM_CMD_M_CALL(${tracks[track.id].index + 4})`);
+      // goto pattern
+      channelPattern.push(`ATM_CMD_M_CALL(${patterns[pattern.id].index + 4})`);
       totalBytes += 2;
 
-      // add last track fx after track
+      // add last pattern fx after pattern
       if (endFx) {
-        channelTrack = channelTrack.concat(endFx.fx);
+        channelPattern = channelPattern.concat(endFx.fx);
         totalBytes += endFx.bytes;
       }
 
-      previousTrackId = track.id;
-      previousTrackEffects = eff.flags;
+      previousPatternId = pattern.id;
+      previousPatternEffects = eff.flags;
     }
   }
 
   // add ending fx after channel commands
   const newFxEnd = createFxArray(getFxList(effects, 'last'), 'end', effects);
-  channelTrack = channelTrack.concat(newFxEnd.fx);
+  channelPattern = channelPattern.concat(newFxEnd.fx);
   totalBytes += newFxEnd.bytes;
 
   // end of channel
-  if (songRepeat && channelTrack.length) {
-    channelTrack.push(`ATM_CMD_M_SET_LOOP_PATTERN(${index})`);
+  if (songRepeat && channelPattern.length) {
+    channelPattern.push(`ATM_CMD_M_SET_LOOP_PATTERN(${index})`);
   }
-  channelTrack.push('ATM_CMD_I_STOP');
+  channelPattern.push('ATM_CMD_I_STOP');
   totalBytes++;
 
   return {
-    notes: channelTrack,
+    notes: channelPattern,
     bytes: totalBytes
   };
 }
 
 /**
  * Aggregate all effects and note commands for the passed channel
- * @param {Object} requiredDrumTracks An object with percussion channel types as
+ * @param {Object} requiredDrumPatterns An object with percussion channel types as
  * the keys (only if present in the current song)
- * @param {Object} track The current "tune" track to assemble
+ * @param {Object} pattern The current "tune" pattern to assemble
  * @return {Object} An object the total bytes and the assembled pattern commands
  */
-function atmifyTrack (requiredDrumTracks, track) {
-  if ( track.type === 'tune' )
-    return atmifyRegularTrack(track);
+function atmifyPattern (requiredDrumPatterns, pattern) {
+  if ( pattern.type === 'tune' )
+    return atmifyRegularPattern(pattern);
   else
-    return atmifyDrumTrack(requiredDrumTracks, track);
+    return atmifyDrumPattern(requiredDrumPatterns, pattern);
 }
 
 /**
  * Aggregate all effects and note commands for the passed non-drum pattern
- * @param {Object} track The pattern object including the note information as
+ * @param {Object} pattern The pattern object including the note information as
  * it's created for the tracker file
  * @return {Object} An object the total bytes and the assembled pattern commands
  */
-function atmifyRegularTrack (track) {
-  const { notes } = track;
+function atmifyRegularPattern (pattern) {
+  const { notes } = pattern;
   const noteSequence = [];
 
   let thisNote,
@@ -684,13 +684,13 @@ function atmifyRegularTrack (track) {
 
 /**
  * Aggregate all effects and note commands for the passed drum pattern
- * @param {*} drumTrackNumbers An object with percussion channel types as
+ * @param {*} drumPatternNumbers An object with percussion channel types as
  * the keys
- * @param {*} track The current "tune" track to assemble
+ * @param {*} pattern The current "tune" pattern to assemble
  * @return {Object} An object the total bytes and the assembled pattern commands
  */
-function atmifyDrumTrack (drumTrackNumbers, track) {
-  const { notes } = track;
+function atmifyDrumPattern (drumPatternNumbers, pattern) {
+  const { notes } = pattern;
 
   let note,
     noteSequence = [],
@@ -700,7 +700,7 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
     totalBytes = 0;
 
   // loop over the notes and add the ticks / delay commands for the pattern
-  for ( let x = 0, l = track.ticks; x < l; x++ ) {
+  for ( let x = 0, l = pattern.ticks; x < l; x++ ) {
     note = notes[x];
     if ( (note === undefined || note === null) && skip-- < 1 ) {
       if (wasEmpty) {
@@ -716,13 +716,13 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
     } else if ( note !== undefined && Object.prototype.toString.apply(note).slice(8, -1) === 'String' ) {
       skip = getEffectLength(note);
       wasEmpty = false;
-      const target = drumTrackNumbers[note] + 4;
+      const target = drumPatternNumbers[note] + 4;
       noteSequence.push(`ATM_CMD_M_CALL(${target})`);
       totalBytes += 2;
     }
   };
 
-  // end of track (RETURN)
+  // end of pattern (RETURN)
   noteSequence.push('ATM_CMD_I_RETURN');
   totalBytes++;
 
@@ -733,17 +733,17 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
 }
 
 /**
- * Extract the drum track types from all tracks
- * @param {Array} tracks Array of all tracks in the song
- * @return {Object} An object with keys of all drum track types for this song
+ * Extract the drum pattern types from all patterns
+ * @param {Array} patterns Array of all patterns in the song
+ * @return {Object} An object with keys of all drum pattern types for this song
  */
-function getRequiredDrumTracks (tracks) {
-  let track,
+function getRequiredDrumPatterns (patterns) {
+  let pattern,
       notes;
   const required = {};
 
-  const drumTracks = tracks.filter(track => track.type === 'drum');
-  drumTracks.forEach(({ notes = [] }) => {
+  const drumPatterns = patterns.filter(pattern => pattern.type === 'drum');
+  drumPatterns.forEach(({ notes = [] }) => {
     notes.forEach(note => {
       if (note) {
         required[note] = true;

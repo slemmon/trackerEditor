@@ -16,18 +16,18 @@ render(
     document.getElementById('app')
 )
 
-let previousTracksLength = 0
+let previousPatternsLength = 0
 const unsubscribe = store.subscribe(() => {
     const state = store.getState()
 
-    const newLength = state.tracks.length
-    const previousLength = previousTracksLength
+    const newLength = state.patterns.length
+    const previousLength = previousPatternsLength
     if ( previousLength !== newLength )
-        previousTracksLength = newLength
+        previousPatternsLength = newLength
     if ( (newLength > previousLength) || (newLength && !previousLength) ) {
         store.dispatch({
-            type: 'SET_ACTIVE_TRACK',
-            track: state.tracks.slice(-1)[0]
+            type: 'SET_ACTIVE_PATTERN',
+            pattern: state.patterns.slice(-1)[0]
         })
     }
 })

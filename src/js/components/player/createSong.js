@@ -1,9 +1,9 @@
 export { createNoteSequence, createSongFromChannels, getEffectLength }
 
-const drumTracks = {
+const drumPatterns = {
     snare: {
         notes: [
-            "//\"Track snare\"",
+            "//\"Pattern snare\"",
             "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
             "0x41, -16,\t\t// FX: VOLUME SLIDE ON: steps = -16",
             "0x9F + 2,\t\t// DELAY: ticks = 2",
@@ -14,7 +14,7 @@ const drumTracks = {
     },
     shake: {
         notes: [
-            "//\"Track shake\"",
+            "//\"Pattern shake\"",
             "0x49, 4 + 0,\t\t// FX: RETRIG NOISE: point = 1 (*4) / speed = 0 (fastest)",
             "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
             "0x41, -8,\t\t// FX: VOLUME SLIDE ON: steps = -8",
@@ -27,7 +27,7 @@ const drumTracks = {
     },
     crash: {
         notes: [
-            "//\"Track crash\"",
+            "//\"Pattern crash\"",
             "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
             "0x41, -2,\t\t// FX: VOLUME SLIDE ON: steps = -2",
             "0x9F + 16,\t\t// DELAY: ticks = 16",
@@ -38,7 +38,7 @@ const drumTracks = {
     },
     tick: {
         notes: [
-            "//\"Track tick\"",
+            "//\"Pattern tick\"",
             "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
             "0x9F + 1,\t\t// DELAY: ticks = 1",
             "0x40, 0,\t\t// FX: SET VOLUME: volume = 0",
@@ -48,7 +48,7 @@ const drumTracks = {
     },
     short_crash: {
         notes: [
-            "//\"Track short crash\"",
+            "//\"Pattern short crash\"",
             "0x40, 32,\t\t// FX: SET VOLUME: volume = 32",
             "0x41, -4,\t\t// FX: VOLUME SLIDE ON: steps = -4",
             "0x9F + 8,\t\t// DELAY: ticks = 8",
@@ -59,55 +59,55 @@ const drumTracks = {
     }
 }
 
-function createSongFromChannels (tracks, channels, fx) {
+function createSongFromChannels (patterns, channels, fx) {
 
-    const trackAtm = {}
-    let totalTracks = 0
+    const patternAtm = {}
+    let totalPatterns = 0
 
-    const requiredDrumTracks = getRequiredDrumTracks(tracks)
-    for ( const key in requiredDrumTracks ) {
-        if ( requiredDrumTracks[key] !== false ) {
-            totalTracks++
-            trackAtm[key] = {
-                track: {},
-                index: totalTracks - 1,
-                atm: drumTracks[key]
+    const requiredDrumPatterns = getRequiredDrumPatterns(patterns)
+    for ( const key in requiredDrumPatterns ) {
+        if ( requiredDrumPatterns[key] !== false ) {
+            totalPatterns++
+            patternAtm[key] = {
+                pattern: {},
+                index: totalPatterns - 1,
+                atm: drumPatterns[key]
             }
         }
     }
 
-    let track
-    for ( let x = 0, l = tracks.length; x < l; x++ ) {
-        track = tracks[x]
-        totalTracks++
-        trackAtm[track.id] = {
-            track,
-            index: totalTracks - 1,
-            atm: atmifyTrack(requiredDrumTracks, track)
+    let pattern
+    for ( let x = 0, l = patterns.length; x < l; x++ ) {
+        pattern = patterns[x]
+        totalPatterns++
+        patternAtm[pattern.id] = {
+            pattern,
+            index: totalPatterns - 1,
+            atm: atmifyPattern(requiredDrumPatterns, pattern)
         }
     }
 
-    const channelTracks = []
+    const channelPatterns = []
     for ( let i = 0; i < 4; i++ )
-        channelTracks.push(atmifyChannel({
-            tracks: trackAtm,
+        channelPatterns.push(atmifyChannel({
+            patterns: patternAtm,
             channel: channels[i],
             index: i,
             effects: fx.channel[i],
-            trackEffects: fx.track
+            patternEffects: fx.pattern
         }))
 
-    const { channelAddresses, channelString, channelEntryTracks, totalBytes } = concatAllChannels(/*totalTracks, */channelTracks)
-    const { trackAddresses, trackString/*, totalBytes*/ } = concatAllTracks(totalBytes, trackAtm)
-    totalTracks += 4
+    const { channelAddresses, channelString, channelEntryPatterns, totalBytes } = concatAllChannels(/*totalPatterns, */channelPatterns)
+    const { patternAddresses, patternString/*, totalBytes*/ } = concatAllPatterns(totalBytes, patternAtm)
+    totalPatterns += 4
 
     let completeSong = '#ifndef SONG_H\n#define SONG_H\n\n#define Song const uint8_t PROGMEM\n\nSong music[] = {\n'
-    completeSong += `0x${hexify(totalTracks)},\t\t\t// Number of tracks\n`
+    completeSong += `0x${hexify(totalPatterns)},\t\t\t// Number of patterns\n`
     completeSong += channelAddresses
-    completeSong += trackAddresses
-    completeSong += channelEntryTracks
+    completeSong += patternAddresses
+    completeSong += channelEntryPatterns
     completeSong += channelString
-    completeSong += trackString
+    completeSong += patternString
     completeSong += '\n};\n\n\n\n#endif\n'
 
     return completeSong
@@ -326,26 +326,26 @@ function createInfoComment (template, values) {
     return result
 }
 
-function atmifyChannel ({tracks, channel, /*addTempo,*/ index, /*tempo, */effects, trackEffects}) {
-    let channelTrack = []
+function atmifyChannel ({patterns, channel, /*addTempo,*/ index, /*tempo, */effects, patternEffects}) {
+    let channelPattern = []
     let totalBytes = 0
 
     const newFxStart = createFxArray(getFxList(effects, 'first'), 'start', effects)
-    channelTrack = channelTrack.concat(newFxStart.fx)
+    channelPattern = channelPattern.concat(newFxStart.fx)
     totalBytes += newFxStart.bytes
 
-    let previousTrackId = -1,
-        previousTrackEffects = 0,
+    let previousPatternId = -1,
+        previousPatternEffects = 0,
         count = 0
-    for ( const track of channel ) {
+    for ( const pattern of channel ) {
 
-        const eff = trackEffects[track.editorId] || {flags:0}
+        const eff = patternEffects[pattern.editorId] || {flags:0}
 
-        if ( previousTrackId === track.id && !eff.flags && !previousTrackEffects ) {
+        if ( previousPatternId === pattern.id && !eff.flags && !previousPatternEffects ) {
 
             count++
-            channelTrack.pop()
-            channelTrack.push(`0xFD, ${count}, ${tracks[track.id].index + 4},\t\t// REPEAT: count = ${count} + 1 / track = ${tracks[track.id].index + 4}`)
+            channelPattern.pop()
+            channelPattern.push(`0xFD, ${count}, ${patterns[pattern.id].index + 4},\t\t// REPEAT: count = ${count} + 1 / pattern = ${patterns[pattern.id].index + 4}`)
             if ( count === 1 )
                 totalBytes++ // we remove a line with 2 bytes (GOTO = 2 bytes) and we add 3 bytes (REPEAT = 3 bytes)
 
@@ -358,50 +358,50 @@ function atmifyChannel ({tracks, channel, /*addTempo,*/ index, /*tempo, */effect
                 endFx = createFxArray(getFxList(eff, 'last'), 'end', eff)
             }
 
-            // add first track fx before track
+            // add first pattern fx before pattern
             if ( startFx ) {
-                channelTrack = channelTrack.concat(startFx.fx)
+                channelPattern = channelPattern.concat(startFx.fx)
                 totalBytes += startFx.bytes
             }
 
             count = 0
-            channelTrack.push(`0xFC, ${tracks[track.id].index + 4},\t\t// GOTO track ${tracks[track.id].index + 4}`)    // goto track
+            channelPattern.push(`0xFC, ${patterns[pattern.id].index + 4},\t\t// GOTO pattern ${patterns[pattern.id].index + 4}`)    // goto pattern
             totalBytes += 2
 
-            // add last track fx after track
+            // add last pattern fx after pattern
             if ( endFx ) {
-                channelTrack = channelTrack.concat(endFx.fx)
+                channelPattern = channelPattern.concat(endFx.fx)
                 totalBytes += endFx.bytes
             }
 
-            previousTrackId = track.id
-            previousTrackEffects = eff.flags
+            previousPatternId = pattern.id
+            previousPatternEffects = eff.flags
         }
 
     }
 
     // add fx after channel
     const newFxEnd = createFxArray(getFxList(effects, 'last'), 'end', effects)
-    channelTrack = channelTrack.concat(newFxEnd.fx)
+    channelPattern = channelPattern.concat(newFxEnd.fx)
     totalBytes += newFxEnd.bytes
 
-    channelTrack.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL')                                             // end of channel
+    channelPattern.push('0x9F,\t\t\t// FX: STOP CURRENT CHANNEL')                                             // end of channel
     totalBytes++
 
-    channelTrack.unshift(`//\"Track channel ${index}\"`)
+    channelPattern.unshift(`//\"Pattern channel ${index}\"`)
 
-    return { notes: channelTrack, bytes: totalBytes }
+    return { notes: channelPattern, bytes: totalBytes }
 }
 
-function atmifyTrack (requiredDrumTracks, track) {
-    if ( track.type === 'tune' )
-        return atmifyRegularTrack(track)
+function atmifyPattern (requiredDrumPatterns, pattern) {
+    if ( pattern.type === 'tune' )
+        return atmifyRegularPattern(pattern)
     else
-        return atmifyDrumTrack(requiredDrumTracks, track)
+        return atmifyDrumPattern(requiredDrumPatterns, pattern)
 }
 
-function atmifyRegularTrack (track) {
-    const notes = track.notes
+function atmifyRegularPattern (pattern) {
+    const notes = pattern.notes
     const noteSequence = []
 
     let thisNote,
@@ -433,16 +433,16 @@ function atmifyRegularTrack (track) {
         lastNote = thisNote
     }
 
-    noteSequence.push('0xFE,\t\t\t// RETURN')                 // end of track (RETURN)
+    noteSequence.push('0xFE,\t\t\t// RETURN')                 // end of pattern (RETURN)
     totalBytes++
 
-    noteSequence.unshift(`//\"Track ${track.name}\"`)
+    noteSequence.unshift(`//\"Pattern ${pattern.name}\"`)
 
     return { notes: noteSequence, bytes: totalBytes }
 }
 
-function atmifyDrumTrack (drumTrackNumbers, track) {
-    const notes = track.notes
+function atmifyDrumPattern (drumPatternNumbers, pattern) {
+    const notes = pattern.notes
 
     let note,
         noteSequence = [],
@@ -451,7 +451,7 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
         lastDelayTotal,
         totalBytes = 0
 
-    for ( let x = 0, l = track.ticks; x < l; x++ ) {
+    for ( let x = 0, l = pattern.ticks; x < l; x++ ) {
         note = notes[x]
         if ( (note === undefined || note === null) && skip-- < 1 ) {
             if ( wasEmpty ) {
@@ -467,15 +467,15 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
         } else if ( note !== undefined && Object.prototype.toString.apply(note).slice(8, -1) === 'String' ) {
             skip = getEffectLength(note)
             wasEmpty = false
-            noteSequence.push(`0xFC, ${drumTrackNumbers[note] + 4},\t\t// GOTO track ${drumTrackNumbers[note] + 4}`)
+            noteSequence.push(`0xFC, ${drumPatternNumbers[note] + 4},\t\t// GOTO pattern ${drumPatternNumbers[note] + 4}`)
             totalBytes += 2
         }
     }
 
-    noteSequence.push('0xFE,\t\t\t// RETURN')                 // end of track (RETURN)
+    noteSequence.push('0xFE,\t\t\t// RETURN')                 // end of pattern (RETURN)
     totalBytes++
 
-    noteSequence.unshift(`//\"Track ${track.name}\"`)
+    noteSequence.unshift(`//\"Pattern ${pattern.name}\"`)
 
     return {
         notes: noteSequence,
@@ -483,14 +483,14 @@ function atmifyDrumTrack (drumTrackNumbers, track) {
     }
 }
 
-function getRequiredDrumTracks (tracks) {
-    let track,
+function getRequiredDrumPatterns (patterns) {
+    let pattern,
         notes
     const required = {}
-    for ( let i = 0, l = tracks.length; i < l; i++ ) {
-        track = tracks[i]
-        if ( track.type === 'drum' ) {
-            notes = track.notes
+    for ( let i = 0, l = patterns.length; i < l; i++ ) {
+        pattern = patterns[i]
+        if ( pattern.type === 'drum' ) {
+            notes = pattern.notes
             for ( let i = 0, l = notes.length; i < l; i++ )
                 if ( notes[i] ) required[notes[i]] = true
         }
@@ -503,28 +503,28 @@ function getRequiredDrumTracks (tracks) {
     return required
 }
 
-function concatAllTracks (bytesOffset, tracks) {
-    let trackAddresses = '',
-        trackString = '',
+function concatAllPatterns (bytesOffset, patterns) {
+    let patternAddresses = '',
+        patternString = '',
         totalBytes = bytesOffset,
-        track,
+        pattern,
         hexified
 
     const sorted = []
-    for ( const key in tracks )
-        sorted[tracks[key].index] = tracks[key]
+    for ( const key in patterns )
+        sorted[patterns[key].index] = patterns[key]
 
-    for ( const track of sorted ) {
+    for ( const pattern of sorted ) {
         hexified = hexify(totalBytes)
-        trackAddresses += `0x${hexified.slice(-2)}, 0x${hexified.slice(-4, -3) || 0}${hexified.slice(-3, -2) || 0},\t\t// Address of track ${track.index + 4}\n`
-        trackString += `${track.atm.notes.join('\n')}\n`
-        totalBytes += track.atm.bytes
+        patternAddresses += `0x${hexified.slice(-2)}, 0x${hexified.slice(-4, -3) || 0}${hexified.slice(-3, -2) || 0},\t\t// Address of pattern ${pattern.index + 4}\n`
+        patternString += `${pattern.atm.notes.join('\n')}\n`
+        totalBytes += pattern.atm.bytes
     }
 
     return {
         // totalBytes,
-        trackAddresses,
-        trackString
+        patternAddresses,
+        patternString
     }
 }
 
@@ -535,28 +535,28 @@ function hexify (number, nopadding) {
     return hex
 }
 
-function concatAllChannels (/*tracksOffset, */channels) {
+function concatAllChannels (/*patternsOffset, */channels) {
     let channelAddresses = '',
         channelString = '',
         totalBytes = 0,
-        // totalTracks = 0,
-        channelEntryTracks = '',
+        // totalPatterns = 0,
+        channelEntryPatterns = '',
         channel,
         hexified
 
     for ( let x = 0; x < 4; x++ ) {
         channel = channels[x]
         hexified = hexify(totalBytes)
-        channelAddresses += `0x${hexified.slice(-2)}, 0x${hexified.slice(-4, -3) || 0}${hexified.slice(-3, -2) || 0},\t\t// Address of track ${/*totalTracks + */x}\n`
+        channelAddresses += `0x${hexified.slice(-2)}, 0x${hexified.slice(-4, -3) || 0}${hexified.slice(-3, -2) || 0},\t\t// Address of pattern ${/*totalPatterns + */x}\n`
         channelString += `${channel.notes.join('\n')}\n`
-        channelEntryTracks += `0x${hexify(/*totalTracks + */x)},\t\t\t// Channel ${x} entry track\n`
+        channelEntryPatterns += `0x${hexify(/*totalPatterns + */x)},\t\t\t// Channel ${x} entry pattern\n`
         totalBytes += channel.bytes
     }
 
     return {
         channelAddresses,
         channelString,
-        channelEntryTracks,
+        channelEntryPatterns,
         totalBytes
     }
 }
@@ -565,15 +565,15 @@ function concatAllChannels (/*tracksOffset, */channels) {
 
 
 
-function createNoteSequence (track) {
-    if ( track.type === 'tune')
-        return tuneSequence(track)
+function createNoteSequence (pattern) {
+    if ( pattern.type === 'tune')
+        return tuneSequence(pattern)
     else
-        return drumSequence(track)
+        return drumSequence(pattern)
 }
 
-function tuneSequence (track) {
-    const notes = track.notes,
+function tuneSequence (pattern) {
+    const notes = pattern.notes,
           noteSequence = []
 
     let thisNote,
@@ -601,8 +601,8 @@ function tuneSequence (track) {
     return noteSequence
 }
 
-function drumSequence (track) {
-    const notes = track.notes
+function drumSequence (pattern) {
+    const notes = pattern.notes
 
     let note,
         noteSequence = [],
@@ -610,7 +610,7 @@ function drumSequence (track) {
         skip = 0,
         lastDelayTotal
 
-    for ( let x = 0, l = track.ticks; x < l; x++ ) {
+    for ( let x = 0, l = pattern.ticks; x < l; x++ ) {
         note = notes[x]
         if ( note === undefined && skip-- < 1 ) {
             if ( wasEmpty ) {

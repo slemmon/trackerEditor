@@ -42,17 +42,17 @@ class Color extends Component {
 
     render () {
         const state = this.state
-        const track = this.props.track
+        const pattern = this.props.pattern
         return (
             <span
-                className = "track-list-item-buttons-color-button"
-                style = {{ backgroundColor: stringifyColor(track.color, 'hex') }}
+                className = "pattern-list-item-buttons-color-button"
+                style = {{ backgroundColor: stringifyColor(pattern.color, 'hex') }}
                 onClick = { this.toggle }
             >
                 { state.showPicker ?
                     <span className="colorpicker">
                         <GithubPicker
-                            onChangeComplete = { color => this.props.setTrackColor(track.id, color) }
+                            onChangeComplete = { color => this.props.setPatternColor(pattern.id, color) }
                             colors = {colors}
                         />
                     </span>

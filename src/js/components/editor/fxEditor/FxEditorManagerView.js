@@ -44,11 +44,11 @@ class FxEditorManager extends Component {
                  />
             break
 
-            case 'track':
+            case 'pattern':
             fx = props.fx[props.fx.status.fxType][props.fx.status.id] || { flags: false, fx: [] }
             editor = <FxEditor
                     id = {props.fx.status.id}
-                    type="track"
+                    type="pattern"
                     addFx = {this.addFx}
                     removeFx = {this.removeFx}
                     updateFx = {this.updateFx}

@@ -37,7 +37,7 @@ const mapDispatchToProps = (dispatch) => {
         },
         initFx (id) {
             dispatch({
-                type: "FX_INIT_TRACK_FX",
+                type: "FX_INIT_PATTERN_FX",
                 id
             })
         }
