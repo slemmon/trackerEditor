@@ -50,6 +50,7 @@
             padding: 4px 8px;
             border-radius: 4px;
             white-space: nowrap;
+            pointer-events: none;
         }
         input + button:hover:before,
         input + button + button:hover:before {
