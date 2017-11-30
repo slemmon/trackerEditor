@@ -2,10 +2,10 @@ import color from 'color'
 import colormap from 'colormap'
 
 const colors = colormap({
-    colormap: 'rainbow',
-    nshades: 16,
-    format: 'hex',
-    alpha: 1
+      colormap: 'rainbow',
+      nshades: 16,
+      format: 'hex',
+      alpha: 1
 })
 const colorsArr = colors.map(hex => color(hex))
 const colorsHex = colorsArr.map(colorObj => colorObj.hex())
