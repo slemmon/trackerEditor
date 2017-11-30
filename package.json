@@ -1,20 +1,20 @@
 {
-  "name": "tracker-editor",
+  "name": "patterner-editor",
   "version": "1.0.0",
-  "description": "an 8-bit tracker music editor",
+  "description": "an 8-bit patterner music editor",
   "main": "index.js",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TEAMarg/trackerEditor.git"
+    "url": "git+https://github.com/TEAMarg/patternerEditor.git"
   },
-  "homepage": "https://github.com/TEAMarg/trackerEditor#readme",
+  "homepage": "https://github.com/TEAMarg/patternerEditor#readme",
   "bugs": {
-    "url": "https://github.com/TEAMarg/trackerEditor/issues"
+    "url": "https://github.com/TEAMarg/patternerEditor/issues"
   },
   "keywords": [
     "music",
-    "tracker-music",
+    "patterner-music",
     "8-bit",
     "arduino",
     "editor"

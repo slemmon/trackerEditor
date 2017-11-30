@@ -3,7 +3,7 @@ import EditorView from './EditorView'
 
 const mapStateToProps = (state) => {
     return {
-        activeTrack: state.activeTrack
+        activePattern: state.activePattern
     }
 }
 

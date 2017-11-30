@@ -1,18 +1,18 @@
 import React, { Component } from 'react'
 import SongEditor from './songEditor/SongEditor'
-import TrackList from './trackList/TrackList'
-import TrackEditor from './trackEditor/TrackEditor'
+import PatternList from './patternList/PatternList'
+import PatternEditor from './patternEditor/PatternEditor'
 import DrumEditor from './drumEditor/DrumEditor'
 import FxEditorManager from './fxEditor/FxEditorManager'
 
-const Editor = ({activeTrack}) =>
+const Editor = ({activePattern}) =>
     <div>
         <SongEditor />
         <FxEditorManager />
-        <TrackList />
-        { activeTrack.type === 'tune' ?
-            <TrackEditor />
-        : activeTrack.type === 'drum' ?
+        <PatternList />
+        { activePattern.type === 'tune' ?
+            <PatternEditor />
+        : activePattern.type === 'drum' ?
             <DrumEditor />
             :null
         }

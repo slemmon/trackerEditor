@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import stringifyColor from '../../../stringifyColor'
 import color from 'color'
 
-class Track extends Component {
+class Pattern extends Component {
     constructor () {
         super()
 
@@ -24,9 +24,9 @@ class Track extends Component {
         window.addEventListener('drop', this.handleDrop)
         window.addEventListener('dragover', this.handleDragOver)
 
-        e.dataTransfer.setData('trackId', this.props.track.id)
-        e.dataTransfer.setData('type', this.props.track.type)
-        e.dataTransfer.setData('editorId', this.props.track.editorId)
+        e.dataTransfer.setData('patternId', this.props.pattern.id)
+        e.dataTransfer.setData('type', this.props.pattern.type)
+        e.dataTransfer.setData('editorId', this.props.pattern.editorId)
         e.dataTransfer.setData('channel', this.props.channel)
         setTimeout(
             () => {
@@ -43,9 +43,9 @@ class Track extends Component {
     }
 
     handleDrop (e) {
-        if ( !e.target.closest('.channel-track.droppable') )
-        // if ( !e.target.classList.contains('channel-track') || !e.target.classList.contains('droppable') )
-            return this.props.removeTrack(this.props.channel, this.props.track.editorId)
+        if ( !e.target.closest('.channel-pattern.droppable') )
+        // if ( !e.target.classList.contains('channel-pattern') || !e.target.classList.contains('droppable') )
+            return this.props.removePattern(this.props.channel, this.props.pattern.editorId)
 
         this.setState({
             imBeingDragged: false
@@ -56,11 +56,11 @@ class Track extends Component {
     }
 
     openFx () {
-        this.props.openFx(this.props.track.editorId)
+        this.props.openFx(this.props.pattern.editorId)
     }
 
     render () {
-        const { appliedFx, detail, position, track } = this.props
+        const { appliedFx, detail, position, pattern } = this.props
         const rgbObj = color(detail.color.rgb).rgb()
         const colorLight = rgbObj.fade(.5)
         const colorDark = rgbObj.string()
@@ -79,7 +79,7 @@ class Track extends Component {
                 onDoubleClick = {this.openFx}
                 onDragStart = { this.handleDragStart }
                 data-position = { position }
-                className = { `draggable ${track.type === 'tune' ? 'draggable-tune' : 'draggable-drum' } ${this.state.imBeingDragged ? 'beingdragged' : ''} ${this.props.activeFx ? 'active' : ''}` }
+                className = { `draggable ${pattern.type === 'tune' ? 'draggable-tune' : 'draggable-drum' } ${this.state.imBeingDragged ? 'beingdragged' : ''} ${this.props.activeFx ? 'active' : ''}` }
                 style = {style}
             >
                 {fxCount > 0 && <span>{fxCount}</span>}
@@ -88,4 +88,4 @@ class Track extends Component {
     }
 }
 
-export default Track
+export default Pattern

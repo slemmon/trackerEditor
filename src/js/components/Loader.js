@@ -16,12 +16,12 @@ class LoaderView extends Component {
 
     saveJSON (e) {
 
-        // get fx, tracks, channels, and songName
-        const { channels, fx, songName, songRepeat, tracks  } = this.props
+        // get fx, patterns, channels, and songName
+        const { channels, fx, songName, songRepeat, patterns  } = this.props
         const saveData = {
             fx: fx,
             channels: channels,
-            tracks: tracks,
+            patterns: patterns,
             meta: {
                 name: songName,
                 songRepeat
@@ -67,11 +67,23 @@ class LoaderView extends Component {
                           "id": 0
                         },
                         "channel": JSON.parse(JSON.stringify(result.fx).replace(/val_b/g, 'val_1').replace(/val"/g, 'val_0"')),
-                        "track": []
+                        "pattern": []
                       }
                 const fileName = file.name.replace('.atm', '')
                 result.meta = result.meta || {}
                 result.meta.name = result.meta.name || fileName
+
+                // replace occurrences of "track" with "pattern" in existing
+                // files ... except in the song name
+                const meta = result.meta
+                delete result.meta
+                let resultString = JSON.stringify(result)
+                resultString = resultString.replace(/track/g, 'pattern')
+                               .replace(/Track/g, 'Pattern')
+                               .replace(/TRACK/g, 'TRACK')
+                result = JSON.parse(resultString)
+                result.meta = meta
+
                 this.props.setLoadedData(result)
             } else {
                 return alert('invalid file (2)')
@@ -97,6 +109,11 @@ class LoaderView extends Component {
 
             switch (name) {
                 case 'channels':
+                case 'patterns':
+                truths++
+                if ( Array.isArray(file[name]) ) truths++
+                break
+
                 case 'tracks':
                 truths++
                 if ( Array.isArray(file[name]) ) truths++
@@ -129,38 +146,39 @@ class LoaderView extends Component {
     }
 }
 
-const mapStateToProps = ({ channels, fx, songName, songRepeat, tracks }) => {
+const mapStateToProps = ({ channels, fx, songName, songRepeat, patterns }) => {
     return {
         channels,
         fx,
         songName,
         songRepeat,
-        tracks
+        patterns
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        setLoadedData ({channels, tracks, fx, meta} = data) {
+        setLoadedData ({channels, fx, meta, patterns, tracks} = data) {
             const { name = '', songRepeat = false } = meta
+            patterns = patterns || tracks
 
             dispatch({
                 type: 'STATUS_SET',
                 status: 1
             })
             dispatch({
-                type: 'SET_ACTIVE_TRACK',
-                track: {notes: []}
+                type: 'SET_ACTIVE_PATTERN',
+                pattern: {notes: []}
             })
-            if (tracks && tracks.length) {
+            if (patterns && patterns.length) {
                 dispatch({
-                    type: 'SET_ACTIVE_TRACK_TYPE',
-                    trackType: tracks[tracks.length - 1].type
+                    type: 'SET_ACTIVE_PATTERN_TYPE',
+                    patternType: patterns[patterns.length - 1].type
                 })
             }
             dispatch({
-                type: 'TRACK_SET_DATA',
-                tracks
+                type: 'PATTERN_SET_DATA',
+                patterns
             })
             dispatch({
                 type: 'FX_SET_DATA',

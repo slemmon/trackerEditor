@@ -65,12 +65,12 @@ class Player extends Component {
     }
 
     playOnce (e) {
-        const pattern = this.createTheSongArray(this.props.activeTrack)
+        const pattern = this.createTheSongArray(this.props.activePattern)
 
         this.playSong(pattern, () => {
-            const { trackRepeat } = this.props
+            const { patternRepeat } = this.props
 
-            if (trackRepeat) {
+            if (patternRepeat) {
                 this.playOnce()
                 this.setState({
                     autoplay: false
@@ -79,7 +79,7 @@ class Player extends Component {
                 this.stopSong();
             }
         })
-        this.props.setTrackIsPlaying(true);
+        this.props.setPatternIsPlaying(true);
     }
 
     toggleRepeat (e) {
@@ -89,7 +89,7 @@ class Player extends Component {
         })
 
         if ( newState )
-            this.playActiveTrack(true)
+            this.playActivePattern(true)
         else
             this.stopRepeat()
     }
@@ -102,36 +102,36 @@ class Player extends Component {
         this.output.setVolume(newState ? 0 : 1)
     }
 
-    createTheSongArray (track) {
-        const notes = track.notes
-        const drum = track.type === 'drum'
+    createTheSongArray (pattern) {
+        const notes = pattern.notes
+        const drum = pattern.type === 'drum'
         const channel = this.state.channel
 
-        const noteSequence = createNoteSequence(track)
+        const noteSequence = createNoteSequence(pattern)
         const tempoFx = this.props.fx.channel[channel].fx['1048576']
         const tempo = tempoFx ? tempoFx.val_0 : this.tempo
 
         const templateSong = [
 
-            2,              // number of tracks
-            0,              // address of track 0
-            0,              // address of track 0
-            3,              // address of track 1
-            0,              // address of track 1
+            2,              // number of patterns
+            0,              // address of pattern 0
+            0,              // address of pattern 0
+            3,              // address of pattern 1
+            0,              // address of pattern 1
 
-            drum?0:1,       // Channel 0 entry track (PULSE)
-            0,              // Channel 1 entry track (SQUARE)
-            0,              // Channel 2 entry track (TRIANGLE)
-            drum?1:0,       // Channel 3 entry track (NOISE)
+            drum?0:1,       // Channel 0 entry pattern (PULSE)
+            0,              // Channel 1 entry pattern (SQUARE)
+            0,              // Channel 2 entry pattern (TRIANGLE)
+            drum?1:0,       // Channel 3 entry pattern (NOISE)
 
 
-            "Track 0",      // ticks = 0 / bytes = 3
+            "Pattern 0",      // ticks = 0 / bytes = 3
             64,             // FX: SET VOLUME: volume = 0
             0,              // FX: SET VOLUME: volume = 0
             159,            // FX: STOP CURRENT CHANNEL
 
 
-            "Track 1",
+            "Pattern 1",
             157, tempo,     // SET song tempo: value = 50
             64, 48          // FX: SET VOLUME: volume = 48
 
@@ -167,7 +167,7 @@ class Player extends Component {
         // Begin playback
         this.output.play()
 
-        this.trackPlayPosition()
+        this.patternPlayPosition()
     }
 
     // DEV NOTE: Kept for reference in case we want a method to add a repeat
@@ -175,20 +175,20 @@ class Player extends Component {
     playSongAndRepeat = (song, type, repeatCount = 255) => {
         song.pop()     // remove last fx
         song.push(254) // add RETURN fx to end of array
-        song[0]++      // increase track number
+        song[0]++      // increase pattern number
 
         const repeater = [
-            "Track 2",
+            "Pattern 2",
             253,         // repeat
             repeatCount, // 255x
-            1,           // track 1
+            1,           // pattern 1
             159          // stop channel
         ]
 
         song = song.concat(repeater)
 
         const d = song.join(',')
-        const a = d.slice(d.indexOf('Track 1') + 8, d.indexOf('Track 2') - 1)
+        const a = d.slice(d.indexOf('Pattern 1') + 8, d.indexOf('Pattern 2') - 1)
         const q = a.split(',')
 
         song = [].concat(song.slice(0, 5), [q.length + song[3], 0], song.slice(5))
@@ -210,13 +210,13 @@ class Player extends Component {
      */
     stopSong () {
         clearInterval(this.listenForSongEndInterval)
-        clearInterval(this.trackPlayPositionInterval)
+        clearInterval(this.patternPlayPositionInterval)
         this.output.pause(true)
         
         delete this.player
 
         this.props.setSongIsPlaying(false);
-        this.props.setTrackIsPlaying(false);
+        this.props.setPatternIsPlaying(false);
     }
 
     /**
@@ -227,10 +227,10 @@ class Player extends Component {
         this.setState({repeatIsOn: false})
     }
 
-    trackPlayPosition () {
-        if ( this.trackPlayPositionInterval )
-            clearInterval(this.trackPlayPositionInterval)
-        this.trackPlayPositionInterval = setInterval(
+    patternPlayPosition () {
+        if ( this.patternPlayPositionInterval )
+            clearInterval(this.patternPlayPositionInterval)
+        this.patternPlayPositionInterval = setInterval(
             () => {
                 document.dispatchEvent(
                     new CustomEvent(
@@ -254,7 +254,7 @@ class Player extends Component {
     }
 
     exportSong () {
-        const { saveSongCode } = this.props
+        const { saveSongCode, songName = 'song_export' } = this.props
         const songString = this.getSongFileCode()
 
         saveSongCode(songString)
@@ -262,7 +262,7 @@ class Player extends Component {
         // make the browser download the file
         const download = document.createElement('a')
         download.href = `data:text/plain;charset=utf-8;base64,${btoa(songString)}`
-        download.download = 'song_export.h'
+        download.download = `${songName}.h`
 
         document.body.appendChild(download)
         download.click()
@@ -270,12 +270,11 @@ class Player extends Component {
     }
 
     createAndPlaySong () {
-        const { tracks, channels, fx, songRepeat } = this.props
+        const { patterns, channels, fx, songRepeat } = this.props
 
-        let music = createSongFromChannels(tracks, channels, fx)
-        console.log(music);
+        let music = createSongFromChannels(patterns, channels, fx)
 
-        music = music.replace(/\/\/"Track.*"/g, 'Track,')
+        music = music.replace(/\/\/"Pattern.*"/g, 'Pattern,')
         music = music.replace(/, /g, ',\n')
         music = music.replace(/,\t*.*\n/g, ',')
         music = music.slice(84, -15)
@@ -283,7 +282,7 @@ class Player extends Component {
         music = music.split(',')
 
         let number
-        let trackCounter = 0
+        let patternCounter = 0
         let item
         let splitItem
         for ( let i = 0, l = music.length; i < l; i++ ) {
@@ -300,7 +299,7 @@ class Player extends Component {
                 music[i] = number
             } else {
                 number = parseInt(item, 10)
-                music[i] = isNaN(number) ? `${item} ${trackCounter++}` : number
+                music[i] = isNaN(number) ? `${item} ${patternCounter++}` : number
             }
         }
 
@@ -318,12 +317,12 @@ class Player extends Component {
     }
 
     getSongFileCode = () => {
-        const { channels, fx, songName, songRepeat, tracks } = this.props
+        const { channels, fx, songName, songRepeat, patterns } = this.props
 
         return createSongFileFromChannels(
             Object.assign(
                 {},
-                { channels, fx, songName, songRepeat, tracks }
+                { channels, fx, songName, songRepeat, patterns }
             )
         )
     }

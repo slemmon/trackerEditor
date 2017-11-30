@@ -175,7 +175,7 @@ class SongEditor extends Component {
                         </div>
                     </div>
 
-                    <div className="channel-tracks">
+                    <div className="channel-patterns">
                         <div>
                             <ChannelRow
                                 channel={0}

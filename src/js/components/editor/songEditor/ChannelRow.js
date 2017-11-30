@@ -4,8 +4,8 @@ import ChannelRowView from './ChannelRowView'
 const mapStateToProps = (state, props) => {
     return {
         status: state.status,
-        tracks: state.tracks,
-        channelTracks: state.channels[props.channel],
+        patterns: state.patterns,
+        channelPatterns: state.channels[props.channel],
         fxStatus: state.fx.status,
         fx: state.fx
     }
@@ -13,26 +13,26 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        addTrackAtIndex (channel, track, position) {
+        addPatternAtIndex (channel, pattern, position) {
             dispatch({
-                type: "CHANNEL_ADD_TRACK",
-                track,
+                type: "CHANNEL_ADD_PATTERN",
+                pattern,
                 position,
                 channel
             })
         },
-        moveTrackToIndex (toChannel, fromChannel, editorId, position) {
+        movePatternToIndex (toChannel, fromChannel, editorId, position) {
             dispatch({
-                type: "CHANNEL_MOVE_TRACK",
+                type: "CHANNEL_MOVE_PATTERN",
                 editorId,
                 position,
                 toChannel,
                 fromChannel
             })
         },
-        removeTrack (channel, editorId) {
+        removePattern (channel, editorId) {
             dispatch({
-                type: "CHANNEL_REMOVE_TRACK",
+                type: "CHANNEL_REMOVE_PATTERN",
                 editorId,
                 channel
             })
@@ -40,7 +40,7 @@ const mapDispatchToProps = (dispatch) => {
         openFx (editorId) {
             dispatch({
                 type: "FX_SET_VIEW",
-                fxType: 'track',
+                fxType: 'pattern',
                 id: editorId
             })
         }

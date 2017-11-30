@@ -23,7 +23,7 @@ class FxEditor extends Component {
 
     componentDidMount() {
         const props = this.props
-        if ( props.type === 'track' && props.flags === false )
+        if ( props.type === 'pattern' && props.flags === false )
             props.initFx(props.id)
     }
 
@@ -43,7 +43,7 @@ class FxEditor extends Component {
             selected
         })
 
-        if ( nextProps.type === 'track' && nextProps.id !== this.props.id && nextProps.flags === false )
+        if ( nextProps.type === 'pattern' && nextProps.id !== this.props.id && nextProps.flags === false )
             nextProps.initFx(nextProps.id)
     }
 
@@ -91,7 +91,7 @@ class FxEditor extends Component {
         const state = this.state
         return (
             <div className="fx-editor-channel">
-                <h5>{`${props.type === 'channel' ? 'Channel' : 'Track'} Fx Editor`}</h5>
+                <h5>{`${props.type === 'channel' ? 'Channel' : 'Pattern'} Fx Editor`}</h5>
                 <div className="fx-lists">
                     <Available
                         fx={state.availableFx}

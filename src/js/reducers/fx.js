@@ -27,7 +27,7 @@ const defaultState = {
             fx: {}
         }
     },
-    track: {}
+    pattern: {}
 }
 
 export default function fx (state = defaultState, action) {
@@ -39,8 +39,8 @@ export default function fx (state = defaultState, action) {
         case "FX_ADD_FX":
         return addFx(state, action)
 
-        case "FX_INIT_TRACK_FX":
-        return createTrackFx(state, action)
+        case "FX_INIT_PATTERN_FX":
+        return createPatternFx(state, action)
 
         case "FX_REMOVE_FX":
         return removeFx(state, action)
@@ -121,10 +121,10 @@ function updateFx (state, {fxType, id, fx, key, value} = action) {
     return newState
 }
 
-function createTrackFx (state, action) {
+function createPatternFx (state, action) {
     const newState = merge({}, state)
 
-    newState.track[action.id] = {flags: 0, fx: {}}
+    newState.pattern[action.id] = {flags: 0, fx: {}}
 
     return newState
 }

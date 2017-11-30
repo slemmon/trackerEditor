@@ -2,36 +2,36 @@ import { connect } from 'react-redux'
 import DrumEditorView from './DrumEditorView'
 
 const mapStateToProps = (state) => {
-    const activeTrackId = state.activeTrack.id
-    const { status, tracks, trackIsPlaying, trackRepeat } = state
+    const activePatternId = state.activePattern.id
+    const { status, patterns, patternIsPlaying, patternRepeat } = state
     return {
         status,
-        track: tracks.find( t => t.id === activeTrackId ),
-        trackIsPlaying,
-        trackRepeat
+        pattern: patterns.find( t => t.id === activePatternId ),
+        patternIsPlaying,
+        patternRepeat
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        updateTrack (trackId, track) {
+        updatePattern (patternId, pattern) {
             dispatch({
-                type: 'UPDATE_TRACK',
-                trackId,
-                track
+                type: 'UPDATE_PATTERN',
+                patternId,
+                pattern
             })
             dispatch({
-                type: 'SET_ACTIVE_TRACK',
-                track
+                type: 'SET_ACTIVE_PATTERN',
+                pattern
             })
             dispatch({
-                type: 'SET_ACTIVE_TRACK_TYPE',
-                trackType: 'drum'
+                type: 'SET_ACTIVE_PATTERN_TYPE',
+                patternType: 'drum'
             })
         },
-        toggleTrackRepeat (repeat) {
+        togglePatternRepeat (repeat) {
             dispatch({
-                type: "TOGGLE_TRACK_REPEAT",
+                type: "TOGGLE_PATTERN_REPEAT",
                 repeat
             })
         }

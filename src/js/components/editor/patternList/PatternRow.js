@@ -4,7 +4,7 @@ import stringifyColor from '../../../stringifyColor'
 import ConfirmDelete from '../ConfirmDelete'
 
 
-class TrackRow extends React.Component {
+class PatternRow extends React.Component {
     state = {}
 
     // shows the delete confirmation dialog
@@ -14,10 +14,10 @@ class TrackRow extends React.Component {
         })
     }
 
-    // when the delete dialog is confirmed hide the dialog and delete the track
+    // when the delete dialog is confirmed hide the dialog and delete the pattern
     onConfirmClick = () => {
         this.hideDialog()
-        this.props.deleteTrack(this.props.track.id)
+        this.props.deletePattern(this.props.pattern.id)
     }
 
     // hides the delete confirmation dialog
@@ -27,32 +27,32 @@ class TrackRow extends React.Component {
         })
     }
 
-    // adds the selected track to the track editor view
-    onEditClick = (track) => {
+    // adds the selected pattern to the pattern editor view
+    onEditClick = (pattern) => {
         this.setState({
-            activeTrack: track.id
+            activePattern: pattern.id
         });
-        this.props.setActiveTrack(track)
+        this.props.setActivePattern(pattern)
     }
 
-    // handles the dragging of a track tickbar element
+    // handles the dragging of a pattern tickbar element
     onDragStart (e, id, type) {
-        e.dataTransfer.setData('trackId', id)
+        e.dataTransfer.setData('patternId', id)
         e.dataTransfer.setData('type', type)
     }
 
     render () {
         const { showConfirm } = this.state
-        const { activeTrack, isLast, track,
-                deleteTrack, setTrackColor} = this.props
+        const { activePattern, isLast, pattern,
+                deletePattern, setPatternColor} = this.props
                 
-        const { color, id, name, ticks, type } = track
-        const activated = id === activeTrack
-        const selectedCls = activated || (isLast && activeTrack === null) ?
-              ' track-list-item-selected' : ''
+        const { color, id, name, ticks, type } = pattern
+        const activated = id === activePattern
+        const selectedCls = activated || (isLast && activePattern === null) ?
+              ' pattern-list-item-selected' : ''
         const iconCls = `fa fa-${ type === 'tune' ? 'music' : 'superpowers' }`
-        const textCls = 'track-list-item-text'
-        const tickbarCls = `track-list-item-tickbar-bar tickbar-tune-${type}`
+        const textCls = 'pattern-list-item-text'
+        const tickbarCls = `pattern-list-item-tickbar-bar tickbar-tune-${type}`
         const tickbarStyle = {
                   width: ticks * 2,
                   backgroundColor: stringifyColor(color, 'rgba', {a: 0.5}), 
@@ -60,34 +60,34 @@ class TrackRow extends React.Component {
               }
 
         return (
-            <li className={`track-list-item${selectedCls}`}>
-                <span className="track-list-item-icon">
+            <li className={`pattern-list-item${selectedCls}`}>
+                <span className="pattern-list-item-icon">
                     <i className={iconCls} aria-hidden="true"></i>
                 </span>
                 <span className={textCls}>{`${name} - (${type})`}</span>
                 <span className={textCls}>
                     <span>Ticks: </span><span>{ticks}</span>
                 </span>
-                <span className="track-list-item-tickbar">
+                <span className="pattern-list-item-tickbar">
                     <span
                         draggable = { true }
                         onDragStart = { e => { this.onDragStart(e, id, type) } }
-                        data-track-id = { id }
+                        data-pattern-id = { id }
                         className = {tickbarCls}
                         style = {tickbarStyle}
                     ></span>
                 </span>
                 <span
-                    className = "track-list-item-buttons"
+                    className = "pattern-list-item-buttons"
                 >
-                    <Color track={track} setTrackColor={ setTrackColor } />
+                    <Color pattern={pattern} setPatternColor={ setPatternColor } />
                     <ConfirmDelete
                         onTargetClick={this.onDeleteClick}
                         onConfirmClick={this.onConfirmClick}
                         show={showConfirm}
                         hide={this.hideDialog}
                     />
-                    <span onClick={ () => {this.onEditClick(track)} }>
+                    <span onClick={ () => {this.onEditClick(pattern)} }>
                         <i className="fa fa-pencil" aria-hidden="true"></i>
                     </span>
                 </span>
@@ -96,4 +96,4 @@ class TrackRow extends React.Component {
     }
 }
 
-export default TrackRow
+export default PatternRow
