@@ -6,7 +6,8 @@ const mapStateToProps = (state, props) => {
         status: state.status,
         tracks: state.tracks,
         channelTracks: state.channels[props.channel],
-        fxStatus: state.fx.status
+        fxStatus: state.fx.status,
+        fx: state.fx
     }
 }
 
