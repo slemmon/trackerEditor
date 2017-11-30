@@ -61,7 +61,7 @@ class Pattern extends Component {
 
     render () {
         const { appliedFx, detail, position, pattern } = this.props
-        const rgbObj = color(detail.color.rgb).rgb()
+        const rgbObj = color(detail.color.hex).rgb()
         const colorLight = rgbObj.fade(.5)
         const colorDark = rgbObj.string()
         const fxCount = Object.keys(appliedFx).length

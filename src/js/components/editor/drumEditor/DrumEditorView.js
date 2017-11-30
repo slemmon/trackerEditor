@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import DrumTable from './DrumTable'
 import DrumEffectSelector from './DrumEffectSelector'
+import DrumTable from './DrumTable'
 import emitCustomEvent from '../../../customEventEmitter'
 
 class DrumEditor extends Component {
@@ -55,8 +55,10 @@ class DrumEditor extends Component {
         e.preventDefault()
 
         const pattern = Object.assign({}, this.props.pattern)
-        const currentTicks = this.state.currentTicks
-        const newValue = currentTicks > 0 && currentTicks < 65 ? currentTicks : currentTicks > 64 ? 64 : 1
+        const { currentTicks } = this.state
+        const newValue = (currentTicks > 0 && currentTicks < 65)
+                         ? currentTicks
+                         : ((currentTicks > 64) ? 64 : 1)
 
         pattern.ticks = newValue
 
@@ -69,6 +71,7 @@ class DrumEditor extends Component {
     trimNotes (notes, ticks) {
         const newNotes = notes.map((note, i) => {
             const noteTicks = this.getEffectLength(note) - 1
+
             if ( i + noteTicks >= ticks )
                 return undefined
             else
@@ -94,10 +97,9 @@ class DrumEditor extends Component {
     }
 
     addEffectAtPosition (position) {
-
         const pattern = Object.assign({}, this.props.pattern)
-        const ticks = pattern.ticks
-        let effects = pattern.notes.slice()
+        const { notes, ticks } = pattern
+        let effects = notes.slice()
 
         if ( effects[position] !== undefined )
             effects[position] = undefined
@@ -111,11 +113,11 @@ class DrumEditor extends Component {
     }
 
     updateEffectsList (effects, position) {
-        const selectedEffect = this.state.selectedEffect
-        const pattern = this.props.pattern
+        const { selectedEffect } = this.state
+        const { pattern } = this.props
 
         const effectLength = this.getEffectLength(selectedEffect)
-        if ( position + effectLength > pattern.ticks )
+        if ( (position + effectLength) > pattern.ticks )
             return effects
 
         effects[position] = selectedEffect
@@ -141,7 +143,7 @@ class DrumEditor extends Component {
             // remove next 8
 
         // remove previous if previous is long enough
-        const indexToStartSlicingFrom = position - 15 < 0 ? 0 : position - 15
+        const indexToStartSlicingFrom = (position - 15) < 0 ? 0 : position - 15
         const previousEffects = effects.slice(indexToStartSlicingFrom, position)
         const selectLength = previousEffects.length
 
@@ -181,6 +183,7 @@ class DrumEditor extends Component {
 
     toggleMute = () => {
         const newState = !this.state.isMuted
+        
         this.setState({
             isMuted: newState
         })

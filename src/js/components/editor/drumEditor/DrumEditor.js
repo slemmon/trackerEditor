@@ -2,7 +2,7 @@ import { connect } from 'react-redux'
 import DrumEditorView from './DrumEditorView'
 
 const mapStateToProps = (state) => {
-    const activePatternId = state.activePattern.id
+    const { id: activePatternId } = state.activePattern
     const { status, patterns, patternIsPlaying, patternRepeat } = state
     return {
         status,
