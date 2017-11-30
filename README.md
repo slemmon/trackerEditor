@@ -1,8 +1,8 @@
 # ATM pattern editor
-Create 8-bit patterner music, writen specific for the ATMlib a memory optimized song player for Arduino dev boards.
+Create 8-bit tracker music, writen specific for the ATMlib a memory optimized song player for Arduino dev boards.
 
 ## Demo
-[PatternEditor](http://teamarg.github.io/patternerEditor/)
+[PatternEditor](http://teamarg.github.io/trackerEditor/)
 
 ## Development
 

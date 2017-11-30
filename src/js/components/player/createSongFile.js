@@ -120,7 +120,7 @@ const drumPatterns = {
   }
 };
 
-// hash of starting effects correlating an id from the patterner format to the
+// hash of starting effects correlating an id from the tracker format to the
 // commands and value data needed for the final audio file output
 const startFx = {
   1: {
@@ -181,7 +181,7 @@ const startFx = {
   }
 };
 
-// hash of ending effects correlating an id from the patterner format to the
+// hash of ending effects correlating an id from the tracker format to the
 // commands and value data needed for the final audio file output
 const endFx = {
   8: {
@@ -464,7 +464,7 @@ function getFxList (effects, type) {
  * @param {Number[]} fxToAdd Array of effects (their keys) to add
  * @param {String} type The type of effects being added: 'start' or 'last'
  * @param {Object} effects The effects object for a given pattern (as it would
- * appear in the patterner file)
+ * appear in the tracker file)
  * @return {Object} An object with the bytes for the effects and an 'fx' key 
  * with an array of effect commands correlating to the effects keys passed in
  */
@@ -633,7 +633,7 @@ function atmifyPattern (requiredDrumPatterns, pattern) {
 /**
  * Aggregate all effects and note commands for the passed non-drum pattern
  * @param {Object} pattern The pattern object including the note information as
- * it's created for the patterner file
+ * it's created for the tracker file
  * @return {Object} An object the total bytes and the assembled pattern commands
  */
 function atmifyRegularPattern (pattern) {
