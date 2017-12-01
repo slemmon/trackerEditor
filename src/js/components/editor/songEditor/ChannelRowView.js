@@ -33,37 +33,53 @@ class ChannelRowView extends Component {
 
     render () {
         const props = this.props
-        const channelPatterns = props.channelPatterns
-        const patterns = props.patterns
-        const fxStatus = props.fxStatus
+        const { channel, channelPatterns, editingFx, fx,
+              fxStatus, openFx, patterns, removePattern, tick = 0 } = props
         const activeFx = fxStatus.fxType === 'pattern' && fxStatus.id
-        const fx = props.fx
+        const indicatorCtStyle = {
+            display: 'inline-flex',
+            padding: '4px 0',
+            position: 'relative'
+        }
+        const indicatorStyle = {
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
+            height: 3,
+            background: '#00969b',
+            width: channelPatterns.length ? tick * 2 : 0
+        }
+        console.log('TICK IS', tick);
+        
         return (
             <div
                 onDragOver = { this.handleDragover }
                 onDrop = { this.handleDrop }
-                className = {`channel-pattern droppable ${ props.editingFx ? 'active' : '' }`}
+                className = {`channel-pattern droppable ${ editingFx ? 'active' : '' }`}
             >
-                {channelPatterns.map( (pattern, i) => {
-                    const { editorId, id } = pattern
-                    const patternFx = fx.pattern[editorId]
-                    const appliedFx = (patternFx && patternFx.fx) || {}
+                <div style={indicatorCtStyle}>
+                    {channelPatterns.map( (pattern, i) => {
+                        const { editorId, id } = pattern
+                        const patternFx = fx.pattern[editorId]
+                        const appliedFx = (patternFx && patternFx.fx) || {}
 
-                    return (
-                        <Pattern
-                            key = {editorId}
-                            position = {i}
-                            pattern = {pattern}
-                            detail = {patterns.find( t => t.id === id )}
-                            removePattern = {props.removePattern}
-                            channel = {props.channel}
-                            openFx = {props.openFx}
-                            activeFx = {activeFx === editorId}
-                            appliedFx = {appliedFx}
-                        />
-                    )
-                }
-                )}
+                        return (
+                            <Pattern
+                                key = {editorId}
+                                position = {i}
+                                pattern = {pattern}
+                                detail = {patterns.find( t => t.id === id )}
+                                removePattern = {removePattern}
+                                channel = {channel}
+                                openFx = {openFx}
+                                activeFx = {activeFx === editorId}
+                                appliedFx = {appliedFx}
+                            />
+                        )
+                    }
+                    )}
+                    <div style={indicatorStyle}></div>
+                </div>
             </div>
         )
     }

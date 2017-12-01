@@ -151,6 +151,9 @@ class Player extends Component {
     playSong (song, callback) {
         // Initialize player
         this.player = new SquawkStream(this.emulateSampleRate)
+        this.player.onTick = (tick) => {
+            this.props.setTick(tick)
+        }
         this.player.onPlayEnd = () => {
             if (callback) {
                 callback()

@@ -7,7 +7,8 @@ const mapStateToProps = (state, props) => {
         patterns: state.patterns,
         channelPatterns: state.channels[props.channel],
         fxStatus: state.fx.status,
-        fx: state.fx
+        fx: state.fx,
+        tick: state.tick
     }
 }
 
