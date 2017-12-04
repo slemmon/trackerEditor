@@ -49,7 +49,6 @@ class ChannelRowView extends Component {
             background: '#00969b',
             width: channelPatterns.length ? tick * 2 : 0
         }
-        console.log('TICK IS', tick);
         
         return (
             <div
