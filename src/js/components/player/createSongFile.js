@@ -339,7 +339,7 @@ function getNote (note) {
   // the octave level for the passed index *starting at 2*
   const level = Math.ceil(note / 12) + 1;
   // the note on the chromatic scale
-  const notePos = note % 12;
+  const notePos = (note % 12) || 12;
   const { letter, suffix = '' } = noteVal[notePos];
 
   return `${letter}${level}${suffix}`;
