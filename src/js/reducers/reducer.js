@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 import activePattern from './activePattern'
 import activePatternType from './activePatternType'
 import channels from './channels'
+import dragSource from './dragSource'
 import fx from './fx'
 import patternIsPlaying from './patterns/patternIsPlaying'
 import patternRepeat from './patterns/patternRepeat'
@@ -17,6 +18,7 @@ export default combineReducers({
     activePattern,
     activePatternType,
     channels,
+    dragSource,
     fx,
     patternIsPlaying,
     patternRepeat,

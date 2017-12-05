@@ -45,13 +45,19 @@ const mapDispatchToProps = (dispatch) => {
                 type: 'SET_ACTIVE_PATTERN_TYPE',
                 patternType: type
             })
+        },
+        setDragSource (dragSource) {
+            dispatch({
+                type: 'SET_PATTERN_DRAG_SOURCE',
+                dragSource
+            })
         }
     }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ({ patterns }) => {
     return {
-        patterns: state.patterns
+        patterns
     }
 }
 

@@ -2,13 +2,17 @@ import { connect } from 'react-redux'
 import ChannelRowView from './ChannelRowView'
 
 const mapStateToProps = (state, props) => {
+    const { channels, dragSource, fx, patterns, status, tick } = state
+    const { channel } = props
+
     return {
-        status: state.status,
-        patterns: state.patterns,
-        channelPatterns: state.channels[props.channel],
-        fxStatus: state.fx.status,
-        fx: state.fx,
-        tick: state.tick
+        channelPatterns: channels[channel],
+        dragSource: dragSource,
+        fx: fx,
+        fxStatus: fx.status,
+        patterns: patterns,
+        status: status,
+        tick: tick
     }
 }
 

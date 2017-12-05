@@ -4,38 +4,35 @@ import SongCode from './SongCode'
 import customEventEmitter from '../../../customEventEmitter'
 
 class SongEditor extends Component {
-    constructor (props) {
-        super(props)
-
-        this.state = {
-            showCode: false,
-            isMuted: false
-        }
-
-        this.toggleShowCode = this.toggleShowCode.bind(this)
+    state = {
+        dropIndicatorColor: '#00969b',
+        dropIndicatorPos: {
+            x: 0,
+            y: 0
+        },
+        isMuted: false,
+        showCode: false,
+        showDropIndicator: false
     }
 
     exportSong () {
         customEventEmitter('exportSong')
     }
 
-    toggleShowCode () {
-        const codeIsVisible = this.state.showCode
-        if ( codeIsVisible )
-            this.setState({
-                showCode: false
-            })
-        else {
-            this.setState({
-                showCode: true
-            })
+    toggleShowCode = () => {
+        const { showCode } = this.state
+
+        this.setState({
+            showCode: !showCode
+        })
+
+        if (!showCode) {
             customEventEmitter('createSongCode')
         }
     }
 
     addDefaultVolumeFx (channel) {
-
-        const channelsFx = this.state.channelsFx
+        const { channelsFx } = this.state
 
         const fxList = Object.assign({}, channelsFx[channel])
         fxList.fx = Object.assign({}, fxList.fx)
@@ -88,8 +85,96 @@ class SongEditor extends Component {
         customEventEmitter('toggleMute')
     }
 
+    /**
+     * Shows the insert-pattern indicator when a pattern is dragged over another
+     * existing pattern in the song editor
+     * @param {Object} meta The pattern meta object used to show / decorate the
+     * insert-pattern indicator
+     */
+    showDropIndicator = ({ color, x, y }) => {
+        // we need to find the channel row container's position in order to
+        // figure placement of the drop indicator
+        const { left, top } = this.channelsCt.getBoundingClientRect()
+        
+        // show the drop indicator next to the target pattern
+        this.setState({
+            showDropIndicator: true,
+            dropIndicatorPos: {
+                x: x - left - 1,
+                y: top - y + 13
+            },
+            dropIndicatorColor: color
+        })
+    }
+
+    /**
+     * Hides the insert-pattern drop indicator
+     */
+    hideDropIndicator = () => {
+        this.setState({
+            showDropIndicator: false
+        })
+    }
+
+    /**
+     * Return all channel rows
+     * @param {Number} activeFx The index of the effects currently being
+     * reviewed in the UI (if any)
+     * @return {Array} The array of <ChannelRow>s
+     */
+    getChannelRows (activeFx) {
+        const channels = []
+
+        for (let i = 0; i < 4; i++) {
+            channels.push(
+                <ChannelRow
+                    key={i}
+                    channel={i}
+                    editingFx={activeFx === i}
+                    showDropIndicator={this.showDropIndicator}
+                    hideDropIndicator={this.hideDropIndicator}
+                />
+            )
+        }
+
+        return channels
+    }
+
+    /**
+     * Returns all channel Fx buttons
+     * @param {Number} activeFx The index of the effects currently being
+     * reviewed in the UI (if any)
+     * @return {Array} The array of channel Fx buttons
+     */
+    getChannelFxButtons (activeFx) {
+        const buttons = []
+
+        for (let i = 0; i < 4; i++) {
+            const activeFxCls = (activeFx === i) ? 'active' : ''
+
+            buttons.push(
+                <button
+                    className={`channel-fx ${activeFxCls}`}
+                    onClick={ () => this.openChannelFx(i) }
+                >
+                    FX
+                </button>
+            )
+        }
+
+        return buttons
+    }
+
     render () {
         const state = this.state
+        const { dropIndicatorColor, showDropIndicator } = state
+        const { x, y } = state.dropIndicatorPos
+        const dropIndicatorStyle = {
+            display: showDropIndicator ? 'block' : 'none',
+            left: x,
+            top: y,
+            color: dropIndicatorColor
+        }
         const {
             onSongNameChange, songIsPlaying, songName, songRepeat
         } = this.props
@@ -100,6 +185,7 @@ class SongEditor extends Component {
         const playOrStopText = songIsPlaying ? 'Stop' : 'Play'
         const { fxStatus, toggleSongRepeat } = this.props
         const activeFx = fxStatus.fxType === 'channel' && fxStatus.id
+        
         return (
             <div id="song-editor-container">
                 <h5>
@@ -151,56 +237,59 @@ class SongEditor extends Component {
                         />
                     </label>
                     <div style={{flex: 1}}></div>
-                    <button onClick={this.toggleMute}>{ `${state.isMuted ? 'un' : ''}mute` }</button>
+                    <button onClick={this.toggleMute}>
+                        {`${state.isMuted ? 'un' : ''}mute`}
+                    </button>
                 </div>
 
                 <div className="song-editor-channels">
 
                     <div className="channel-titles">
                         <div className="channel-title">
-                            <span><i className='fa fa-music' aria-hidden="true"></i></span>
+                            <span>
+                                <i className='fa fa-music' aria-hidden="true" />
+                            </span>
                             <span>CH 0</span>
                         </div>
                         <div className="channel-title">
-                            <span><i className='fa fa-music' aria-hidden="true"></i></span>
+                            <span>
+                                <i className='fa fa-music' aria-hidden="true" />
+                            </span>
                             <span>CH 1</span>
                         </div>
                         <div className="channel-title">
-                            <span><i className='fa fa-music' aria-hidden="true"></i></span>
+                            <span>
+                                <i className='fa fa-music' aria-hidden="true" />
+                            </span>
                             <span>CH 2</span>
                         </div>
                         <div className="channel-title">
-                            <span><i className='fa fa-superpowers' aria-hidden="true"></i></span>
+                            <span>
+                                <i
+                                    className='fa fa-superpowers'
+                                    aria-hidden="true"
+                                />
+                            </span>
                             <span>CH 3</span>
                         </div>
                     </div>
 
-                    <div className="channel-patterns">
+                    <div
+                        ref={el => this.channelsCt = el}
+                        className="channel-patterns"
+                        id="channel-patterns"
+                    >
                         <div>
-                            <ChannelRow
-                                channel={0}
-                                editingFx={activeFx===0}
-                            />
-                            <ChannelRow
-                                channel={1}
-                                editingFx={activeFx===1}
-                            />
-                            <ChannelRow
-                                channel={2}
-                                editingFx={activeFx===2}
-                            />
-                            <ChannelRow
-                                channel={3}
-                                editingFx={activeFx===3}
-                            />
+                            {this.getChannelRows(activeFx)}
                         </div>
+                        <div
+                            id="insert-indicator"
+                            style={dropIndicatorStyle}
+                        ></div>
                     </div>
 
                     <div className="channel-fx-box">
-                        <button className={`channel-fx ${ activeFx === 0 ? 'active' : '' }`} onClick={ () => this.openChannelFx(0) }>FX</button>
-                        <button className={`channel-fx ${ activeFx === 1 ? 'active' : '' }`} onClick={ () => this.openChannelFx(1) }>FX</button>
-                        <button className={`channel-fx ${ activeFx === 2 ? 'active' : '' }`} onClick={ () => this.openChannelFx(2) }>FX</button>
-                        <button className={`channel-fx ${ activeFx === 3 ? 'active' : '' }`} onClick={ () => this.openChannelFx(3) }>FX</button>
+                        {this.getChannelFxButtons(activeFx)}
                     </div>
 
                 </div>
