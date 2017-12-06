@@ -1,7 +1,9 @@
 import { connect } from 'react-redux'
 import SongEditorView from './SongEditorView'
 
-const mapStateToProps = ({ fx, songIsPlaying, songName, songRepeat, songState }) => {
+const mapStateToProps = (state) => {
+    const { fx, songIsPlaying, songName, songRepeat, songState } = state
+
     return {
         fxStatus: fx.status,
         songIsPlaying,

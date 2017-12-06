@@ -14,7 +14,8 @@ class PatternRow extends React.Component {
         })
     }
 
-    // when the delete dialog is confirmed hide the dialog and delete the pattern
+    // when the delete dialog is confirmed hide the dialog and delete the
+    // pattern
     onConfirmClick = () => {
         this.hideDialog()
         this.props.deletePattern(this.props.pattern.id)
@@ -35,10 +36,19 @@ class PatternRow extends React.Component {
         this.props.setActivePattern(pattern)
     }
 
-    // handles the dragging of a pattern tickbar element
-    onDragStart (e, id, type) {
+    /**
+     * Handles the dragging of a pattern tickbar element
+     * @param {Event} e The drag event
+     * @param {*} pattern The pattern being dragged
+     */
+    onDragStart (e, pattern) {
+        const { id, type } = pattern
+
+        // add data to the drag event used by the drop handler
         e.dataTransfer.setData('patternId', id)
         e.dataTransfer.setData('type', type)
+        // cache the drag source for other views to reference
+        this.props.setDragSource(pattern)
     }
 
     render () {
@@ -71,7 +81,7 @@ class PatternRow extends React.Component {
                 <span className="pattern-list-item-tickbar">
                     <span
                         draggable = { true }
-                        onDragStart = { e => { this.onDragStart(e, id, type) } }
+                        onDragStart = { e => { this.onDragStart(e, pattern) } }
                         data-pattern-id = { id }
                         className = {tickbarCls}
                         style = {tickbarStyle}
@@ -80,7 +90,10 @@ class PatternRow extends React.Component {
                 <span
                     className = "pattern-list-item-buttons"
                 >
-                    <Color pattern={pattern} setPatternColor={ setPatternColor } />
+                    <Color
+                        pattern={pattern}
+                        setPatternColor={setPatternColor}
+                    />
                     <ConfirmDelete
                         onTargetClick={this.onDeleteClick}
                         onConfirmClick={this.onConfirmClick}

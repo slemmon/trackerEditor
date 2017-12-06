@@ -107,6 +107,7 @@
             display: flex;
             border: 1px solid #00969c;
             margin-left: 1px;
+            position: relative;
 
             > * {
                 flex: 1;
@@ -172,4 +173,52 @@
 
 .beingdragged {
     opacity: 0.5;
+    transform: scale(0.8);
+    transition: all .200ms;
+
+    span {
+        display: none;
+    }
+}
+
+.will-delete:before,
+.copy-pattern:before {
+    content: '\f05e';
+    font: normal normal normal 15px/1 FontAwesome;
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+    top: -1px;
+}
+
+.will-delete:before {
+    content: '\f05e';
+}
+
+.copy-pattern:before {
+    content: '\f0fe';
+}
+
+
+#insert-indicator {
+    position: absolute;
+    width: 0;
+    height: 10px;
+    color: red;
+    pointer-events: none;
+    overflow: visible;
+    font: normal normal normal 10px/1 FontAwesome;
+
+    &:before {
+        content: '\f078';
+        position: absolute;
+        top: -100%;
+        transform: translateX(-50%);
+    }
+    &:after {
+        content: '\f077';
+        position: absolute;
+        bottom: -100%;
+        transform: translateX(-50%);
+    }
 }
