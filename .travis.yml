@@ -1,4 +1,4 @@
-sudo: false
+# sudo: false
 language: node_js
 node_js:
 - lts/*
@@ -8,17 +8,18 @@ node_js:
 # branches:
 #   only:
 #   - master
-notifications:
-  email: false
-before_script:
-- echo "process npm prune"
-- npm prune
+# notifications:
+#   email: false
+# before_script:
+# - echo "process npm prune"
+# - npm prune
 script:
 - npm run build
 # after_success:
 # - bash ./.bin/deploy.sh
 before_deploy:
 - echo "before_deploy"
+
 deploy:
   provider: pages
   local_dir: docs
@@ -26,5 +27,6 @@ deploy:
   github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
   on:
     all_branches: true
+
 after_deploy:
 - echo "after_deploy"
