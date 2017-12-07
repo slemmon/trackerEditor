@@ -4,7 +4,8 @@ set -e # exit with nonzero exit code if anything fails
 echo $TRAVIS_BRANCH
 echo " \n"
 echo $TRAVIS_PULL_REQUEST
-if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ]]; then
+#if [[ $TRAVIS_BRANCH == "master" && $TRAVIS_PULL_REQUEST == "false" ]]; then
+if [ $TRAVIS_BRANCH == "master" ]; then
 
 echo "Starting to update gh-pages\n"
 
