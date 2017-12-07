@@ -2,9 +2,9 @@ sudo: false
 language: node_js
 node_js:
 - lts/*
-cache:
-  directories:
-  - node_modules
+# cache:
+#   directories:
+#   - node_modules
 branches:
   only:
   - master
@@ -23,7 +23,7 @@ env:
   # - GH_TOKEN: 2XC7ItviggwBnwHOdOoAwVx7gUry5CK9Ib97ZujVRogCdA4K2Rd2BWoJEbPJvf0ind4pczt4GvqbZzmsWcIP8ZvmwAanCwYcF+ddzrshK7eZfuq3sc+/19jzkRynHAtjsp4KgThHYLHvhGNe3tDBcxBMnhRNPGfc96r7TncDMGCxAr/WtwIAtMovKxDcDbfMPLi4Rp4HMHxdh6xGrrNpw22x8S3DherJjChH5joBrMEHYlI0TQu8fjRoN8ir4DOznnqqMCnQEDRFk6i9Ri2ouppaKzbGCyYWp33UZyxpM2TteFjtu0+zTKBQlg7dmT8UNO6ki/zahT0vjCWBYALM9BB91zO7VLPPFnrjcq5fqbIY4NzQauvsKaboLAv/MzCc8wsnnG/rkitknVTV+EA+8j8EPF+YfO46Z/AIPHBBnh2Vv24WEYJ8MeWADnxmCTs9D+c7MjCZaERvLQzxfsgSFwAx/X8hpZfJOCR9YhjHaji0RTcZ0/QY1fJLyfhYHciRFEvhnNc4L4B46CR0wEYh6xZKv2K5sP6VLSUYF0jv18CPQbiI+9G780YN262wBeRSstFJVsfW4DxRRqvqWiCzc+zV71hc5HeAb1kZE8b0hhFM23X2XmLu3cmcsFlKqY7Tg59QK3RiVrtklx4sEs7keR1llZD3Xw5RRKOtUxwJO0I=
 deploy:
   provider: pages
-  local_dir: docs
+  # local_dir: docs
   skip_cleanup: true
   github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
   on:
