@@ -10,6 +10,8 @@ branches:
   - master
 notifications:
   email: false
+install:
+- npm install
 before_script:
 - npm prune
 script:
