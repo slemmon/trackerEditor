@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export NODE_ENV=develop
-
+ls
 rm -R docs
 mkdir docs
 mkdir docs/css

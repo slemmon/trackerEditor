@@ -10,6 +10,8 @@ branches:
   - master
 notifications:
   email: false
+before_script:
+- npm prune
 script:
 - npm run build
 after_success:
