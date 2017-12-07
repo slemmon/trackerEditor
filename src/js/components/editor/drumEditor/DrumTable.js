@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import isEqual from 'lodash.isEqual'
+import isEqual from 'lodash.isequal'
 import Pointer from './Pointer'
 
 class DrumTable extends Component {
