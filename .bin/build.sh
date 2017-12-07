@@ -1,7 +1,6 @@
 #!/bin/bash
 
 export NODE_ENV=develop
-ls
 rm -R docs
 mkdir docs
 mkdir docs/css
@@ -23,6 +22,9 @@ cp -r src/images docs/images
 cp mockups/sketch01.png docs/images
 
 echo "starting browserify"
+cd node_modules
+ls
+cd ..
 node_modules/.bin/browserify -e src/js/index.js -o "docs/js/app.js" -t [ babelify ]
 echo "starting node-sass"
 node_modules/.bin/node-sass src/css -o docs/css
