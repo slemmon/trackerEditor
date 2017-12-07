@@ -10,9 +10,9 @@ node_js:
 #   - master
 # notifications:
 #   email: false
-# before_script:
-# - echo "process npm prune"
-# - npm prune
+before_script:
+- echo "process npm prune"
+- npm prune
 script:
 - npm run build
 # after_success:
