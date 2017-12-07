@@ -24,7 +24,7 @@ deploy:
   provider: pages
   local_dir: docs
   skip_cleanup: true
-  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+  github_token: gh-pages # Set in travis-ci.org dashboard
   # on:
   #   all_branches: true
 
